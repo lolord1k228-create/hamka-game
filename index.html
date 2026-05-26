@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>🐹 hamka v0.3.6</title>
+    <title>🐹 hamka v0.3.7</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -239,9 +239,17 @@ function openEventChest(cost) {
             else { homa += 120; reward = '120 хом (титул вже є)'; }
         }
         else if (r < 95) { homa += 500; reward = '500 хом'; }
-        else {
+        else if (r < 99.7) {
             if (!myTitles.includes('ĹÈŤOʻ')) { myTitles.push('ĹÈŤOʻ'); newTitlesToday++; reward = 'титул "ĹÈŤOʻ"'; }
             else { homa += 300; reward = '300 хом (титул вже є)'; }
+        }
+        else {  // 0.3% шанс (від 99.7 до 100)
+            if (!myTitles.includes('солнечний мальчик')) { 
+                myTitles.push('солнечний мальчик'); 
+                newTitlesToday++; 
+                reward = '☀️ титул "солнечний мальчик"'; 
+            }
+            else { homa += 1000; reward = '1000 хом (титул вже є)'; }
         }
     }
     
@@ -521,7 +529,7 @@ function updateQuestProgress() {
             case 'newGif': q.progress = newGifsToday; break;
             case 'morseUse': q.progress = morseUsesToday; break;
             case 'earnHoma': q.progress = homaEarnedToday; break;
-            case 'reachLevel': q.progress = (accLvl >= q.target) ? 1 : 0; break;
+            case 'reachLevel': q.progress = Math.max(0, accLvl - 1); break;
             case 'buyAutoTap': q.progress = boughtAutoTapToday; break;
             case 'casinoWins': q.progress = casinoWinsToday; break;
             case 'newTitle': q.progress = newTitlesToday; break;
@@ -749,8 +757,64 @@ async function executeAdminAction() {
     } catch (e) { console.error(e); toast('❌ Помилка: ' + e.message); }
 }
 
+// Вибір теми та титула у профілі
+function buildProfile(){
+    const a=document.getElementById('profile-area');
+    const titleNames={
+        king:'👑 Король',lord:'🗡️ Лорд',knight:'🛡️ Лицар',hamka:'🐹 Хамка',pro:'Профі',player:'Гравець',noob:'Новачок',none:'Без титулу',
+        'летний':'🏖️ Літній','ĹÈŤOʻ':'💜 ĹÈŤOʻ','солнечний мальчик':'☀️ Сонячний хлопчик'
+    };
+    const currentTitleName = titleNames[curTitle] || curTitle;
+    
+    let html = '<div class="profile-header"><div class="avatar">'+curGif+'</div><div class="name">'+userName+'</div><div class="level">'+currentTitleName+' | ⭐ Рівень '+accLvl+'</div></div>';
+    html += '<div class="profile-stats"><div class="profile-stat"><div class="value">💰 '+coins+'</div>Монети</div><div class="profile-stat"><div class="value">🟣 '+homa+'</div>Хоми</div><div class="profile-stat"><div class="value">👆 '+totalTaps+'</div>Тапів</div><div class="profile-stat"><div class="value">💪 x'+tapPow.toFixed(1)+'</div>Сила</div></div>';
+    html += '<div class="card" style="margin-top:6px"><b>🎒 Інвентар</b><br><small>Гіфки: '+myGifs.join(' ')+'</small><br><small>Титули: '+myTitles.filter(t=>t!=='none').map(t=>titleNames[t]||t).join(', ')+'</small></div>';
+    
+    // Вибір титула
+    html += '<div class="card" style="margin-top:6px"><b>🏅 Вибрати титул</b><br><select id="titleSelect" style="width:100%;background:#1a1a1d;color:#fff;border:1px solid #333;padding:6px;border-radius:4px;margin:4px 0">';
+    myTitles.forEach(title => {
+        const selected = title === curTitle ? 'selected' : '';
+        html += `<option value="${title}" ${selected}>${titleNames[title] || title}</option>`;
+    });
+    html += '</select><button class="btn btn-g btn-block btn-sm" onclick="changeTitle()">Змінити титул</button></div>';
+    
+    // Вибір теми
+    html += '<div class="card" style="margin-top:6px"><b>🎨 Вибрати тему</b><br><div class="color-dots">';
+    const themes = [
+        {color:'#00ff88', name:'Зелена'},
+        {color:'#ef4444', name:'Червона'},
+        {color:'#3b82f6', name:'Синя'},
+        {color:'#f97316', name:'Помаранчева'},
+        {color:'#a855f7', name:'Фіолетова'},
+        {color:'#ec4899', name:'Рожева'},
+        {color:'#fbbf24', name:'Золота'}
+    ];
+    themes.forEach(theme => {
+        html += `<div class="color-dot" style="background:${theme.color}" onclick="chTheme('${theme.color}')" title="${theme.name}"></div>`;
+    });
+    html += '</div><small>Натисніть на колір, щоб змінити тему</small></div>';
+    
+    if(currentNick) html += '<button class="btn btn-r btn-block btn-sm" onclick="logout()">🚪 Вийти</button>';
+    
+    a.innerHTML = html;
+}
+
+function changeTitle(){
+    const select = document.getElementById('titleSelect');
+    if (!select) return;
+    const newTitle = select.value;
+    if (myTitles.includes(newTitle)) {
+        curTitle = newTitle;
+        updAll();
+        saveG();
+        toast('✅ Титул змінено!');
+        buildProfile(); // оновити відображення
+    } else {
+        toast('❌ У вас немає цього титулу');
+    }
+}
+
 function buildVip(){const v=document.getElementById('vip-area');if(isAdmin||inv.includes('VIP')){v.innerHTML='<div><b style="color:#00ff88;font-size:10px">🎨 Гіфка (вибір)</b><div class="gif-row" id="styleGifGrid"></div><b style="color:#00ff88;font-size:10px;display:block;margin-top:6px">🎨 Колір теми</b><div class="color-dots"><div class="color-dot active" style="background:#00ff88" onclick="chTheme(\'#00ff88\')"></div><div class="color-dot" style="background:#ef4444" onclick="chTheme(\'#ef4444\')"></div><div class="color-dot" style="background:#3b82f6" onclick="chTheme(\'#3b82f6\')"></div></div><b style="color:#00ff88;font-size:10px;display:block;margin-top:6px">💻 Консоль</b><div class="console-box" id="consoleOutput">Готово. /help</div><input type="text" class="console-inp" id="consoleInput" placeholder="Команда..."><button class="btn btn-g btn-sm btn-block" onclick="execConsole()">▶ Виконати</button>'; if(isAdmin){ v.innerHTML+='<button class="btn btn-o btn-block btn-sm" onclick="openAdminPanel()" style="margin-top:4px">🔧 Адмін панель</button>'; } v.innerHTML+='</div>'; renderStyleGifs(); }else{v.innerHTML='<h3 style="color:#ef4444;text-align:center;font-size:10px">🔒 Потрібен VIP (20000💰)</h3>';} }
-function buildProfile(){const a=document.getElementById('profile-area');const titleNames={king:'👑 Король',lord:'🗡️ Лорд',knight:'🛡️ Лицар',hamka:'🐹 Хамка',pro:'Профі',player:'Гравець',noob:'Новачок',none:'Без титулу','летний':'🏖️ Літній','ĹÈŤOʻ':'💜 ĹÈŤOʻ'};const currentTitleName=titleNames[curTitle]||curTitle;a.innerHTML='<div class="profile-header"><div class="avatar">'+curGif+'</div><div class="name">'+userName+'</div><div class="level">'+currentTitleName+' | ⭐ Рівень '+accLvl+'</div></div><div class="profile-stats"><div class="profile-stat"><div class="value">💰 '+coins+'</div>Монети</div><div class="profile-stat"><div class="value">🟣 '+homa+'</div>Хоми</div><div class="profile-stat"><div class="value">👆 '+totalTaps+'</div>Тапів</div><div class="profile-stat"><div class="value">💪 x'+tapPow.toFixed(1)+'</div>Сила</div></div><div class="card" style="margin-top:6px"><b>🎒 Інвентар</b><br><small>Гіфки: '+myGifs.join(' ')+'</small><br><small>Титули: '+myTitles.filter(t=>t!=='none').map(t=>titleNames[t]||t).join(', ')+'</small></div>';if(currentNick)a.innerHTML+='<button class="btn btn-r btn-block btn-sm" onclick="logout()">🚪 Вийти</button>';}
 function buildTop(){const a=document.getElementById('top-area');a.innerHTML='<div class="card"><b>🏆 Топ гравців (за XP)</b></div><p style="color:#888;text-align:center;font-size:9px">Завантаження...</p>';db.ref('users').orderByChild('xp').limitToLast(20).once('value').then(snap=>{const sorted=[];snap.forEach(child=>{const data=child.val();if(data&&typeof data.xp==='number') sorted.push({key:child.key,...data});});sorted.sort((a,b)=>(b.xp||0)-(a.xp||0));let h='<div class="card"><b>🏆 Топ гравців (за XP)</b></div>';if(sorted.length===0){h+='<p style="color:#888;text-align:center;font-size:9px">Немає даних</p>';}else{sorted.slice(0,20).forEach((data,i)=>{const rank=i+1;const rankClass=rank===1?'rank-1':rank===2?'rank-2':rank===3?'rank-3':'';let displayName=data.name;if(!displayName) displayName=data.key.replace('nick_','').replace('tg_','').replace('guest_user','Гість');const avatar=data.avatar||'🐹';const lvl=data.lvl||1;const xpVal=data.xp||0;const medal=rank<=3?['🥇','🥈','🥉'][i]:rank;h+=`<div class="top-item"><div class="rank ${rankClass}" style="background:${rankClass?'':'#333'}">${medal}</div><div style="flex:1"><b>${avatar} ${displayName}</b><br><small style="color:#888">⭐ ${lvl} рівень | XP: ${xpVal}</small></div><div style="color:#fbbf24;font-weight:700">💰 ${data.coins||0}</div></div>`;});}a.innerHTML=h;updateTopTitles();}).catch(err=>{a.innerHTML='<div class="card"><b>🏆 Топ гравців</b></div><p style="color:#888;text-align:center;font-size:9px">Помилка завантаження</p>';console.error(err);});}
 function renderStyleGifs(){const s=document.getElementById('styleGifGrid');if(!s)return;s.innerHTML=GIFS.map(g=>'<div class="gif-cell '+(curGif===g.id?'sel':'')+' '+(myGifs.includes(g.id)?'':'locked')+'" onclick="selGif(\''+g.id+'\')">'+g.e+'</div>').join('');}
 function chTheme(c){document.documentElement.style.setProperty('--main',c);}
