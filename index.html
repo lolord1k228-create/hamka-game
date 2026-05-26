@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>🐹 hamka v0.3.4</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+</head>
+<body>
+<div class="app" id="app">
+    <div id="authScreen">
+        <h2>🐹 hamka</h2>
+        <input type="text" id="authNick" placeholder="Нікнейм" autocomplete="off">
+        <input type="password" id="authPass" placeholder="Пароль">
+        <button class="btn btn-g" onclick="handleLogin()">Увійти</button>
+        <button class="btn btn-o" onclick="handleRegister()">Зареєструватися</button>
+        <button class="btn btn-b" onclick="loginWithTelegram()" id="tgLoginBtn" style="display:none;">🚀 Увійти через Telegram</button>
+        <div class="link" onclick="authAsGuest()">Грати без реєстрації</div>
+    </div>
+
+    <div id="game" style="display:none;flex-direction:column;height:100%">
+        <div class="top-bar"><span>🐹 <span id="userName">Гравець</span></span><span style="color:#ec4899;font-size:10px">🟣 <span id="homaDisp">0</span></span></div>
+        <div class="tab-nav"><button class="active" onclick="switchTab('games',this)">🎮</button><button onclick="switchTab('shop',this)">🛒</button><button onclick="switchTab('vip',this)">👑</button><button onclick="switchTab('profile',this)">👤</button><button onclick="switchTab('top',this)">🏆</button></div>
+        <div class="content-area" id="contentArea"></div>
+        <div id="offlineBonus" class="offline-bonus" style="display:none"></div>
+        <div class="energy-bar" style="width:90%;margin:0 auto"><div class="energy-fill" id="energyFill" style="width:100%"></div></div>
+        <div class="stats-row">⚡ <span id="energyText">400</span>/<span id="maxEnergyText">400</span></div>
+        <div class="bal" id="balance">💰 50</div>
+        <div class="xp-info">⭐ Рів <span id="lvlDisp">1</span> | XP: <span id="xpDisp">0</span>/200</div>
+        <div class="xp-bar" style="width:90%;margin:0 auto"><div class="xp-fill" id="xpFill" style="width:0%"></div></div>
+        <div class="promo-row"><input type="text" id="promoInp" placeholder="🎁 Промокод"><button class="btn btn-g btn-sm" onclick="activatePromo()">OK</button></div>
+    </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="game.js"></script>
+</body>
+</html>
