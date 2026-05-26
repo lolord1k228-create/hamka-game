@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>🐹 hamka v0.3.5</title>
+    <title>🐹 hamka v0.3.6</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -144,6 +144,7 @@ let eventHoma = 0;
 let megaQuest = null;
 let megaQuestProgress = 0;
 let megaQuestLevel = 1;
+let lastFreeBoss = 0; // час останньої битви з безкоштовним босом
 
 const MEGA_QUEST_TYPES = [
     {type:'taps', desc:'Натисніть тап {0} разів', baseTarget:100},
@@ -202,7 +203,7 @@ function openEventChest(cost) {
     let reward = '';
     const r = Math.random() * 100;
 
-    if (cost === 10) {
+    if (cost === 1) {  // малий ящик – 1 івенхом
         if (r < 34) { homa += 5; reward = '5 хом'; }
         else if (r < 60) { homa += 20; reward = '20 хом'; }
         else if (r < 75) {
@@ -222,7 +223,7 @@ function openEventChest(cost) {
             if (!myTitles.includes('ĹÈŤOʻ')) { myTitles.push('ĹÈŤOʻ'); newTitlesToday++; reward = 'титул "ĹÈŤOʻ"'; }
             else { homa += 50; reward = '50 хом (титул вже є)'; }
         }
-    } else if (cost === 300) {
+    } else if (cost === 10) {  // великий ящик – 10 івенхомів
         if (r < 20) { homa += 50; reward = '50 хом'; }
         else if (r < 40) { homa += 150; reward = '150 хом'; }
         else if (r < 55) {
@@ -252,8 +253,8 @@ function renderEvent() {
     if (!a) return;
     let html = '<div class="center-game"><h3 style="color:#ec4899">🌸 Івент: Літній бум</h3>';
     html += `<div class="card"><b>🪙 Івенхоми:</b> ${eventHoma}</div>`;
-    html += `<div class="card"><b>📦 Івенхоум</b> (10 івенхом)<br><button class="btn btn-o btn-sm" onclick="openEventChest(10)">Відкрити (10)</button></div>`;
-    html += `<div class="card"><b>📦 Великий івенхоум</b> (300 івенхом)<br><small>Покращені шанси!</small><br><button class="btn btn-o btn-sm" onclick="openEventChest(300)">Відкрити (300)</button></div>`;
+    html += `<div class="card"><b>📦 Івенхоум</b> (1 івенхом)<br><button class="btn btn-o btn-sm" onclick="openEventChest(1)">Відкрити (1)</button></div>`;
+    html += `<div class="card"><b>📦 Великий івенхоум</b> (10 івенхомів)<br><small>Покращені шанси!</small><br><button class="btn btn-o btn-sm" onclick="openEventChest(10)">Відкрити (10)</button></div>`;
     if (megaQuest) {
         const prog = Math.min(megaQuestProgress, megaQuest.target);
         html += `<div class="card"><b>🏆 Мегаквест ${megaQuestLevel}</b><br>${megaQuest.desc}<br>
@@ -266,32 +267,119 @@ function renderEvent() {
     a.innerHTML = html;
 }
 
-// ---- ДЕННІ КВЕСТИ ----
+// ---- БЕЗКОШТОВНИЙ БОС ----
+function fightFreeBoss() {
+    const now = Date.now();
+    if (now - lastFreeBoss < 600000) { // 10 хвилин
+        const left = Math.ceil((600000 - (now - lastFreeBoss)) / 60000);
+        toast(`⏳ Зачекайте ще ${left} хв`);
+        return;
+    }
+    lastFreeBoss = now;
+    saveG();
+    toast('⚔️ Безкоштовний бос...');
+    setTimeout(() => {
+        let chance = 0.4 + accLvl * 0.02 + luck * 0.05;
+        if (Math.random() < Math.min(chance, 0.9)) {
+            const rewards = ['gif', 'homa', 'title', 'chest'];
+            const reward = rewards[Math.floor(Math.random() * rewards.length)];
+            if (reward === 'gif') {
+                const available = GIFS.filter(g => !myGifs.includes(g.id) && !g.homa);
+                if (available.length > 0) { const gif = available[Math.floor(Math.random() * available.length)]; myGifs.push(gif.id); toast('🎨 Отримано гіфку: ' + gif.e); newGifsToday++; }
+                else { homa += 30; homaEarnedToday += 30; toast('🟣 +30 Хом (всі гіфки зібрані)'); }
+            } else if (reward === 'homa') { const amount = Math.floor(Math.random() * 150) + 50; homa += amount; homaEarnedToday += amount; toast('🟣 +' + amount + ' Хом'); }
+            else if (reward === 'title') {
+                const specialTitles = ['king', 'lord', 'knight', 'hamka', 'pro', 'player', 'noob'];
+                const newTitle = specialTitles[Math.floor(Math.random() * specialTitles.length)];
+                if (!myTitles.includes(newTitle)) { myTitles.push(newTitle); toast('🏅 Отримано титул: ' + newTitle); newTitlesToday++; }
+                else { homa += 80; homaEarnedToday += 80; toast('🟣 +80 Хом (титул вже є)'); }
+            } else if (reward === 'chest') {
+                const chestTypes = ['common', 'rare', 'epic'];
+                const ct = chestTypes[Math.floor(Math.random() * chestTypes.length)];
+                chests[ct] = (chests[ct] || 0) + 1;
+                toast('🎁 Отримано ящик: ' + ct);
+            }
+        } else { toast('❌ Поразка... Спробуйте пізніше!'); }
+        bossKillsToday++; updateQuestProgress(); updateMegaQuestProgress(); updAll(); saveG();
+        renderBosses(); // оновити кнопку безкоштовного боса
+    }, 2000);
+}
+
+function fightBoss(cost) {
+    if (homa < cost) { toast('❌ Недостатньо 🟣'); return; }
+    homa -= cost; updHoma(); saveG();
+    toast('⚔️ Битва з босом...');
+    setTimeout(() => {
+        let chance = 0.3 + accLvl * 0.03 + luck * 0.05;
+        if (cost >= 5000) chance += 0.05;
+        if (cost >= 15000) chance += 0.1;
+        if (Math.random() < Math.min(chance, 0.85)) {
+            const rewards = ['gif', 'homa', 'title', 'chest'];
+            const reward = rewards[Math.floor(Math.random() * rewards.length)];
+            if (reward === 'gif') {
+                const available = GIFS.filter(g => !myGifs.includes(g.id) && !g.homa);
+                if (available.length > 0) { const gif = available[Math.floor(Math.random() * available.length)]; myGifs.push(gif.id); toast('🎨 Отримано гіфку: ' + gif.e); newGifsToday++; }
+                else { homa += 50; homaEarnedToday += 50; toast('🟣 +50 Хом (всі гіфки зібрані)'); }
+            } else if (reward === 'homa') { const amount = Math.floor(Math.random() * 200) + 100 + cost; homa += amount; homaEarnedToday += amount; toast('🟣 +' + amount + ' Хом'); }
+            else if (reward === 'title') {
+                const specialTitles = ['king', 'lord', 'knight', 'hamka', 'pro', 'player', 'noob'];
+                const newTitle = specialTitles[Math.floor(Math.random() * specialTitles.length)];
+                if (!myTitles.includes(newTitle)) { myTitles.push(newTitle); toast('🏅 Отримано титул: ' + newTitle); newTitlesToday++; }
+                else { homa += 100; homaEarnedToday += 100; toast('🟣 +100 Хом (титул вже є)'); }
+            } else if (reward === 'chest') {
+                const chestTypes = ['common', 'rare', 'epic', 'legendary', 'mythic'];
+                const ct = chestTypes[Math.floor(Math.random() * chestTypes.length)];
+                chests[ct] = (chests[ct] || 0) + 1;
+                toast('🎁 Отримано ящик: ' + ct);
+            }
+        } else { toast('❌ Поразка... Спробуйте ще!'); }
+        bossKillsToday++; updateQuestProgress(); updateMegaQuestProgress(); updAll(); saveG();
+    }, 2000);
+}
+function renderBosses() {
+    const a = document.getElementById('game-area');
+    const now = Date.now();
+    const freeCooldown = Math.max(0, Math.ceil((600000 - (now - lastFreeBoss)) / 60000));
+    const freeBtnText = now - lastFreeBoss >= 600000 ? '⚔️ Битися (0🟣)' : `⏳ ${freeCooldown} хв`;
+    const freeBtnDisabled = now - lastFreeBoss < 600000 ? 'disabled' : '';
+
+    a.innerHTML = `<div class="center-game" style="gap:4px"><h3 style="color:#f97316">🐉 БОСИ</h3>
+        <div class="card" style="width:100%"><b>🆓 Безкоштовний бос</b><br><small>Раз на 10 хв | Нагорода: гіфка/хоми/титул/ящик</small><br><button class="btn btn-b btn-block btn-sm" onclick="fightFreeBoss()" ${freeBtnDisabled}>${freeBtnText}</button></div>
+        <div class="card" style="width:100%"><b>👾 Бос 1</b><br><small>Вхід: 100🟣 | Нагорода: гіфка/хоми/титул/ящик</small><br><button class="btn btn-o btn-block btn-sm" onclick="fightBoss(100)">Битися (100🟣)</button></div>
+        <div class="card" style="width:100%"><b>👾 Бос 2</b><br><small>Вхід: 500🟣 | Підвищений шанс</small><br><button class="btn btn-o btn-block btn-sm" onclick="fightBoss(500)">Битися (500🟣)</button></div>
+        <div class="card" style="width:100%"><b>👾 Бос 3</b><br><small>Вхід: 2000🟣 | Легендарна нагорода</small><br><button class="btn btn-o btn-block btn-sm" onclick="fightBoss(2000)">Битися (2000🟣)</button></div>
+        <div class="card" style="width:100%"><b>👾 Бос 4</b><br><small>Вхід: 5000🟣 | Дуже рідкісна нагорода</small><br><button class="btn btn-o btn-block btn-sm" onclick="fightBoss(5000)">Битися (5000🟣)</button></div>
+        <div class="card" style="width:100%"><b>👾 Бос 5</b><br><small>Вхід: 15000🟣 | Епічна нагорода</small><br><button class="btn btn-o btn-block btn-sm" onclick="fightBoss(15000)">Битися (15000🟣)</button></div>
+        <div class="card" style="width:100%"><b>👾 Бос 6</b><br><small>Вхід: 50000🟣 | Міфічна нагорода</small><br><button class="btn btn-o btn-block btn-sm" onclick="fightBoss(50000)">Битися (50000🟣)</button></div>
+    </div>`;
+}
+
+// ---- ДЕННІ КВЕСТИ (БЕЗ ХОМ) ----
 const QUEST_POOL = [
-    {desc:'Натисніть тап 100 разів', type:'taps', target:100, rewardType:'coins', rewardValue:800},
-    {desc:'Заробіть 2000 монет', type:'earnCoins', target:2000, rewardType:'homa', rewardValue:10},
+    {desc:'Натисніть тап 100 разів', type:'taps', target:100, rewardType:'coins', rewardValue:1500},
+    {desc:'Заробіть 2000 монет', type:'earnCoins', target:2000, rewardType:'xp', rewardValue:300},
     {desc:'Зіграйте в казино 5 разів', type:'casinoPlays', target:5, rewardType:'chest', rewardValue:'common'},
-    {desc:'Відкрийте 2 ящики', type:'openChest', target:2, rewardType:'coins', rewardValue:2000},
+    {desc:'Відкрийте 2 ящики', type:'openChest', target:2, rewardType:'coins', rewardValue:3000},
     {desc:'Переможіть боса 2 рази', type:'bossKill', target:2, rewardType:'gif', rewardValue:'random'},
-    {desc:'Прокачайте рівень до наступного', type:'levelUp', target:1, rewardType:'xp', rewardValue:500},
-    {desc:'Отримайте нову гіфку', type:'newGif', target:1, rewardType:'coins', rewardValue:1500},
+    {desc:'Прокачайте рівень до наступного', type:'levelUp', target:1, rewardType:'xp', rewardValue:800},
+    {desc:'Отримайте нову гіфку', type:'newGif', target:1, rewardType:'coins', rewardValue:2500},
     {desc:'Використайте морзянку 1 раз', type:'morseUse', target:1, rewardType:'title', rewardValue:'hamka'},
     {desc:'Зробіть 10 обертань у казино', type:'casinoPlays', target:10, rewardType:'chest', rewardValue:'rare'},
-    {desc:'Натисніть тап 500 разів', type:'taps', target:500, rewardType:'homa', rewardValue:50},
-    {desc:'Зберіть 10 хом', type:'earnHoma', target:10, rewardType:'coins', rewardValue:5000},
+    {desc:'Натисніть тап 500 разів', type:'taps', target:500, rewardType:'eventHoma', rewardValue:5},
+    {desc:'Зберіть 10 хом', type:'earnHoma', target:10, rewardType:'coins', rewardValue:8000},
     {desc:'Відкрийте 3 ящики', type:'openChest', target:3, rewardType:'gif', rewardValue:'random'},
     {desc:'Досягніть рівня 5', type:'reachLevel', target:5, rewardType:'chest', rewardValue:'epic'},
-    {desc:'Купіть покращення "Авто тап" 1 раз', type:'buyAutoTap', target:1, rewardType:'coins', rewardValue:1500},
+    {desc:'Купіть покращення "Авто тап" 1 раз', type:'buyAutoTap', target:1, rewardType:'coins', rewardValue:2000},
     {desc:'Виграйте в казино 3 рази', type:'casinoWins', target:3, rewardType:'title', rewardValue:'player'},
     {desc:'Зробіть 1000 тапів', type:'taps', target:1000, rewardType:'gif', rewardValue:'random'},
-    {desc:'Отримайте титул (будь-який)', type:'newTitle', target:1, rewardType:'coins', rewardValue:3000},
+    {desc:'Отримайте титул (будь-який)', type:'newTitle', target:1, rewardType:'coins', rewardValue:5000},
     {desc:'Відкрийте Хома-ящик 1 раз', type:'openHomaChest', target:1, rewardType:'chest', rewardValue:'homa_chest'},
     {desc:'Переможіть боса 5 разів', type:'bossKill', target:5, rewardType:'title', rewardValue:'lord'},
-    {desc:'Купіть 1 гіфку за монети', type:'buyGif', target:1, rewardType:'coins', rewardValue:1000},
-    {desc:'Зберіть 5000 монет', type:'earnCoins', target:5000, rewardType:'homa', rewardValue:20},
+    {desc:'Купіть 1 гіфку за монети', type:'buyGif', target:1, rewardType:'coins', rewardValue:2000},
+    {desc:'Зберіть 5000 монет', type:'earnCoins', target:5000, rewardType:'xp', rewardValue:1000},
     {desc:'Використайте морзянку 2 рази', type:'morseUse', target:2, rewardType:'chest', rewardValue:'legendary'},
     {desc:'Досягніть рівня 10', type:'reachLevel', target:10, rewardType:'gif', rewardValue:'random'},
-    {desc:'Відкрийте 5 ящиків', type:'openChest', target:5, rewardType:'coins', rewardValue:15000},
+    {desc:'Відкрийте 5 ящиків', type:'openChest', target:5, rewardType:'coins', rewardValue:20000},
 ];
 
 let dailyQuests = [];
@@ -325,13 +413,14 @@ function loadD(d){
     morseUsesToday = d.morseUsesToday || 0; newGifsToday = d.newGifsToday || 0; newTitlesToday = d.newTitlesToday || 0; coinsEarnedToday = d.coinsEarnedToday || 0; homaEarnedToday = d.homaEarnedToday || 0;
     levelUpsToday = d.levelUpsToday || 0; boughtAutoTapToday = d.boughtAutoTapToday || 0; boughtGifToday = d.boughtGifToday || 0; homaChestsOpenedToday = d.homaChestsOpenedToday || 0;
     eventHoma = d.eventHoma || 0; megaQuest = d.megaQuest || null; megaQuestProgress = d.megaQuestProgress || 0; megaQuestLevel = d.megaQuestLevel || 1;
+    lastFreeBoss = d.lastFreeBoss || 0;
 }
-function defD(){ coins=50; inv=[]; autoTap=0; tapLvl=1; totalTaps=0; luck=1.0; curGif='🐹'; myGifs=['🐹']; accXP=0; accLvl=1; myTitles=['none']; curTitle='none'; coinBoost=1.0; autoXP=0; maxEn=400; curEn=400; homa=0; saperHW=0; casinoW=0; tapPow=1.0; crit=0; morseUsed=0; buyCount={maxEnergy:0,autoXP:0,autoTap:0,energyRegen:0,upgradeTap:0,coinBoostB:0,energyUp:0,tapPowerB:0,critChanceB:0,luckB:0}; lastSaveTime=Date.now(); isAdmin=0; chests = {common:0, rare:0, epic:0, legendary:0, mythic:0, homa_chest:0, homa10_chest:0}; morseLastLevel=0; dailyQuests=[]; lastQuestDate=''; tapsToday=0; casinoPlaysToday=0; casinoWinsToday=0; chestsOpenedToday=0; bossKillsToday=0; morseUsesToday=0; newGifsToday=0; newTitlesToday=0; coinsEarnedToday=0; homaEarnedToday=0; levelUpsToday=0; boughtAutoTapToday=0; boughtGifToday=0; homaChestsOpenedToday=0; eventHoma=0; megaQuest=null; megaQuestProgress=0; megaQuestLevel=1; }
+function defD(){ coins=50; inv=[]; autoTap=0; tapLvl=1; totalTaps=0; luck=1.0; curGif='🐹'; myGifs=['🐹']; accXP=0; accLvl=1; myTitles=['none']; curTitle='none'; coinBoost=1.0; autoXP=0; maxEn=400; curEn=400; homa=0; saperHW=0; casinoW=0; tapPow=1.0; crit=0; morseUsed=0; buyCount={maxEnergy:0,autoXP:0,autoTap:0,energyRegen:0,upgradeTap:0,coinBoostB:0,energyUp:0,tapPowerB:0,critChanceB:0,luckB:0}; lastSaveTime=Date.now(); isAdmin=0; chests = {common:0, rare:0, epic:0, legendary:0, mythic:0, homa_chest:0, homa10_chest:0}; morseLastLevel=0; dailyQuests=[]; lastQuestDate=''; tapsToday=0; casinoPlaysToday=0; casinoWinsToday=0; chestsOpenedToday=0; bossKillsToday=0; morseUsesToday=0; newGifsToday=0; newTitlesToday=0; coinsEarnedToday=0; homaEarnedToday=0; levelUpsToday=0; boughtAutoTapToday=0; boughtGifToday=0; homaChestsOpenedToday=0; eventHoma=0; megaQuest=null; megaQuestProgress=0; megaQuestLevel=1; lastFreeBoss=0; }
 function saveG(){
     lastSaveTime=Date.now();
     const d={coins,inv,autoTap,tapLvl,totalTaps,totalWon,luck,curGif,myGifs,xp:accXP,lvl:accLvl,myTitles,curTitle,coinBoost,autoXP,maxEn,curEn,homa,saperHW,casinoW,tapPow,crit,morseUsed,buyCount,lastSaveTime,name:userName,avatar:curGif, isAdmin, chests, morseLastLevel,
         dailyQuests, lastQuestDate, tapsToday, casinoPlaysToday, casinoWinsToday, chestsOpenedToday, bossKillsToday, morseUsesToday, newGifsToday, newTitlesToday, coinsEarnedToday, homaEarnedToday, levelUpsToday, boughtAutoTapToday, boughtGifToday, homaChestsOpenedToday,
-        eventHoma, megaQuest, megaQuestProgress, megaQuestLevel
+        eventHoma, megaQuest, megaQuestProgress, megaQuestLevel, lastFreeBoss
     };
     if(currentNick) d.passwordHash = savedPassHash;
     db.ref('users/'+getUserKey()).set(d);
@@ -449,22 +538,25 @@ function claimQuestReward(index) {
     q.claimed = true;
     switch (q.rewardType) {
         case 'coins': coins += q.rewardValue; toast(`✅ +${q.rewardValue}💰`); break;
-        case 'homa': homa += q.rewardValue; homaEarnedToday += q.rewardValue; toast(`✅ +${q.rewardValue}🟣`); break;
         case 'xp': addXP(q.rewardValue); toast(`✅ +${q.rewardValue} XP`); break;
         case 'gif':
             if (q.rewardValue === 'random') {
                 const available = GIFS.filter(g => !myGifs.includes(g.id) && !g.homa);
                 if (available.length > 0) { const gif = available[Math.floor(Math.random() * available.length)]; myGifs.push(gif.id); newGifsToday++; toast('🎨 Отримано гіфку: ' + gif.e); }
-                else { homa += 100; homaEarnedToday += 100; toast('🟣 +100 Хом (всі гіфки зібрані)'); }
+                else { coins += 5000; toast('💰 +5000 (всі гіфки зібрані)'); }
             }
             break;
         case 'title':
             if (!myTitles.includes(q.rewardValue)) { myTitles.push(q.rewardValue); newTitlesToday++; toast('🏅 Отримано титул: ' + q.rewardValue); }
-            else { homa += 50; homaEarnedToday += 50; toast('🟣 +50 Хом (титул вже є)'); }
+            else { coins += 3000; toast('💰 +3000 (титул вже є)'); }
             break;
         case 'chest':
             if (chests[q.rewardValue] !== undefined) { chests[q.rewardValue] = (chests[q.rewardValue] || 0) + 1; toast('🎁 Отримано ящик: ' + q.rewardValue); }
             else { coins += 5000; toast('💰 +5000 (невідомий ящик)'); }
+            break;
+        case 'eventHoma':
+            eventHoma += q.rewardValue;
+            toast(`✅ +${q.rewardValue} івенхом`);
             break;
         default: toast('❌ Невідома нагорода');
     }
@@ -482,11 +574,11 @@ function renderQuests() {
             let rewardText = '';
             switch (q.rewardType) {
                 case 'coins': rewardText = `💰${q.rewardValue}`; break;
-                case 'homa': rewardText = `🟣${q.rewardValue}`; break;
                 case 'xp': rewardText = `⭐${q.rewardValue} XP`; break;
                 case 'gif': rewardText = `🎨 Випадкова гіфка`; break;
                 case 'title': rewardText = `🏅 Титул "${q.rewardValue}"`; break;
                 case 'chest': rewardText = `🎁 Ящик "${q.rewardValue}"`; break;
+                case 'eventHoma': rewardText = `🪙 ${q.rewardValue} івенхом`; break;
                 default: rewardText = '❓';
             }
             html += `<div class="card" style="width:100%"><b>${q.desc}</b><br><small>Прогрес: ${prog}/${q.target}</small><div style="background:#333;height:5px;border-radius:3px;margin:4px 0"><div style="width:${(prog/q.target)*100}%;height:100%;background:#00ff88;border-radius:3px"></div></div><small>Нагорода: ${rewardText}</small><br><button class="btn btn-sm ${claimed?'btn-g':'btn-o'}" onclick="claimQuestReward(${i})" ${!done || claimed ? 'disabled' : ''}>${claimed ? 'Отримано' : (done ? 'Забрати' : 'Виконати')}</button></div>`;
@@ -550,50 +642,6 @@ function startDot(e){e.preventDefault();if(morseTimeout){clearTimeout(morseTimeo
 function startDash(e){e.preventDefault();if(morseTimeout){clearTimeout(morseTimeout);morseTimeout=null;}morseSeq+='-';document.getElementById('morseDisp').textContent=morseSeq;}
 function stopMorse(e){e.preventDefault();morseTimeout=setTimeout(()=>{if(morseSeq.length>0){const l=Object.keys({I:'..',M:'--',A:'.-'}).find(k=>({I:'..',M:'--',A:'.-'})[k]===morseSeq);if(l){morseCode+=l;}morseSeq='';}},800);}
 function submitMorse(){if(morseCode==='IMA'){coins+=20000;addXP(1000); morseLastLevel = accLvl; morseUsed++; morseUsesToday++; updateQuestProgress(); updateMegaQuestProgress(); morseCode='';updBal();saveG();toast('✅ +20000💰');openGame('morse');}}
-
-// Боси
-function fightBoss(cost) {
-    if (homa < cost) { toast('❌ Недостатньо 🟣'); return; }
-    homa -= cost; updHoma(); saveG();
-    toast('⚔️ Битва з босом...');
-    setTimeout(() => {
-        let chance = 0.3 + accLvl * 0.03 + luck * 0.05;
-        if (cost >= 5000) chance += 0.05;
-        if (cost >= 15000) chance += 0.1;
-        if (Math.random() < Math.min(chance, 0.85)) {
-            const rewards = ['gif', 'homa', 'title', 'chest'];
-            const reward = rewards[Math.floor(Math.random() * rewards.length)];
-            if (reward === 'gif') {
-                const available = GIFS.filter(g => !myGifs.includes(g.id) && !g.homa);
-                if (available.length > 0) { const gif = available[Math.floor(Math.random() * available.length)]; myGifs.push(gif.id); toast('🎨 Отримано гіфку: ' + gif.e); newGifsToday++; }
-                else { homa += 50; homaEarnedToday += 50; toast('🟣 +50 Хом (всі гіфки зібрані)'); }
-            } else if (reward === 'homa') { const amount = Math.floor(Math.random() * 200) + 100 + cost; homa += amount; homaEarnedToday += amount; toast('🟣 +' + amount + ' Хом'); }
-            else if (reward === 'title') {
-                const specialTitles = ['king', 'lord', 'knight', 'hamka', 'pro', 'player', 'noob'];
-                const newTitle = specialTitles[Math.floor(Math.random() * specialTitles.length)];
-                if (!myTitles.includes(newTitle)) { myTitles.push(newTitle); toast('🏅 Отримано титул: ' + newTitle); newTitlesToday++; }
-                else { homa += 100; homaEarnedToday += 100; toast('🟣 +100 Хом (титул вже є)'); }
-            } else if (reward === 'chest') {
-                const chestTypes = ['common', 'rare', 'epic', 'legendary', 'mythic'];
-                const ct = chestTypes[Math.floor(Math.random() * chestTypes.length)];
-                chests[ct] = (chests[ct] || 0) + 1;
-                toast('🎁 Отримано ящик: ' + ct);
-            }
-        } else { toast('❌ Поразка... Спробуйте ще!'); }
-        bossKillsToday++; updateQuestProgress(); updateMegaQuestProgress(); updAll(); saveG();
-    }, 2000);
-}
-function renderBosses() {
-    const a = document.getElementById('game-area');
-    a.innerHTML = `<div class="center-game" style="gap:4px"><h3 style="color:#f97316">🐉 БОСИ</h3>
-        <div class="card" style="width:100%"><b>👾 Бос 1</b><br><small>Вхід: 100🟣 | Нагорода: гіфка/хоми/титул/ящик</small><br><button class="btn btn-o btn-block btn-sm" onclick="fightBoss(100)">Битися (100🟣)</button></div>
-        <div class="card" style="width:100%"><b>👾 Бос 2</b><br><small>Вхід: 500🟣 | Підвищений шанс</small><br><button class="btn btn-o btn-block btn-sm" onclick="fightBoss(500)">Битися (500🟣)</button></div>
-        <div class="card" style="width:100%"><b>👾 Бос 3</b><br><small>Вхід: 2000🟣 | Легендарна нагорода</small><br><button class="btn btn-o btn-block btn-sm" onclick="fightBoss(2000)">Битися (2000🟣)</button></div>
-        <div class="card" style="width:100%"><b>👾 Бос 4</b><br><small>Вхід: 5000🟣 | Дуже рідкісна нагорода</small><br><button class="btn btn-o btn-block btn-sm" onclick="fightBoss(5000)">Битися (5000🟣)</button></div>
-        <div class="card" style="width:100%"><b>👾 Бос 5</b><br><small>Вхід: 15000🟣 | Епічна нагорода</small><br><button class="btn btn-o btn-block btn-sm" onclick="fightBoss(15000)">Битися (15000🟣)</button></div>
-        <div class="card" style="width:100%"><b>👾 Бос 6</b><br><small>Вхід: 50000🟣 | Міфічна нагорода</small><br><button class="btn btn-o btn-block btn-sm" onclick="fightBoss(50000)">Битися (50000🟣)</button></div>
-    </div>`;
-}
 
 // Ящики
 function buyChest(type) { const prices = {common:30000, rare:100000, epic:500000, legendary:2000000, mythic:10000000, homa_chest:500, homa10_chest:4500}; const price = prices[type]; if (!price) return; if (type.startsWith('homa')) { if (homa < price) { toast('❌ Недостатньо 🟣'); return; } homa -= price; } else { if (coins < price) { toast('❌ Недостатньо 💰'); return; } coins -= price; } chests[type] = (chests[type] || 0) + 1; updAll(); saveG(); toast('✅ Ящик додано в інвентар'); renderShopBox(); }
