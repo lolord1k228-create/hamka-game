@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>🐹 hamka – ринок виправлено</title>
+    <title>🐹 hamka – покращений лута в гачах</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -142,7 +142,7 @@ const LETNI_TITLES=['Спека','Пляжний відпочинок','Моро
 const R={common:{p:1000},rare:{p:3000},superrare:{p:8000},epic:{p:50000},mythic:{p:150000},legendary:{p:500000}};
 const LEVELS=[{l:1,x:0,rw:0},{l:2,x:200,rw:20},{l:3,x:600,rw:40},{l:4,x:1500,rw:80},{l:5,x:4000,rw:160},{l:6,x:10000,rw:320},{l:7,x:25000,rw:640},{l:8,x:60000,rw:1280},{l:9,x:150000,rw:2500},{l:10,x:400000,rw:5000},{l:11,x:1000000,rw:10000},{l:12,x:2500000,rw:25000},{l:13,x:6000000,rw:50000},{l:14,x:15000000,rw:100000},{l:15,x:40000000,rw:250000},{l:16,x:100000000,rw:500000},{l:17,x:250000000,rw:1000000},{l:18,x:600000000,rw:2500000},{l:19,x:1500000000,rw:5000000},{l:20,x:4000000000,rw:10000000}];
 
-let coins=50,inv=[],autoTap=0,tapLvl=1,totalTaps=0,totalWon=0,luck=1.0,lastSpin=0,isAdmin=0,coinBoost=1.0,autoXP=0,homa=0,maxEn=400,curEn=400,accXP=0,accLvl=1,userName='Гравець',myGifs=['🐹'],curGif='🐹',myTitles=['none'],curTitle='none',morseUsed=0,tapPow=1.0,crit=0;
+let coins=50,inv=[],autoTap=0,tapLvl=1,totalTaps=0,totalWon=0,luck=1.0,lastSpin=0,isAdmin=0,coinBoost=1.0,autoXP=0,homa=0,maxEn=400,curEn=400,accXP=0,accLvl=1,userName='Гравець',myGifs=['🐹'],curGif='🐹',myTitles=['none'],curTitle='none',morseUsed=0,tapPow=1.0,crit=0, hideFromTop=false;
 let buyCount={maxEnergy:0,autoXP:0,autoTap:0,energyRegen:0,upgradeTap:0,coinBoostB:0,energyUp:0,tapPowerB:0,critChanceB:0,luckB:0};
 let chests = {common:0, rare:0, epic:0, legendary:0, mythic:0, homa_chest:0, homa10_chest:0, summer_box:0, event_box:0};
 let morseLastLevel=0;
@@ -178,6 +178,7 @@ function loadD(d){
     isAdmin=d.isAdmin||0; userName=d.name||userName;
     eventHoma=d.eventHoma||0; lastFreeBoss=d.lastFreeBoss||0; eventTapCooldown=d.eventTapCooldown||0; lastTimeReward=d.lastTimeReward||0;
     morseLastLevel=d.morseLastLevel||0; lastSaveTime=d.lastSaveTime||Date.now(); currentTheme=d.currentTheme||'#00ff88';
+    hideFromTop = d.hideFromTop === true;
     document.documentElement.style.setProperty('--main', currentTheme);
 }
 function defD(){
@@ -186,10 +187,11 @@ function defD(){
     buyCount={maxEnergy:0,autoXP:0,autoTap:0,energyRegen:0,upgradeTap:0,coinBoostB:0,energyUp:0,tapPowerB:0,critChanceB:0,luckB:0};
     chests={common:0,rare:0,epic:0,legendary:0,mythic:0,homa_chest:0,homa10_chest:0,summer_box:0,event_box:0};
     isAdmin=0; userName='Гравець'; eventHoma=0; lastFreeBoss=0; eventTapCooldown=0; lastTimeReward=0; morseLastLevel=0; lastSaveTime=Date.now(); currentTheme='#00ff88';
+    hideFromTop = false;
 }
 function saveG(){
     lastSaveTime=Date.now();
-    const d={coins,inv,autoTap,tapLvl,totalTaps,totalWon,luck,curGif,myGifs,xp:accXP,lvl:accLvl,myTitles,curTitle,coinBoost,autoXP,maxEn,curEn,homa,tapPow,crit,morseUsed,buyCount,chests,isAdmin,name:userName,eventHoma,lastFreeBoss,eventTapCooldown,lastTimeReward,morseLastLevel,lastSaveTime,currentTheme};
+    const d={coins,inv,autoTap,tapLvl,totalTaps,totalWon,luck,curGif,myGifs,xp:accXP,lvl:accLvl,myTitles,curTitle,coinBoost,autoXP,maxEn,curEn,homa,tapPow,crit,morseUsed,buyCount,chests,isAdmin,name:userName,eventHoma,lastFreeBoss,eventTapCooldown,lastTimeReward,morseLastLevel,lastSaveTime,currentTheme, hideFromTop};
     if(currentNick) d.passwordHash=savedPassHash;
     db.ref('users/'+getUserKey()).set(d);
 }
@@ -246,7 +248,7 @@ function tapClick(e){
     if(totalTaps%10===0) saveG();
 }
 
-// ========== ІНШІ МІНІ-ІГРИ (скорочено, але всі працюють) ==========
+// ========== ІНШІ МІНІ-ІГРИ ==========
 function spin(){ const bet=Number(document.getElementById('bet')?.value||0); if(!bet||coins<bet)return; coins-=bet; updBal(); const s1=document.getElementById('s1'),s2=document.getElementById('s2'),s3=document.getElementById('s3'); const em=["🍒","🍋","🍉","⭐","7️⃣","💎"]; const int=setInterval(()=>{s1.textContent=em[Math.floor(Math.random()*6)];s2.textContent=em[Math.floor(Math.random()*6)];s3.textContent=em[Math.floor(Math.random()*6)];},80); setTimeout(()=>{clearInterval(int); let x=em[Math.floor(Math.random()*6)],y=em[Math.floor(Math.random()*6)],z=em[Math.floor(Math.random()*6)]; s1.textContent=x;s2.textContent=y;s3.textContent=z; let win=0; if(x===y&&y===z)win=bet*3; else if(x===y||y===z||x===z)win=Math.floor(bet*1.5); win=Math.floor(win*luck); coins+=win; if(win>0) addXP(Math.floor(win/5)); updBal(); saveG();},1200); }
 function chBet(d){const i=document.getElementById('bet');if(i)i.value=Math.max(1,parseInt(i.value||10)+d);}
 let saperGrid=[],sRows=7,sCols=7,sMines=10,sFlags=0,sOver=0,sRevealed=0,sBet=0,sMult=1.3,sFirst=1,saperMode='reveal',saperGameActive=false;
@@ -300,7 +302,7 @@ function renderEventUI(){
     a.innerHTML=`<div class="center-game"><h3 style="color:#ec4899">🌸 Івент: Літній бум</h3><div class="card"><b>🪙 Івенхоми:</b> ${eventHoma.toFixed(2)}</div><div class="card"><b>📦 Івенхоум</b> (1)<br><button class="btn btn-o btn-sm" onclick="openEventChest(1)">Відкрити (1)</button></div><div class="card"><b>📦 Великий івенхоум</b> (10)<br><button class="btn btn-o btn-sm" onclick="openEventChest(10)">Відкрити (10)</button></div><div class="card"><b>⚡ Тапалка івенхомів</b><br><button class="btn btn-b btn-sm" onclick="tapEventHoma()">Тапнути (+0.25)</button><br><small>Раз на 5 секунд</small></div></div>`;
 }
 
-// ========== ЯЩИКИ ТА БОКСИ ==========
+// ========== ЯЩИКИ ТА БОКСИ (ПОКРАЩЕНО ЛУТ) ==========
 function buySummerBox(){
     if(eventHoma<200){ toast('❌ Потрібно 200 🪙 івенхомів'); return; }
     eventHoma-=200;
@@ -318,20 +320,20 @@ function buyEventBox(){
 function giveSummerReward(){
     const r=Math.random();
     let rewardText='';
-    if(r<0.3){
+    if(r<0.25){ // збільшено шанс на гіфку
         let newGif=LETNI_GIFS[Math.floor(Math.random()*LETNI_GIFS.length)];
         myGifs.push(newGif.id);
         rewardText=`🎨 Отримано літню гіфку: ${newGif.e}`;
-    } else if(r<0.55){
+    } else if(r<0.45){ // титул
         let newTitle=LETNI_TITLES[Math.floor(Math.random()*LETNI_TITLES.length)];
         myTitles.push(newTitle);
         rewardText=`🏅 Отримано літній титул: "${newTitle}"`;
-    } else if(r<0.8){
-        let amount=Math.floor(Math.random()*350)+150;
+    } else if(r<0.7){
+        let amount=Math.floor(Math.random()*500)+200; // більше хом
         homa+=amount;
         rewardText=`🟣 +${amount} Хом`;
     } else {
-        let amount=Math.floor(Math.random()*100)+50;
+        let amount=Math.floor(Math.random()*150)+80; // більше івенхом
         eventHoma+=amount;
         rewardText=`🌸 +${amount} Івенхомів`;
     }
@@ -341,31 +343,169 @@ function giveSummerReward(){
 function giveEventBoxReward(){
     const r=Math.random();
     let rewardText='';
-    if(r<0.25){
+    if(r<0.2){
         let freeGifs=GIFS.filter(g=>!g.homa);
         if(freeGifs.length){
             let g=freeGifs[Math.floor(Math.random()*freeGifs.length)];
             myGifs.push(g.id);
             rewardText=`🎨 Гіфка ${g.e}`;
         } else {
-            homa+=10;
-            rewardText=`🟣 +10 Хом`;
+            homa+=20;
+            rewardText=`🟣 +20 Хом`;
         }
-    } else if(r<0.5){
-        let amount=Math.floor(Math.random()*300)+100;
+    } else if(r<0.4){
+        let amount=Math.floor(Math.random()*500)+200;
         homa+=amount;
         rewardText=`🟣 +${amount} Хом`;
-    } else if(r<0.75){
-        let amount=Math.floor(Math.random()*150)+50;
+    } else if(r<0.6){
+        let amount=Math.floor(Math.random()*200)+100;
         eventHoma+=amount;
         rewardText=`🌸 +${amount} Івенхомів`;
-    } else {
-        let amount=Math.floor(Math.random()*50000)+20000;
+    } else if(r<0.8){
+        let amount=Math.floor(Math.random()*100000)+50000;
         coins+=amount;
         rewardText=`💰 +${amount} монет`;
+    } else {
+        // рідкісний лут: +20 макс енергії або легендарна гіфка
+        if(Math.random()<0.5){
+            let bonus=Math.floor(Math.random()*30)+15;
+            maxEn+=bonus;
+            curEn+=bonus;
+            rewardText=`⚡ +${bonus} до макс. енергії (тепер ${maxEn})`;
+        } else {
+            let rareGifs=GIFS.filter(g=>g.r==='legendary'||g.r==='mythic');
+            if(rareGifs.length){
+                let g=rareGifs[Math.floor(Math.random()*rareGifs.length)];
+                myGifs.push(g.id);
+                rewardText=`🎨 Легендарна/Міфічна гіфка ${g.e}`;
+            } else {
+                let g=GIFS[Math.floor(Math.random()*GIFS.length)];
+                myGifs.push(g.id);
+                rewardText=`🎨 Гіфка ${g.e}`;
+            }
+        }
     }
     toast(`🎁 Івент-бокс: ${rewardText}`);
     updAll(); saveG();
+}
+function openChestLogic(type){
+    let reward=''; const rand=Math.random();
+    if(type==='homa_chest'){ // 500 хом
+        if(rand<0.2){
+            let freeGifs=GIFS.filter(g=>!g.homa);
+            if(freeGifs.length){
+                let g=freeGifs[Math.floor(Math.random()*freeGifs.length)];
+                myGifs.push(g.id);
+                reward=`🎨 Гіфка ${g.e}`;
+            } else {
+                homa+=100;
+                reward=`🟣 +100 Хом (всі гіфки)`;
+            }
+        } else if(rand<0.35){
+            let titles=['Хома-магнат','Щедрий дарувальник','Володар хом'];
+            let newTitle=titles[Math.floor(Math.random()*titles.length)];
+            if(!myTitles.includes(newTitle)){
+                myTitles.push(newTitle);
+                reward=`🏅 Титул "${newTitle}"`;
+            } else {
+                homa+=60;
+                reward=`🟣 +60 Хом (титул вже є)`;
+            }
+        } else if(rand<0.55){
+            let amt=Math.floor(Math.random()*150)+50;
+            eventHoma+=amt;
+            reward=`🌸 +${amt} Івенхомів`;
+            renderEventUI();
+        } else if(rand<0.7){
+            let amt=Math.floor(Math.random()*120000)+50000;
+            coins+=amt;
+            reward=`💰 +${amt} монет`;
+        } else if(rand<0.85){
+            let bonus=Math.floor(Math.random()*70)+30;
+            maxEn+=bonus;
+            curEn+=bonus;
+            reward=`⚡ +${bonus} макс. енергії (тепер ${maxEn})`;
+        } else {
+            let amt=Math.floor(Math.random()*500)+250;
+            homa+=amt;
+            reward=`🟣 +${amt} Хом`;
+        }
+    } else if(type==='homa10_chest'){ // 4500 хом
+        if(rand<0.25){
+            let rareGifs=GIFS.filter(g=>g.r==='legendary'||g.r==='mythic');
+            if(rareGifs.length){
+                let g=rareGifs[Math.floor(Math.random()*rareGifs.length)];
+                myGifs.push(g.id);
+                reward=`🎨 Легендарна/Міфічна гіфка ${g.e}`;
+            } else {
+                let freeGifs=GIFS.filter(g=>!g.homa);
+                let g=freeGifs[Math.floor(Math.random()*freeGifs.length)];
+                myGifs.push(g.id);
+                reward=`🎨 Гіфка ${g.e}`;
+            }
+        } else if(rand<0.4){
+            let titles=['Хома-король','Благодійник','Золоті руки'];
+            let newTitle=titles[Math.floor(Math.random()*titles.length)];
+            if(!myTitles.includes(newTitle)){
+                myTitles.push(newTitle);
+                reward=`🏅 Титул "${newTitle}"`;
+            } else {
+                homa+=100;
+                reward=`🟣 +100 Хом (титул вже є)`;
+            }
+        } else if(rand<0.6){
+            let amt=Math.floor(Math.random()*250)+100;
+            eventHoma+=amt;
+            reward=`🌸 +${amt} Івенхомів`;
+            renderEventUI();
+        } else if(rand<0.75){
+            let amt=Math.floor(Math.random()*200000)+100000;
+            coins+=amt;
+            reward=`💰 +${amt} монет`;
+        } else if(rand<0.9){
+            let bonus=Math.floor(Math.random()*120)+60;
+            maxEn+=bonus;
+            curEn+=bonus;
+            reward=`⚡ +${bonus} макс. енергії (тепер ${maxEn})`;
+        } else {
+            let amt=Math.floor(Math.random()*1000)+600;
+            homa+=amt;
+            reward=`🟣 +${amt} Хом`;
+        }
+    } else { 
+        // Звичайні ящики (common, rare, epic, legendary, mythic) – ПОКРАЩЕНО ЛУТ
+        const chestPrice = {common:30000, rare:100000, epic:500000, legendary:2000000, mythic:10000000}[type];
+        if(rand<0.3){ // 30% – велика сума монет (від 50% до 200% вартості)
+            let amt = Math.floor(chestPrice * (0.5 + Math.random() * 1.5));
+            coins += amt;
+            reward = `💰 +${amt} монет`;
+        } else if(rand<0.55){ // 25% – хоми (від 5 до 50)
+            let amt = Math.floor(Math.random() * 45) + 5;
+            homa += amt;
+            reward = `🟣 +${amt} Хом`;
+        } else if(rand<0.75){ // 20% – випадкова гіфка (можна дублікат)
+            let freeGifs = GIFS.filter(g=>!g.homa);
+            if(freeGifs.length){
+                let g = freeGifs[Math.floor(Math.random()*freeGifs.length)];
+                myGifs.push(g.id);
+                reward = `🎨 Гіфка ${g.e}`;
+            } else {
+                homa += 15;
+                reward = `🟣 +15 Хом (всі гіфки)`;
+            }
+        } else if(rand<0.9){ // 15% – івенхоми
+            let amt = Math.floor(Math.random() * 80) + 20;
+            eventHoma += amt;
+            reward = `🌸 +${amt} Івенхомів`;
+            renderEventUI();
+        } else { // 10% – бонус енергії
+            let bonus = Math.floor(Math.random() * 40) + 15;
+            maxEn += bonus;
+            curEn += bonus;
+            reward = `⚡ +${bonus} макс. енергії (тепер ${maxEn})`;
+        }
+    }
+    toast(reward);
 }
 function openChestFromInventory(chestType, element){
     if(!chests[chestType] || chests[chestType]<=0){ toast('Немає ящиків'); return; }
@@ -392,33 +532,6 @@ function openChestFromInventory(chestType, element){
         updAll();
     }
 }
-function openChestLogic(type){
-    let reward=''; const rand=Math.random();
-    if(type==='homa_chest'||type==='homa10_chest'){
-        let amt=Math.floor(Math.random()*200)+100;
-        if(type==='homa10_chest') amt*=10;
-        homa+=amt; reward=`🟣 +${amt} Хом`;
-    } else {
-        if(rand<0.4){
-            homa++; reward='🟣 +1 Хома';
-        } else if(rand<0.8){
-            let free=GIFS.filter(g=>!g.homa);
-            if(free.length){
-                let g=free[Math.floor(Math.random()*free.length)];
-                myGifs.push(g.id);
-                reward=`🎨 Гіфка ${g.e}`;
-            } else {
-                homa+=2;
-                reward='🟣 +2 Хоми';
-            }
-        } else {
-            let back=Math.floor(({common:30000,rare:100000,epic:500000,legendary:2000000,mythic:10000000}[type]||30000)*0.5);
-            coins+=back;
-            reward=`💰 +${back} монет`;
-        }
-    }
-    toast(reward);
-}
 function buyChest(type){
     const p={common:30000,rare:100000,epic:500000,legendary:2000000,mythic:10000000,homa_chest:500,homa10_chest:4500,summer_box:0,event_box:0}[type];
     if(type==='summer_box'){ buySummerBox(); return; }
@@ -444,7 +557,7 @@ function renderShopBox(){
     `;
 }
 
-// ========== РИНОК (ВИПРАВЛЕНО) ==========
+// ========== РИНОК (БЕЗ ЗМІН) ==========
 async function loadMarketListings() {
     const container = document.getElementById('market-content');
     if(!container) return;
@@ -485,7 +598,6 @@ async function refreshMarket(){
 }
 async function listItemOnMarket(itemType, itemId, price) {
     if(!itemId || price <= 0) { toast('Вкажіть ціну > 0'); return; }
-    // Перевірка наявності та видалення одного екземпляра
     if(itemType === 'gif'){
         const index = myGifs.indexOf(itemId);
         if(index === -1) { toast('У вас немає такої гіфки'); return; }
@@ -568,7 +680,7 @@ function renderMarketTab(){
 function renderInventoryTab(){
     const container = document.getElementById('inventory-area');
     if(!container) return;
-    const titleNames={king:'👑 Король',lord:'🗡️ Лорд',knight:'🛡️ Лицар',hamka:'🐹 Хамка',pro:'Профі',player:'Гравець',noob:'Новачок',none:'Без титулу','летний':'🏖️ Літній','ĹÈŤOʻ':'💜 ĹÈŤOʻ','солнечний мальчик':'☀️ Сонячний хлопчик','Спека':'🔥 Спека','Пляжний відпочинок':'🏝️ Пляж','Морозиво':'🍦 Морозиво'};
+    const titleNames={king:'👑 Король',lord:'🗡️ Лорд',knight:'🛡️ Лицар',hamka:'🐹 Хамка',pro:'Профі',player:'Гравець',noob:'Новачок',none:'Без титулу','летний':'🏖️ Літній','ĹÈŤOʻ':'💜 ĹÈŤOʻ','солнечний мальчик':'☀️ Сонячний хлопчик','Спека':'🔥 Спека','Пляжний відпочинок':'🏝️ Пляж','Морозиво':'🍦 Морозиво','Хома-магнат':'🟣 Хома-магнат','Щедрий дарувальник':'🎁 Щедрий дарувальник','Володар хом':'👑 Володар хом','Хома-король':'👑 Хома-король','Благодійник':'💖 Благодійник','Золоті руки':'✨ Золоті руки'};
     let html = `<div class="card"><b>🎒 Ваш інвентар</b><br><small>Клікніть "Відкрити" для ящиків/боксів, "Продати" для будь-якого предмета</small></div>`;
     if(myGifs.length){
         html += `<div class="card"><b>🎨 Гіфки</b><div class="inventory-grid">`;
@@ -608,10 +720,19 @@ function promptSell(type, id){
 }
 
 // ========== VIP НАЛАШТУВАННЯ ==========
+function toggleHideFromTop() {
+    hideFromTop = !hideFromTop;
+    saveG();
+    toast(hideFromTop ? '👤 Ви приховані з топу' : '👑 Ви знову відображаєтесь у топі');
+    renderVipTab();
+    if (document.getElementById('tab-top').classList.contains('show')) {
+        buildTop();
+    }
+}
 function renderVipTab(){
     const container = document.getElementById('vip-area');
     if(!container) return;
-    const titleNames={king:'👑 Король',lord:'🗡️ Лорд',knight:'🛡️ Лицар',hamka:'🐹 Хамка',pro:'Профі',player:'Гравець',noob:'Новачок',none:'Без титулу','летний':'🏖️ Літній','ĹÈŤOʻ':'💜 ĹÈŤOʻ','солнечний мальчик':'☀️ Сонячний хлопчик','Спека':'🔥 Спека','Пляжний відпочинок':'🏝️ Пляж','Морозиво':'🍦 Морозиво'};
+    const titleNames={king:'👑 Король',lord:'🗡️ Лорд',knight:'🛡️ Лицар',hamka:'🐹 Хамка',pro:'Профі',player:'Гравець',noob:'Новачок',none:'Без титулу','летний':'🏖️ Літній','ĹÈŤOʻ':'💜 ĹÈŤOʻ','солнечний мальчик':'☀️ Сонячний хлопчик','Спека':'🔥 Спека','Пляжний відпочинок':'🏝️ Пляж','Морозиво':'🍦 Морозиво','Хома-магнат':'🟣 Хома-магнат','Щедрий дарувальник':'🎁 Щедрий дарувальник','Володар хом':'👑 Володар хом','Хома-король':'👑 Хома-король','Благодійник':'💖 Благодійник','Золоті руки':'✨ Золоті руки'};
     let html = `<div class="card"><b>👑 VIP налаштування</b><br><small>Змінюйте гіфку, титул, тему та використовуйте консоль</small></div>`;
     html += `<div class="card"><b>🎨 Активна гіфка:</b><div class="gif-row" id="styleGifGridVip"></div></div>`;
     html += `<div class="card"><b>🏅 Активний титул:</b><select id="titleSelectVip" style="width:100%; background:#1a1a1d; border:1px solid #333; padding:6px; border-radius:8px; color:white;">${myTitles.map(t=>`<option ${curTitle===t?'selected':''}>${titleNames[t]||t}</option>`).join('')}</select><button class="btn btn-g btn-sm btn-block" onclick="changeTitleFromVip()">Змінити титул</button></div>`;
@@ -623,6 +744,7 @@ function renderVipTab(){
         '<div class="color-dot" style="background:#ec4899" onclick="chTheme(\'#ec4899\')"></div>'+
         '</div></div>';
     html += `<div class="card"><b>💻 Консоль:</b><div class="console-box" id="consoleOutputVip">Готово. /help</div><input type="text" class="console-inp" id="consoleInputVip" placeholder="Команда..."><button class="btn btn-g btn-sm btn-block" onclick="execConsoleVip()">Виконати</button></div>`;
+    html += `<div class="card"><b>👁️ Приховування з топу</b><br><button class="btn ${hideFromTop ? 'btn-o' : 'btn-g'} btn-sm btn-block" onclick="toggleHideFromTop()">${hideFromTop ? 'Показати в топі' : 'Приховати з топу'}</button><br><small>${hideFromTop ? 'Ви зараз приховані' : 'Ви відображаєтесь у топі'}</small></div>`;
     container.innerHTML = html;
     renderStyleGifsVip();
     const inp = document.getElementById('consoleInputVip');
@@ -682,7 +804,40 @@ async function deleteAllProgress(){
     if(!confirm('Ви впевнені?')) return;
     try{ await db.ref('users/'+getUserKey()).remove(); clearAuth(); defD(); if(gameInterval) clearInterval(gameInterval); gameInterval=null; showAuthScreen(); toast('🗑️ Прогрес видалено.'); setTimeout(()=>location.reload(),1500); } catch(e){ toast('Помилка'); }
 }
-function buildTop(){ const a=document.getElementById('top-area'); a.innerHTML='<div class="card"><b>🏆 Топ гравців (за XP)</b></div><p>Завантаження...</p>'; db.ref('users').orderByChild('xp').limitToLast(20).once('value').then(snap=>{ const sorted=[]; snap.forEach(child=>{ const data=child.val(); if(data&&typeof data.xp==='number') sorted.push({key:child.key,...data}); }); sorted.sort((a,b)=>(b.xp||0)-(a.xp||0)); let h='<div class="card"><b>🏆 Топ гравців (за XP)</b></div>'; sorted.slice(0,20).forEach((data,i)=>{ const rank=i+1; const rankClass=rank===1?'rank-1':rank===2?'rank-2':rank===3?'rank-3':''; let displayName=data.name||data.key.replace('nick_','').replace('tg_','').replace('guest_user','Гість'); const avatar=data.avatar||'🐹'; const lvl=data.lvl||1; const xpVal=data.xp||0; const medal=rank<=3?['🥇','🥈','🥉'][i]:rank; h+=`<div class="top-item"><div class="rank ${rankClass}">${medal}</div><div><b>${avatar} ${displayName}</b><br><small>⭐ ${lvl} рівень | XP: ${xpVal}</small></div><div>💰 ${data.coins||0}</div></div>`; }); a.innerHTML=h; }).catch(()=>a.innerHTML='<div class="card"><b>🏆 Топ</b></div><p>Помилка</p>'); }
+function buildTop(){
+    const a=document.getElementById('top-area');
+    a.innerHTML='<div class="card"><b>🏆 Топ гравців (за XP)</b></div><p>Завантаження...</p>';
+    db.ref('users').orderByChild('xp').limitToLast(50).once('value').then(snap=>{
+        const allUsers=[];
+        snap.forEach(child=>{
+            const data=child.val();
+            if(data && typeof data.xp==='number'){
+                if(data.hideFromTop === true) return;
+                allUsers.push({key:child.key, ...data});
+            }
+        });
+        allUsers.sort((a,b)=>(b.xp||0)-(a.xp||0));
+        let h='<div class="card"><b>🏆 Топ гравців (за XP)</b></div>';
+        if(allUsers.length===0){
+            h+='<p style="color:#888;text-align:center;font-size:9px">Немає даних</p>';
+        }else{
+            allUsers.slice(0,20).forEach((data,i)=>{
+                const rank=i+1;
+                const rankClass=rank===1?'rank-1':rank===2?'rank-2':rank===3?'rank-3':'';
+                let displayName=data.name||data.key.replace('nick_','').replace('tg_','').replace('guest_user','Гість');
+                const avatar=data.avatar||'🐹';
+                const lvl=data.lvl||1;
+                const xpVal=data.xp||0;
+                const medal=rank<=3?['🥇','🥈','🥉'][i]:rank;
+                h+=`<div class="top-item"><div class="rank ${rankClass}" style="background:${rankClass?'':'#333'}">${medal}</div><div style="flex:1"><b>${avatar} ${displayName}</b><br><small style="color:#888">⭐ ${lvl} рівень | XP: ${xpVal}</small></div><div style="color:#fbbf24;font-weight:700">💰 ${data.coins||0}</div></div>`;
+            });
+        }
+        a.innerHTML=h;
+    }).catch(err=>{
+        console.error(err);
+        a.innerHTML='<div class="card"><b>🏆 Топ гравців</b></div><p style="color:#888;text-align:center;font-size:9px">Помилка завантаження</p>';
+    });
+}
 
 // ========== МАГАЗИН ==========
 function getPrice(item){ const p={maxEnergy:{base:2000,mult:1.5},autoXP:{base:5000,mult:2},autoTap:{base:300,mult:1.4},energyRegen:{base:15000,mult:2.5},upgradeTap:{base:1000,mult:1.8},coinBoostB:{base:5000,mult:2},energyUp:{base:5000,mult:1.8},tapPowerB:{base:15000,mult:2.5},critChanceB:{base:10000,mult:2},luckB:{base:3000,mult:2}}; const d=p[item]; if(!d)return 0; if(item==='upgradeTap')return Math.floor(d.base*Math.pow(d.mult,tapLvl-1)); return Math.floor(d.base*Math.pow(d.mult,buyCount[item]||0)); }
