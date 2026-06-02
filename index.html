@@ -59,7 +59,8 @@
         .color-dots{display:flex;gap:12px;margin:10px 0;justify-content:center}
         .color-dot{width:36px;height:36px;border-radius:50%;cursor:pointer;border:2px solid rgba(255,255,255,0.3);transition:0.1s}
         .color-dot:hover{transform:scale(1.1)}
-        .top-item{display:flex;align-items:center;gap:6px;padding:6px;background:#1a1a1d;border-radius:6px;margin:2px 0;font-size:9px;border:1px solid #222}
+        .top-item{display:flex;align-items:center;gap:6px;padding:6px;background:#1a1a1d;border-radius:6px;margin:2px 0;font-size:9px;border:1px solid #222;cursor:pointer;transition:0.1s}
+        .top-item:hover{background:#2a2a35}
         .top-item .rank{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:9px}
         .rank-1{background:#ffd700;color:#000;box-shadow:0 0 10px gold}
         .rank-2{background:#c0c0c0;color:#000}
@@ -76,7 +77,6 @@
         #authScreen h2{color:var(--main);margin-bottom:12px;text-shadow:0 0 10px var(--main)}
         #authScreen .btn{width:100%;max-width:280px;margin-top:4px}
         #authScreen .link{color:#3b82f6;font-size:10px;margin-top:6px;cursor:pointer}
-        /* Анімація відкриття ящика */
         .chest-open-anim{animation:openChestGacha 0.8s ease forwards;pointer-events:none;display:inline-block;position:relative}
         @keyframes openChestGacha{
             0%{transform:scale(1) rotate(0deg);opacity:1;filter:brightness(1)}
@@ -94,6 +94,33 @@
         .market-item{display:flex;justify-content:space-between;align-items:center;background:#1a1a1d;margin-bottom:6px;padding:8px;border-radius:12px;border:1px solid #333}
         .market-item .info{flex:1}
         .market-item .price{color:#fbbf24;font-weight:bold}
+        /* Модальне вікно профілю гравця */
+        .profile-modal{
+            position:fixed;
+            top:0;
+            left:0;
+            right:0;
+            bottom:0;
+            background:rgba(0,0,0,0.9);
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            z-index:1000;
+            animation:fadeIn 0.2s;
+        }
+        .profile-modal-content{
+            background:#1a1a1d;
+            border-radius:20px;
+            width:90%;
+            max-width:340px;
+            padding:20px;
+            text-align:center;
+            border:1px solid #333;
+            animation:slideUp 0.2s;
+        }
+        @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+        @keyframes slideUp{from{transform:translateY(50px);opacity:0}to{transform:translateY(0);opacity:1}}
+        .close-modal{position:absolute;top:10px;right:20px;font-size:24px;cursor:pointer;color:#888}
         .title-cyber { color: #0f0; text-shadow: 0 0 5px #0f0; font-weight: 800; }
         .title-neon { background: linear-gradient(45deg, #ff00cc, #3333ff); -webkit-background-clip: text; background-clip: text; color: transparent; }
         .title-glitch { animation: glitch 0.3s infinite; }
@@ -529,7 +556,7 @@ function renderEventUI(){
     a.innerHTML=`<div class="center-game"><h3 style="color:#ec4899">🌸 Івент: Літній бум</h3><div class="card"><b>🪙 Івенхоми:</b> ${eventHoma.toFixed(2)}</div><div class="card"><b>📦 Івенхоум</b> (1)<br><button class="btn btn-o btn-sm" onclick="openEventChest(1)">Відкрити (1)</button></div><div class="card"><b>📦 Великий івенхоум</b> (10)<br><button class="btn btn-o btn-sm" onclick="openEventChest(10)">Відкрити (10)</button></div><div class="card"><b>⚡ Тапалка івенхомів</b><br><button class="btn btn-b btn-sm" onclick="tapEventHoma()">Тапнути (+0.25)</button><br><small>Раз на 5 секунд</small></div></div>`;
 }
 
-// ========== НОВІ БОКСИ З ПОКРАЩЕНИМ ЛУТОМ (ЯК BRAWL STARS) ==========
+// ========== НОВІ БОКСИ З ПОКРАЩЕНИМ ЛУТОМ ==========
 function buySummerBox(){
     if(eventHoma<200){ toast('❌ Потрібно 200 🪙 івенхомів'); return; }
     eventHoma-=200;
@@ -559,7 +586,6 @@ function flashReward(){
         if(balDiv) balDiv.classList.remove('reward-flash');
     }, 500);
 }
-// Великий список луту для боксів (як у Brawl Stars)
 const REWARD_POOL_SUMMER = [
     { type: 'coins', chance: 0.20, min: 100000, max: 1000000, name: 'монети' },
     { type: 'coins', chance: 0.15, min: 50000, max: 300000, name: 'монети' },
@@ -1081,9 +1107,10 @@ function execConsoleVip(){
 }
 function selGif(id){
     if(hasGif(id)){
-        curGif=id;
+        curGif = id;
         updAll(); saveG();
         renderVipTab();
+        toast('Гіфку змінено');
     }
 }
 function chTheme(c){
@@ -1108,6 +1135,36 @@ async function deleteAllProgress(){
     if(!confirm('Ви впевнені?')) return;
     try{ await db.ref('users/'+getUserKey()).remove(); clearAuth(); defD(); if(gameInterval) clearInterval(gameInterval); gameInterval=null; showAuthScreen(); toast('🗑️ Прогрес видалено.'); setTimeout(()=>location.reload(),1500); } catch(e){ toast('Помилка'); }
 }
+// ========== ТОП ГРАВЦІВ З МОДАЛЬНИМ ВІКНОМ ==========
+function showPlayerProfile(playerData){
+    // Видаляємо старе модальне вікно, якщо є
+    let oldModal = document.querySelector('.profile-modal');
+    if(oldModal) oldModal.remove();
+    
+    let modal = document.createElement('div');
+    modal.className = 'profile-modal';
+    modal.innerHTML = `
+        <div class="profile-modal-content">
+            <div style="text-align:right;"><span class="close-modal" onclick="this.closest('.profile-modal').remove()">✕</span></div>
+            <div style="text-align:center;">
+                <div style="font-size:64px; filter:drop-shadow(0 0 10px ${currentTheme});">${playerData.avatar || '🐹'}</div>
+                <div style="font-size:18px; font-weight:600; margin-top:5px;">${playerData.name}</div>
+                <div style="font-size:12px; margin:5px 0;">${playerData.titleDisplay || 'Без титулу'} | ⭐ Рівень ${playerData.lvl}</div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px;">
+                    <div class="profile-stat"><div class="value">💰 ${Math.floor(playerData.coins)}</div>Монети</div>
+                    <div class="profile-stat"><div class="value">🟣 ${playerData.homa}</div>Хоми</div>
+                    <div class="profile-stat"><div class="value">🌸 ${playerData.eventHoma}</div>Івенхоми</div>
+                    <div class="profile-stat"><div class="value">👆 ${playerData.totalTaps}</div>Тапів</div>
+                    <div class="profile-stat"><div class="value">⭐ ${playerData.xp}</div>XP</div>
+                    <div class="profile-stat"><div class="value">📦 ${playerData.totalChests || 0}</div>Ящиків</div>
+                </div>
+                <button class="btn btn-sm btn-g" style="margin-top:10px;" onclick="this.closest('.profile-modal').remove()">Закрити</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    modal.onclick = (e) => { if(e.target === modal) modal.remove(); };
+}
 function buildTop(){
     const a = document.getElementById('top-area');
     if(!a) return;
@@ -1122,12 +1179,24 @@ function buildTop(){
             if(data.name && data.name.startsWith('Гість')) return;
             if(data.hideFromTop === true) return;
             if(data.autoclickFlagged === true && data.banCount > 0) return;
+            
+            // Підраховуємо кількість ящиків у гравця
+            let chestCount = 0;
+            if(data.chests){
+                for(let key in data.chests) chestCount += data.chests[key] || 0;
+            }
+            
             users.push({
                 name: data.name,
                 xp: data.xp || 0,
                 coins: data.coins || 0,
                 lvl: data.lvl || 1,
-                avatar: data.curGif || '🐹'
+                avatar: data.curGif || '🐹',
+                homa: data.homa || 0,
+                eventHoma: data.eventHoma || 0,
+                totalTaps: data.totalTaps || 0,
+                totalChests: chestCount,
+                curTitle: data.curTitle || 'none'
             });
         });
         
@@ -1137,14 +1206,27 @@ function buildTop(){
             a.innerHTML = '<div class="card"><b>🏆 Топ гравців</b></div><p style="text-align:center;color:#888">Немає даних</p>';
             return;
         }
-        let h = '<div class="card"><b>🏆 Топ гравців (за XP)</b></div>';
+        
+        let h = '<div class="card"><b>🏆 Топ гравців (за XP)</b><br><small style="color:#888;">Клікніть на гравця для деталей</small></div>';
         topUsers.forEach((user, i) => {
             const rank = i+1;
             let rankClass = '', medal = rank;
             if(rank === 1){ rankClass = 'rank-1'; medal = '🥇'; }
             else if(rank === 2){ rankClass = 'rank-2'; medal = '🥈'; }
             else if(rank === 3){ rankClass = 'rank-3'; medal = '🥉'; }
-            h += `<div class="top-item">
+            const titleDisplay = getTitleDisplay(user.curTitle).replace(/<[^>]*>/g, '');
+            h += `<div class="top-item" onclick='showPlayerProfile(${JSON.stringify({
+                name: user.name,
+                xp: user.xp,
+                coins: user.coins,
+                lvl: user.lvl,
+                avatar: user.avatar,
+                homa: user.homa,
+                eventHoma: user.eventHoma,
+                totalTaps: user.totalTaps,
+                totalChests: user.totalChests,
+                titleDisplay: titleDisplay
+            })})'>
                 <div class="rank ${rankClass}">${medal}</div>
                 <div style="flex:1"><b>${user.avatar} ${user.name}</b><br><small>⭐ Рівень ${user.lvl} | XP: ${user.xp}</small></div>
                 <div style="color:#fbbf24">💰 ${Math.floor(user.coins)}</div>
