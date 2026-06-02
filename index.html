@@ -76,8 +76,21 @@
         #authScreen h2{color:var(--main);margin-bottom:12px;text-shadow:0 0 10px var(--main)}
         #authScreen .btn{width:100%;max-width:280px;margin-top:4px}
         #authScreen .link{color:#3b82f6;font-size:10px;margin-top:6px;cursor:pointer}
-        .chest-open-anim{animation:openChest 0.5s ease forwards;pointer-events:none;display:inline-block}
-        @keyframes openChest{0%{transform:scale(1);opacity:1}30%{transform:scale(1.2) rotate(3deg)}60%{transform:scale(0.9) rotate(-3deg)}100%{transform:scale(0);opacity:0}}
+        /* Анімація відкриття ящика */
+        .chest-open-anim{animation:openChestGacha 0.8s ease forwards;pointer-events:none;display:inline-block;position:relative}
+        @keyframes openChestGacha{
+            0%{transform:scale(1) rotate(0deg);opacity:1;filter:brightness(1)}
+            20%{transform:scale(1.3) rotate(10deg);filter:brightness(1.5) drop-shadow(0 0 10px gold)}
+            50%{transform:scale(0.8) rotate(-5deg);filter:brightness(1.2)}
+            70%{transform:scale(1.1) rotate(3deg);filter:brightness(1.3) drop-shadow(0 0 15px #ffaa00)}
+            100%{transform:scale(0) rotate(0deg);opacity:0;filter:brightness(0)}
+        }
+        .reward-flash{animation:rewardFlash 0.5s ease}
+        @keyframes rewardFlash{
+            0%{background:transparent}
+            50%{background:rgba(255,215,0,0.3);text-shadow:0 0 10px gold}
+            100%{background:transparent}
+        }
         .market-item{display:flex;justify-content:space-between;align-items:center;background:#1a1a1d;margin-bottom:6px;padding:8px;border-radius:12px;border:1px solid #333}
         .market-item .info{flex:1}
         .market-item .price{color:#fbbf24;font-weight:bold}
@@ -516,7 +529,7 @@ function renderEventUI(){
     a.innerHTML=`<div class="center-game"><h3 style="color:#ec4899">🌸 Івент: Літній бум</h3><div class="card"><b>🪙 Івенхоми:</b> ${eventHoma.toFixed(2)}</div><div class="card"><b>📦 Івенхоум</b> (1)<br><button class="btn btn-o btn-sm" onclick="openEventChest(1)">Відкрити (1)</button></div><div class="card"><b>📦 Великий івенхоум</b> (10)<br><button class="btn btn-o btn-sm" onclick="openEventChest(10)">Відкрити (10)</button></div><div class="card"><b>⚡ Тапалка івенхомів</b><br><button class="btn btn-b btn-sm" onclick="tapEventHoma()">Тапнути (+0.25)</button><br><small>Раз на 5 секунд</small></div></div>`;
 }
 
-// ========== ЯЩИКИ ТА БОКСИ ==========
+// ========== НОВІ БОКСИ З ПОКРАЩЕНИМ ЛУТОМ (ЯК BRAWL STARS) ==========
 function buySummerBox(){
     if(eventHoma<200){ toast('❌ Потрібно 200 🪙 івенхомів'); return; }
     eventHoma-=200;
@@ -531,75 +544,109 @@ function buyEventBox(){
     updAll(); saveG(); renderShopBox(); 
     toast('✅ Івент-бокс в інвентарі! Відкрийте в Інвентарі');
 }
-function giveSummerReward(){
-    const r=Math.random();
-    let rewardText='';
-    if(r<0.25){
-        let newGif=LETNI_GIFS[Math.floor(Math.random()*LETNI_GIFS.length)];
-        addGif(newGif.id,1);
-        rewardText=`🎨 Отримано літню гіфку: ${newGif.e}`;
-    } else if(r<0.45){
-        let newTitle=LETNI_TITLES[Math.floor(Math.random()*LETNI_TITLES.length)];
-        addTitle(newTitle,1);
-        rewardText=`🏅 Отримано літній титул: "${newTitle}"`;
-    } else if(r<0.7){
-        let amount=Math.floor(Math.random()*500)+200;
-        homa+=amount;
-        rewardText=`🟣 +${amount} Хом`;
-    } else {
-        let amount=Math.floor(Math.random()*150)+80;
-        eventHoma+=amount;
-        rewardText=`🌸 +${amount} Івенхомів`;
-    }
-    toast(`🎁 Літній бокс: ${rewardText}`);
-    updAll(); saveG();
+function showGachaAnimation(element, callback){
+    if(!element) { callback(); return; }
+    element.classList.add('chest-open-anim');
+    setTimeout(() => {
+        callback();
+        element.classList.remove('chest-open-anim');
+    }, 800);
 }
-function giveEventBoxReward(){
-    const r=Math.random();
-    let rewardText='';
-    if(r<0.2){
-        let freeGifs=GIFS.filter(g=>!g.homa);
-        if(freeGifs.length){
-            let g=freeGifs[Math.floor(Math.random()*freeGifs.length)];
-            addGif(g.id,1);
-            rewardText=`🎨 Гіфка ${g.e}`;
-        } else {
-            homa+=20;
-            rewardText=`🟣 +20 Хом`;
-        }
-    } else if(r<0.4){
-        let amount=Math.floor(Math.random()*500)+200;
-        homa+=amount;
-        rewardText=`🟣 +${amount} Хом`;
-    } else if(r<0.6){
-        let amount=Math.floor(Math.random()*200)+100;
-        eventHoma+=amount;
-        rewardText=`🌸 +${amount} Івенхомів`;
-    } else if(r<0.8){
-        let amount=Math.floor(Math.random()*100000)+50000;
-        coins+=amount;
-        rewardText=`💰 +${amount} монет`;
-    } else {
-        if(Math.random()<0.5){
-            let bonus=Math.floor(Math.random()*30)+15;
-            maxEn+=bonus;
-            curEn+=bonus;
-            rewardText=`⚡ +${bonus} до макс. енергії (тепер ${maxEn})`;
-        } else {
-            let rareGifs=GIFS.filter(g=>g.r==='legendary'||g.r==='mythic');
-            if(rareGifs.length){
-                let g=rareGifs[Math.floor(Math.random()*rareGifs.length)];
-                addGif(g.id,1);
-                rewardText=`🎨 Легендарна/Міфічна гіфка ${g.e}`;
-            } else {
-                let g=GIFS[Math.floor(Math.random()*GIFS.length)];
-                addGif(g.id,1);
-                rewardText=`🎨 Гіфка ${g.e}`;
+function flashReward(){
+    let balDiv = document.getElementById('balance');
+    if(balDiv) balDiv.classList.add('reward-flash');
+    setTimeout(() => {
+        if(balDiv) balDiv.classList.remove('reward-flash');
+    }, 500);
+}
+// Великий список луту для боксів (як у Brawl Stars)
+const REWARD_POOL_SUMMER = [
+    { type: 'coins', chance: 0.20, min: 100000, max: 1000000, name: 'монети' },
+    { type: 'coins', chance: 0.15, min: 50000, max: 300000, name: 'монети' },
+    { type: 'homa', chance: 0.12, min: 10, max: 70, name: 'Хом' },
+    { type: 'homa', chance: 0.08, min: 5, max: 30, name: 'Хом' },
+    { type: 'energy', chance: 0.10, min: 10, max: 100, name: 'макс. енергії' },
+    { type: 'energy', chance: 0.05, min: 5, max: 50, name: 'макс. енергії' },
+    { type: 'gif', chance: 0.10, items: GIFS.filter(g=>!g.homa).concat(LETNI_GIFS), name: 'гіфку' },
+    { type: 'title', chance: 0.08, items: ['letniy', 'sunny', 'leto', 'king', 'lord', 'knight'], name: 'титул' },
+    { type: 'eventHoma', chance: 0.06, min: 20, max: 150, name: 'Івенхомів' },
+    { type: 'eventHoma', chance: 0.04, min: 10, max: 80, name: 'Івенхомів' },
+    { type: 'boost', chance: 0.02, boosts: ['tapPower', 'coinBoost', 'luck'], name: 'бустер' }
+];
+const REWARD_POOL_EVENT = [
+    { type: 'coins', chance: 0.25, min: 100000, max: 1000000, name: 'монети' },
+    { type: 'coins', chance: 0.15, min: 50000, max: 300000, name: 'монети' },
+    { type: 'homa', chance: 0.15, min: 10, max: 70, name: 'Хом' },
+    { type: 'homa', chance: 0.10, min: 5, max: 30, name: 'Хом' },
+    { type: 'energy', chance: 0.10, min: 10, max: 100, name: 'макс. енергії' },
+    { type: 'gif', chance: 0.10, items: GIFS.filter(g=>!g.homa).concat(LETNI_GIFS), name: 'гіфку' },
+    { type: 'title', chance: 0.08, items: ['cyber', 'neon', 'glitch', 'cosmic', 'void', 'fire', 'ice'], name: 'титул' },
+    { type: 'eventHoma', chance: 0.05, min: 50, max: 200, name: 'Івенхомів' },
+    { type: 'boost', chance: 0.02, boosts: ['tapPower', 'coinBoost', 'luck'], name: 'бустер' }
+];
+function getRandomReward(pool){
+    let r = Math.random();
+    let cumulative = 0;
+    for(let reward of pool){
+        cumulative += reward.chance;
+        if(r <= cumulative){
+            if(reward.type === 'coins'){
+                let amt = Math.floor(Math.random() * (reward.max - reward.min + 1) + reward.min);
+                return { text: `💰 +${amt} монет`, action: () => coins += amt };
+            }
+            else if(reward.type === 'homa'){
+                let amt = Math.floor(Math.random() * (reward.max - reward.min + 1) + reward.min);
+                return { text: `🟣 +${amt} Хом`, action: () => homa += amt };
+            }
+            else if(reward.type === 'energy'){
+                let amt = Math.floor(Math.random() * (reward.max - reward.min + 1) + reward.min);
+                return { text: `⚡ +${amt} до макс. енергії (тепер ${maxEn+amt})`, action: () => { maxEn += amt; curEn += amt; } };
+            }
+            else if(reward.type === 'gif'){
+                let items = reward.items;
+                let g = items[Math.floor(Math.random() * items.length)];
+                return { text: `🎨 Отримано гіфку: ${g.e || g.id}`, action: () => addGif(g.id, 1) };
+            }
+            else if(reward.type === 'title'){
+                let items = reward.items;
+                let nt = items[Math.floor(Math.random() * items.length)];
+                let titleName = TITLES[nt]?.name || nt;
+                return { text: `🏅 Отримано титул: ${titleName}`, action: () => addTitle(nt, 1) };
+            }
+            else if(reward.type === 'eventHoma'){
+                let amt = Math.floor(Math.random() * (reward.max - reward.min + 1) + reward.min);
+                return { text: `🌸 +${amt} Івенхомів`, action: () => eventHoma += amt };
+            }
+            else if(reward.type === 'boost'){
+                let boosts = reward.boosts;
+                let boostType = boosts[Math.floor(Math.random() * boosts.length)];
+                if(boostType === 'tapPower'){ tapPow += 0.2; return { text: `💪 Сила тапа +20% (тепер ${tapPow}x)`, action: () => {} }; }
+                else if(boostType === 'coinBoost'){ coinBoost += 0.2; return { text: `🪙 Бустер монет +20% (тепер ${coinBoost}x)`, action: () => {} }; }
+                else{ luck += 0.05; return { text: `🍀 Удача +0.05 (тепер ${luck.toFixed(2)})`, action: () => {} }; }
             }
         }
     }
-    toast(`🎁 Івент-бокс: ${rewardText}`);
-    updAll(); saveG();
+    return { text: '🎁 Нічого не випало', action: () => {} };
+}
+async function giveSummerReward(){
+    return new Promise((resolve) => {
+        let reward = getRandomReward(REWARD_POOL_SUMMER);
+        reward.action();
+        toast(`🎁 Літній бокс: ${reward.text}`);
+        flashReward();
+        updAll(); saveG();
+        resolve();
+    });
+}
+async function giveEventBoxReward(){
+    return new Promise((resolve) => {
+        let reward = getRandomReward(REWARD_POOL_EVENT);
+        reward.action();
+        toast(`🎁 Івент-бокс: ${reward.text}`);
+        flashReward();
+        updAll(); saveG();
+        resolve();
+    });
 }
 function openChestLogic(type){
     let reward=''; const rand=Math.random();
@@ -718,27 +765,36 @@ function openChestLogic(type){
         }
     }
     toast(reward);
+    flashReward();
+    updAll(); saveG();
 }
 function openChestFromInventory(chestType, element){
     if(!chests[chestType] || chests[chestType]<=0){ toast('Немає ящиків'); return; }
     if(element && element.classList){
-        element.classList.add('chest-open-anim');
-        setTimeout(()=>{
+        showGachaAnimation(element, async () => {
             chests[chestType]--;
             saveG();
-            if(chestType==='summer_box') giveSummerReward();
-            else if(chestType==='event_box') giveEventBoxReward();
-            else openChestLogic(chestType);
+            if(chestType === 'summer_box'){
+                await giveSummerReward();
+            } else if(chestType === 'event_box'){
+                await giveEventBoxReward();
+            } else {
+                openChestLogic(chestType);
+            }
             renderInventoryTab();
             renderShopBox();
             updAll();
-        },500);
+        });
     } else {
         chests[chestType]--;
         saveG();
-        if(chestType==='summer_box') giveSummerReward();
-        else if(chestType==='event_box') giveEventBoxReward();
-        else openChestLogic(chestType);
+        if(chestType === 'summer_box'){
+            giveSummerReward();
+        } else if(chestType === 'event_box'){
+            giveEventBoxReward();
+        } else {
+            openChestLogic(chestType);
+        }
         renderInventoryTab();
         renderShopBox();
         updAll();
@@ -1396,4 +1452,4 @@ function showAuthScreen(){
 if(tg){ tg.ready(); autoStart(); } else setTimeout(autoStart, 300);
 </script>
 </body>
-  </html>
+</html>
