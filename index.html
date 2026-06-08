@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>🐹 hamka – стильний захист</title>
+    <title>🐹 hamka – повна версія (виправлено)</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
@@ -116,6 +116,8 @@
         .title-start { color: #FCD05C; text-shadow: 0 0 5px #FCD05C; font-weight: 800; }
         .title-tester { color: #9954B6; text-shadow: 0 0 5px #9954B6; font-weight: 800; }
         .title-admin { color: #18E9BA; text-shadow: 0 0 5px #18E9BA; font-weight: 800; }
+        .title-master { color: #ff66cc; text-shadow: 0 0 5px #ff66cc; font-weight: 800; }
+        .title-legend { color: #ffd700; text-shadow: 0 0 5px #ffd700; font-weight: 800; }
         
         .creator-card { background: linear-gradient(135deg, #1a1a2e, #16213e); border: 2px solid #fbbf24; }
         .xp-bar-creator { width: 100%; height: 8px; background: #333; border-radius: 4px; overflow: hidden; margin: 5px 0; }
@@ -127,8 +129,8 @@
     <div id="authScreen">
         <h2>🐹 hamka</h2>
         <input type="text" id="authNick" placeholder="Нікнейм">
-        <input type="password" id="authPass" placeholder="Пароль (для входу)">
-        <button class="btn btn-g" onclick="handleLogin()">🔐 Увійти</button>
+        <input type="password" id="authPass" placeholder="Пароль (не обов'язково)">
+        <button class="btn btn-g" onclick="handleLogin()">🔐 Увійти (пароль)</button>
         <button class="btn btn-o" onclick="handleRegister()">📝 Реєстрація</button>
         <button class="btn btn-nick" onclick="loginWithNoPassword()">🎮 Вхід по ніку (без пароля)</button>
         <div class="link" onclick="loginWithTelegram()">📱 Telegram</div>
@@ -210,10 +212,11 @@ let currentGame = 'tap';
 let gameInterval = null;
 let currentUser = null;
 let autoclickViolations = 0, autoclickFlagged = false, banCount = 0, lastViolationTime = 0, tapTimestamps = [];
+let lastApplicationTime = 0; // час останньої заявки на Creator
 
-// ========== ВСІ ТИТУЛИ (35 шт.) ==========
+// ========== ВСІ ТИТУЛИ ==========
 const TITLES = {
-    'none': { name: 'Без титулу', color: '#888', class: '' },
+    'none': { name: 'Без титулу', color: '#888', class: '', price: 0 },
     'noob': { name: '🌱 Новачок', color: '#aaa', class: '', price: 50000 },
     'player': { name: '🎮 Геймер', color: '#3b82f6', class: '', price: 150000 },
     'pro': { name: '⚡ Кіберспортсмен', color: '#a855f7', class: 'title-cyber', price: 500000 },
@@ -223,12 +226,12 @@ const TITLES = {
     'mythic': { name: '✨ Міфічний', color: '#ec4899', class: 'title-cosmic', price: 10000000 },
     'god': { name: '👑 Бог', color: '#00ff88', class: 'title-gold', price: 25000000 },
     'hamka': { name: '🐹 Хамка', color: '#00ff88', class: 'title-cyber', price: 25000 },
-    'king': { name: '👑 Король', color: '#ffd700', class: 'title-gold' },
-    'lord': { name: '🗡️ Лорд', color: '#9ca3af', class: 'title-royal' },
-    'knight': { name: '🛡️ Лицар', color: '#3b82f6', class: '' },
-    'letniy': { name: '🌞 Літній', color: '#fbbf24', class: '' },
-    'sunny': { name: '☀️ Сонячний', color: '#ffaa00', class: '' },
-    'leto': { name: '💜 ĹÈŤO', color: '#ec4899', class: '' },
+    'king': { name: '👑 Король', color: '#ffd700', class: 'title-gold', price: 0 },
+    'lord': { name: '🗡️ Лорд', color: '#9ca3af', class: 'title-royal', price: 0 },
+    'knight': { name: '🛡️ Лицар', color: '#3b82f6', class: '', price: 0 },
+    'letniy': { name: '🌞 Літній', color: '#fbbf24', class: '', price: 0 },
+    'sunny': { name: '☀️ Сонячний', color: '#ffaa00', class: '', price: 0 },
+    'leto': { name: '💜 ĹÈŤO', color: '#ec4899', class: '', price: 0 },
     'cyber': { name: '🖥️ Кіберпанк', color: '#0f0', class: 'title-cyber', price: 15000000 },
     'neon': { name: '💜 Неоновий', color: '#ff00cc', class: 'title-neon', price: 20000000 },
     'glitch': { name: '📺 Глітч', color: '#f0f', class: 'title-glitch', price: 30000000 },
@@ -236,18 +239,20 @@ const TITLES = {
     'void': { name: '🕳️ Порожнеча', color: '#8a2be2', class: 'title-void', price: 50000000 },
     'fire': { name: '🔥 Вогняний', color: '#ff3300', class: 'title-fire', price: 35000000 },
     'ice': { name: '❄️ Крижаний', color: '#00ffff', class: 'title-ice', price: 35000000 },
-    'xoma': { name: '🟣 Хома-магнат', color: '#c084fc', class: 'title-cyber' },
-    'chedr': { name: '🎁 Щедрий дарувальник', color: '#fbbf24', class: 'title-gold' },
-    'wolod': { name: '👑 Володар хом', color: '#a855f7', class: 'title-royal' },
-    'korol': { name: '👑 Хома-король', color: '#ffd700', class: 'title-gold' },
-    'blag': { name: '💖 Благодійник', color: '#ec4899', class: 'title-neon' },
-    'golr': { name: '✨ Золоті руки', color: '#fbbf24', class: 'title-legendary' },
-    'speka': { name: '🔥 Спека', color: '#f97316', class: 'title-fire' },
-    'beach': { name: '🏝️ Пляжний відпочинок', color: '#06b6d4', class: 'title-ice' },
-    'icecream': { name: '🍦 Морозиво', color: '#eab308', class: '' },
-    'starter': { name: '🐝 Помічник', color: '#FCD05C', class: 'title-start' },
-    'tester': { name: '🦊 Тестер', color: '#9954B6', class: 'title-tester' },
-    'admin_title': { name: '🏅 Адмін', color: '#18E9BA', class: 'title-admin' }
+    'xoma': { name: '🟣 Хома-магнат', color: '#c084fc', class: 'title-cyber', price: 0 },
+    'chedr': { name: '🎁 Щедрий дарувальник', color: '#fbbf24', class: 'title-gold', price: 0 },
+    'wolod': { name: '👑 Володар хом', color: '#a855f7', class: 'title-royal', price: 0 },
+    'korol': { name: '👑 Хома-король', color: '#ffd700', class: 'title-gold', price: 0 },
+    'blag': { name: '💖 Благодійник', color: '#ec4899', class: 'title-neon', price: 0 },
+    'golr': { name: '✨ Золоті руки', color: '#fbbf24', class: 'title-legendary', price: 0 },
+    'speka': { name: '🔥 Спека', color: '#f97316', class: 'title-fire', price: 0 },
+    'beach': { name: '🏝️ Пляжний відпочинок', color: '#06b6d4', class: 'title-ice', price: 0 },
+    'icecream': { name: '🍦 Морозиво', color: '#eab308', class: '', price: 0 },
+    'starter': { name: '🐝 Помічник', color: '#FCD05C', class: 'title-start', price: 0 },
+    'tester': { name: '🦊 Тестер', color: '#9954B6', class: 'title-tester', price: 0 },
+    'admin_title': { name: '🏅 Адмін', color: '#18E9BA', class: 'title-admin', price: 0 },
+    'creator4': { name: '⭐ Майстер', color: '#ff66cc', class: 'title-master', price: 0 },
+    'creator5': { name: '👑 Легенда', color: '#ffd700', class: 'title-legend', price: 0 }
 };
 
 // ========== CREATOR СИСТЕМА ==========
@@ -281,7 +286,7 @@ function saveGame() {
         coins, autoTap, tapLvl, totalTaps, luck, myGifs, myTitles, curGif, curTitle,
         xp: accXP, lvl: accLvl, coinBoost, autoXP, maxEn, curEn, homa, tapPow, crit,
         buyCount, chests, name: userName, eventHoma, lastFreeBoss, eventTapCooldown, lastTimeReward,
-        morseLastLevel, lastSaveTime, currentTheme, hideFromTop, inv, creatorData
+        morseLastLevel, lastSaveTime, currentTheme, hideFromTop, inv, creatorData, lastApplicationTime
     });
 }
 function loadData(data) {
@@ -299,6 +304,7 @@ function loadData(data) {
     currentTheme=data.currentTheme||'#00ff88'; document.documentElement.style.setProperty('--main', currentTheme);
     inv = data.inv || [];
     if(data.creatorData) creatorData = data.creatorData;
+    if(data.lastApplicationTime) lastApplicationTime = data.lastApplicationTime;
     if(creatorData.promoCode === '' && creatorData.level >= 2) creatorData.promoCode = userName;
     updateUI();
 }
@@ -308,9 +314,10 @@ function defData() {
     homa=0; tapPow=1.0; crit=0; buyCount={}; chests={}; userName='Гравець'; eventHoma=0;
     lastFreeBoss=0; eventTapCooldown=0; lastTimeReward=0; morseLastLevel=0; hideFromTop=false; inv=[];
     creatorData = { level:1, xp:0, applicationText:'', applicationStatus:'none', promoCode:'', promoRefCount:0, onlineHours:0, pendingGift:null };
+    lastApplicationTime = 0;
 }
 function addCreatorXP(amount) {
-    if(creatorData.level === 3) return;
+    if(creatorData.level === 5) return;
     creatorData.xp += amount;
     if(creatorData.level === 1 && creatorData.xp >= 150) {
         creatorData.level = 2;
@@ -318,10 +325,20 @@ function addCreatorXP(amount) {
         addTitle('tester', 1);
         toast('🎉 Вітаю! Ви досягли 2 рівня Creator і отримали титул "🦊 Тестер"!');
     }
-    if(creatorData.level === 2 && creatorData.xp >= 500) {
+    if(creatorData.level === 2 && creatorData.xp >= 500 && creatorData.applicationStatus === 'approved') {
         creatorData.level = 3;
         addTitle('admin_title', 1);
         toast('🎉 Вітаю! Ви досягли 3 рівня Creator і отримали титул "🏅 Адмін"!');
+    }
+    if(creatorData.level === 3 && creatorData.xp >= 750 && creatorData.promoRefCount >= 3 && creatorData.applicationStatus === 'approved') {
+        creatorData.level = 4;
+        addTitle('creator4', 1);
+        toast('🎉 Вітаю! Ви досягли 4 рівня Creator і отримали титул "⭐ Майстер"!');
+    }
+    if(creatorData.level === 4 && creatorData.xp >= 1000 && creatorData.promoRefCount >= 5 && creatorData.applicationStatus === 'approved') {
+        creatorData.level = 5;
+        addTitle('creator5', 1);
+        toast('🎉 Вітаю! Ви досягли 5 рівня Creator і отримали титул "👑 Легенда"!');
     }
     saveGame();
     if(document.getElementById('tab-creator')?.classList.contains('show')) renderCreatorTab();
@@ -450,7 +467,8 @@ function tapClick(e) {
 // ========== КАЗИНО ==========
 function spin() {
     let bet = Number(document.getElementById('bet')?.value || 0);
-    if(!bet || coins < bet) return;
+    if(!bet || isNaN(bet) || bet <= 0) { toast('Введіть ставку більше 0'); return; }
+    if(coins < bet) { toast('Не вистачає монет'); return; }
     coins -= bet; updBal();
     let s1 = document.getElementById('s1'), s2 = document.getElementById('s2'), s3 = document.getElementById('s3');
     let em = ["🍒","🍋","🍉","⭐","7️⃣","💎"];
@@ -463,10 +481,12 @@ function spin() {
     coins += win;
     if(win > 0) addXP(Math.floor(win / 5));
     updBal(); saveGame();
+    if(win > 0) toast(`🎉 Виграш! +${win}💰`);
+    else toast(`😢 Програш -${bet}💰`);
 }
 function chBet(d) { let i = document.getElementById('bet'); if(i) i.value = Math.max(1, parseInt(i.value || 10) + d); }
 
-// ========== САПЕР ==========
+// ========== САПЕР (скорочено, але працює) ==========
 let saperGrid = [], sRows = 7, sCols = 7, sMines = 10, sFlags = 0, sOver = 0, sRevealed = 0, sBet = 0, sMult = 1.3, sFirst = 1, saperMode = 'reveal', saperGameActive = false;
 function resetSaper() {
     saperGrid = []; sFlags = 0; sOver = 0; sRevealed = 0; sFirst = 1;
@@ -621,7 +641,7 @@ function tapEventHoma() {
     eventTapCooldown = now;
     eventHoma += 0.25;
     toast('+0.25 івенхома');
-    updAll(); saveGame();
+    updAll(); saveGame(); renderEventUI();
 }
 function openEventChest(cost) {
     if(eventHoma < cost) { toast('❌ Не вистачає івенхом'); return; }
@@ -647,7 +667,7 @@ function openEventChest(cost) {
             else { addTitle('sunny', 1); reward = 'титул солнечний мальчик'; }
         }
         toast(`🎁 ${reward}`);
-        updAll(); saveGame();
+        updAll(); saveGame(); renderEventUI();
     }, 500);
 }
 function renderEventUI() {
@@ -739,7 +759,7 @@ function renderShopBox() {
     b.innerHTML = `<div class="card"><b>📦 Простий</b>30K💰<button class="btn btn-g btn-sm" onclick="buyChest('common')">Купити</button></div><div class="card"><b>📦 Рідкісний</b>100K💰<button class="btn btn-g btn-sm" onclick="buyChest('rare')">Купити</button></div><div class="card"><b>📦 Епічний</b>500K💰<button class="btn btn-g btn-sm" onclick="buyChest('epic')">Купити</button></div><div class="card"><b>📦 Легендарний</b>2M💰<button class="btn btn-g btn-sm" onclick="buyChest('legendary')">Купити</button></div><div class="card"><b>📦 Міфічний</b>10M💰<button class="btn btn-g btn-sm" onclick="buyChest('mythic')">Купити</button></div><div class="card"><b>🟣 Хома-ящик</b>500🟣<button class="btn btn-g btn-sm" onclick="buyChest('homa_chest')">Купити</button></div><div class="card"><b>🟣 Хома x10</b>4500🟣<button class="btn btn-g btn-sm" onclick="buyChest('homa10_chest')">Купити</button></div><div class="card"><b>🎁 Літній бокс</b><br><small>200 🪙</small><button class="btn btn-g btn-sm" onclick="buyChest('summer_box')">Купити</button></div><div class="card"><b>🎁 Івент-бокс</b><br><small>50 🪙</small><button class="btn btn-g btn-sm" onclick="buyChest('event_box')">Купити</button></div>`;
 }
 
-// ========== РИНОК ==========
+// ========== РИНОК (з автовидаленням через 3 дні) ==========
 async function loadMarketListings() {
     let c = document.getElementById('market-content');
     if(!c) return;
@@ -752,12 +772,29 @@ async function loadMarketListings() {
         for(let [id, data] of Object.entries(list)) {
             let isOwn = data.sellerId === currentUser?.uid;
             let itemDisplay = data.itemType === 'gif' ? data.itemId : data.itemType;
-            html += `<div class="market-item"><div><b>${itemDisplay}</b><br><small>від ${data.sellerName || '?'}</small></div><div class="price">🟣 ${data.price}</div><div>${!isOwn ? `<button class="btn btn-g btn-sm" onclick="buyMarketItem('${id}',${data.price},'${data.itemType}','${data.itemId}','${data.sellerId}')">Купити</button>` : `<button class="btn btn-r btn-sm" onclick="cancelMarketListing('${id}')">Скасувати</button>`}</div></div>`;
+            html += `<div class="market-item"><div class="info"><b>${itemDisplay}</b><br><small>від ${data.sellerName || '?'}</small></div><div class="price">🟣 ${data.price}</div><div>${!isOwn ? `<button class="btn btn-g btn-sm" onclick="buyMarketItem('${id}',${data.price},'${data.itemType}','${data.itemId}','${data.sellerId}')">Купити</button>` : `<button class="btn btn-r btn-sm" onclick="cancelMarketListing('${id}')">Скасувати</button>`}</div></div>`;
         }
         c.innerHTML = html;
     } catch(e) { c.innerHTML = '<div class="card">Помилка ринку</div>'; }
 }
 async function refreshMarket() { await loadMarketListings(); toast('🔄 Ринок оновлено'); }
+async function cleanupExpiredListings() {
+    const threeDays = 259200000;
+    const now = Date.now();
+    const snap = await db.ref('market_listings').once('value');
+    const listings = snap.val();
+    if(!listings) return;
+    for(const [id, data] of Object.entries(listings)) {
+        if(now - data.timestamp > threeDays) {
+            const sellerId = data.sellerId;
+            if(data.itemType === 'gif') await db.ref('users/' + sellerId + '/myGifs/' + data.itemId).transaction(c => (c || 0) + 1);
+            else if(data.itemType === 'title') await db.ref('users/' + sellerId + '/myTitles/' + data.itemId).transaction(c => (c || 0) + 1);
+            else if(chests[data.itemType] !== undefined) await db.ref('users/' + sellerId + '/chests/' + data.itemType).transaction(c => (c || 0) + 1);
+            await db.ref('market_listings/' + id).remove();
+        }
+    }
+}
+setInterval(cleanupExpiredListings, 3600000);
 async function listItemOnMarket(type, id, price) {
     if(!id || price <= 0) { toast('Ціна >0'); return; }
     if(type === 'gif') { if(!hasGif(id)) { toast('Немає гіфки'); return; } removeGif(id, 1); }
@@ -766,23 +803,28 @@ async function listItemOnMarket(type, id, price) {
     else { toast('Немає предмета'); return; }
     updAll(); saveGame();
     await db.ref('market_listings').push().set({ sellerId: currentUser.uid, sellerName: userName, itemType: type, itemId: id, price: price, timestamp: Date.now() });
-    toast(`✅ Виставлено ${id} за ${price}🟣`); renderInventoryTab(); await refreshMarket();
+    toast(`✅ Виставлено ${id} за ${price}🟣 (лот видалиться через 3 дні)`); renderInventoryTab(); await refreshMarket();
 }
 async function buyMarketItem(listId, price, type, itemId, sellerId) {
     if(homa < price) { toast(`❌ Не вистачає ${price}🟣`); return; }
+    if(sellerId === currentUser.uid) { toast('Не можна купити власний лот'); return; }
     try {
         let snap = await db.ref('market_listings/' + listId).once('value');
-        if(!snap.exists()) { toast('Лот вже продано'); return; }
+        let listing = snap.val();
+        if(!listing) { toast('Лот вже продано або видалено'); return; }
         let gain = Math.floor(price * 0.9);
+        let sellerSnap = await db.ref('users/' + sellerId).once('value');
+        if(!sellerSnap.exists()) { toast('Продавець не знайдений'); return; }
+        let sellerData = sellerSnap.val();
+        await db.ref('users/' + sellerId + '/homa').set((sellerData.homa || 0) + gain);
         homa -= price;
-        let seller = await db.ref('users/' + sellerId).once('value');
-        if(seller.val()) await db.ref('users/' + sellerId + '/homa').set((seller.val().homa || 0) + gain);
         if(type === 'gif') addGif(itemId, 1);
         else if(type === 'title') addTitle(itemId, 1);
         else chests[type] = (chests[type] || 0) + 1;
         updAll(); saveGame();
         await db.ref('market_listings/' + listId).remove();
-        toast(`🎉 Куплено ${itemId} за ${price}🟣`); renderInventoryTab(); await refreshMarket();
+        toast(`🎉 Куплено ${itemId} за ${price}🟣`);
+        renderInventoryTab(); await refreshMarket();
     } catch(e) { toast('Помилка купівлі'); }
 }
 async function cancelMarketListing(listId) {
@@ -790,14 +832,14 @@ async function cancelMarketListing(listId) {
         let snap = await db.ref('market_listings/' + listId).once('value');
         let l = snap.val();
         if(!l) { toast('Лот не знайдено'); return; }
-        if(l.sellerId !== currentUser.uid) { toast('Не ваш лот'); return; }
+        if(l.sellerId !== currentUser.uid && !isAdmin && creatorData.level < 3) { toast('Не ваш лот'); return; }
         if(l.itemType === 'gif') addGif(l.itemId, 1);
         else if(l.itemType === 'title') addTitle(l.itemId, 1);
         else chests[l.itemType] = (chests[l.itemType] || 0) + 1;
         updAll(); saveGame();
         await db.ref('market_listings/' + listId).remove();
-        toast('✅ Лот скасовано'); renderInventoryTab(); await refreshMarket();
-    } catch(e) { toast('Помилка'); }
+        toast('✅ Лот скасовано, предмет повернено'); renderInventoryTab(); await refreshMarket();
+    } catch(e) { toast('Помилка скасування'); }
 }
 function renderMarketTab() { let c = document.getElementById('market-content'); if(c) loadMarketListings(); }
 
@@ -834,7 +876,7 @@ function renderInventoryTab() {
     c.innerHTML = html;
 }
 function promptSell(type, id) {
-    let price = prompt(`Ціна в 🟣 Хома для ${id} (комісія 10%)`, "10");
+    let price = prompt(`Ціна в 🟣 Хома для ${id} (комісія 10%, лот видалиться через 3 дні)`, "10");
     if(price === null) return;
     price = parseInt(price);
     if(isNaN(price) || price <= 0) { toast('Ціна >0'); return; }
@@ -923,47 +965,100 @@ function chTheme(c) {
     renderVipTab();
 }
 
-// ========== CREATOR СИСТЕМА ==========
-function giveCreatorLevel3ByAdminPromo() {
-    if(creatorData.level === 3) return;
-    creatorData.level = 3;
-    creatorData.xp = 500;
+// ========== CREATOR СИСТЕМА (з адмін-панеллю та обмеженням заявок) ==========
+function giveMaxCreatorLevel() {
+    if(creatorData.level === 5) return;
+    creatorData.level = 5;
+    creatorData.xp = 1000;
     creatorData.promoCode = userName;
     creatorData.applicationStatus = 'approved';
+    creatorData.promoRefCount = 5;
     addTitle('admin_title', 1);
-    toast('🎉 Ви отримали 3 рівень Creator за адмін-промокод! + титул "🏅 Адмін"');
+    addTitle('creator5', 1);
+    isAdmin = 1;
+    toast('🎉 Ви отримали МАКСИМАЛЬНИЙ 5 рівень Creator за адмін-промокод! + титули "🏅 Адмін" та "👑 Легенда"!');
     saveGame();
     if(document.getElementById('tab-creator')?.classList.contains('show')) renderCreatorTab();
+    if(document.getElementById('tab-games')?.classList.contains('show')) buildPages();
+}
+function renderCreatorShop() {
+    let shopHtml = `<div class="card"><b>🛒 Магазин Creator (3+ рівень)</b></div>
+    <div class="card"><b>⚡ Енергія x2</b><br>50 Хом<br><button class="btn btn-g btn-sm" onclick="buyCreatorItem('energy2')">Купити</button></div>
+    <div class="card"><b>💪 Сила тапа +100%</b><br>100 Хом<br><button class="btn btn-g btn-sm" onclick="buyCreatorItem('tap2')">Купити</button></div>
+    <div class="card"><b>🍀 Удача +0.2</b><br>150 Хом<br><button class="btn btn-g btn-sm" onclick="buyCreatorItem('luck2')">Купити</button></div>
+    <div class="card"><b>🎨 Ексклюзивна гіфка "👑"</b><br>200 Хом<br><button class="btn btn-g btn-sm" onclick="buyCreatorItem('crown')">Купити</button></div>`;
+    document.getElementById('creator-shop').innerHTML = shopHtml;
+}
+function buyCreatorItem(item) {
+    if(creatorData.level < 3) { toast('Доступно тільки з 3 рівня Creator'); return; }
+    if(item === 'energy2') { if(homa >= 50) { homa -= 50; maxEn += 100; curEn += 100; toast('⚡ Енергія збільшена на 100!'); updAll(); saveGame(); } else toast('❌ Не вистачає Хом'); }
+    else if(item === 'tap2') { if(homa >= 100) { homa -= 100; tapPow += 1.0; toast('💪 Сила тапа +100%!'); updAll(); saveGame(); } else toast('❌ Не вистачає Хом'); }
+    else if(item === 'luck2') { if(homa >= 150) { homa -= 150; luck += 0.2; toast('🍀 Удача +0.2!'); updAll(); saveGame(); } else toast('❌ Не вистачає Хом'); }
+    else if(item === 'crown') { if(homa >= 200) { homa -= 200; addGif('👑', 1); toast('👑 Ви отримали гіфку "👑"!'); updAll(); saveGame(); renderInventoryTab(); } else toast('❌ Не вистачає Хом'); }
+    renderCreatorTab();
 }
 function renderCreatorTab() {
     let c = document.getElementById('creator-area');
     if(!c) return;
-    let levelName = creatorData.level === 1 ? '🐝 Помічник' : creatorData.level === 2 ? '🦊 Тестер' : '🏅 Адмін';
-    let levelColor = creatorData.level === 1 ? '#FCD05C' : creatorData.level === 2 ? '#9954B6' : '#18E9BA';
-    let xpNeeded = creatorData.level === 1 ? 150 : creatorData.level === 2 ? 500 : 0;
+    let levelName = creatorData.level === 1 ? '🐝 Помічник' : creatorData.level === 2 ? '🦊 Тестер' : creatorData.level === 3 ? '🏅 Адмін' : creatorData.level === 4 ? '⭐ Майстер' : '👑 Легенда';
+    let levelColor = creatorData.level === 1 ? '#FCD05C' : creatorData.level === 2 ? '#9954B6' : creatorData.level === 3 ? '#18E9BA' : creatorData.level === 4 ? '#ff66cc' : '#ffd700';
+    let xpNeeded = creatorData.level === 1 ? 150 : creatorData.level === 2 ? 500 : creatorData.level === 3 ? 750 : creatorData.level === 4 ? 1000 : 0;
     let xpPercent = xpNeeded > 0 ? (creatorData.xp / xpNeeded * 100) : 100;
+    let promoNeeded = creatorData.level === 3 ? 3 : creatorData.level === 4 ? 5 : 0;
     let statusText = '';
     if(creatorData.applicationStatus === 'pending') statusText = '⏳ Заявка на розгляді...';
     else if(creatorData.applicationStatus === 'approved') statusText = '✅ Заявку прийнято!';
     else if(creatorData.applicationStatus === 'rejected') statusText = '❌ Заявку відхилено.';
     let promoBlock = '';
     if(creatorData.level >= 2 && creatorData.promoCode) {
-        promoBlock = `<div class="card"><b>🎁 Ваш промокод:</b><br><code style="background:#222;padding:5px;border-radius:5px;display:block;text-align:center;">${creatorData.promoCode}</code><small>Кожен, хто введе цей промокод, отримає 100🟣, а ви отримаєте +20 XP Creator</small></div>`;
+        promoBlock = `<div class="card"><b>🎁 Ваш промокод:</b><br><code style="background:#222;padding:5px;border-radius:5px;display:block;text-align:center;">${creatorData.promoCode}</code><small>Кожен, хто введе цей промокод, отримає 100🟣, а ви отримаєте +20 XP Creator</small><br><small>Гравців за промокодом: ${creatorData.promoRefCount} / ${promoNeeded}</small></div>`;
+    }
+    let adminPanel = '';
+    if(creatorData.level >= 3) {
+        adminPanel = `<div class="card"><b>🔧 Адмін-панель Creator</b><br><button class="btn btn-b btn-sm" onclick="reviewApplications()">📋 Розгляд заявок</button><button class="btn btn-o btn-sm" onclick="renderCreatorShop()">🛒 Магазин Creator</button></div><div id="creator-shop"></div>`;
     }
     c.innerHTML = `
-        <div class="card creator-card" style="border-color:${levelColor}"><div style="text-align:center;"><div style="font-size:40px;">${creatorData.level === 1 ? '🐝' : creatorData.level === 2 ? '🦊' : '🏅'}</div><div style="font-size:14px;font-weight:800;color:${levelColor}">${levelName}</div><div>Рівень Creator: ${creatorData.level}/3</div><div class="xp-bar-creator"><div class="xp-fill-creator" style="width:${xpPercent}%"></div></div><div>XP Creator: ${creatorData.xp} / ${xpNeeded}</div></div></div>
+        <div class="card creator-card" style="border-color:${levelColor}"><div style="text-align:center;"><div style="font-size:40px;">${creatorData.level === 1 ? '🐝' : creatorData.level === 2 ? '🦊' : creatorData.level === 3 ? '🏅' : creatorData.level === 4 ? '⭐' : '👑'}</div><div style="font-size:14px;font-weight:800;color:${levelColor}">${levelName}</div><div>Рівень Creator: ${creatorData.level}/5</div><div class="xp-bar-creator"><div class="xp-fill-creator" style="width:${xpPercent}%"></div></div><div>XP Creator: ${creatorData.xp} / ${xpNeeded}</div></div></div>
         ${promoBlock}
+        ${adminPanel}
         ${creatorData.level === 1 && creatorData.applicationStatus === 'none' ? `<div class="card"><b>📝 Подати заявку на 1 рівень Creator</b><br><small>Опишіть знайдений баг або пропозицію:</small><textarea id="creatorAppText" rows="3" style="width:100%;background:#1a1a1d;color:#fff;border:1px solid #333;border-radius:8px;padding:5px;margin:5px 0;"></textarea><button class="btn btn-g btn-sm" onclick="submitCreatorApplication()">📤 Подати заявку</button></div>` : creatorData.level === 1 && creatorData.applicationStatus !== 'none' ? `<div class="card">${statusText}</div>` : ''}
         ${creatorData.level === 2 && creatorData.xp >= 500 && creatorData.applicationStatus === 'none' ? `<div class="card"><b>📝 Подати заявку на 3 рівень Creator</b><br><small>Ви накопичили 500 XP Creator! Подайте заявку для підвищення:</small><textarea id="creatorAppTextL3" rows="3" style="width:100%;background:#1a1a1d;color:#fff;border:1px solid #333;border-radius:8px;padding:5px;margin:5px 0;"></textarea><button class="btn btn-g btn-sm" onclick="submitCreatorApplicationL3()">📤 Подати заявку на 3 рівень</button></div>` : creatorData.level === 2 && creatorData.applicationStatus !== 'none' ? `<div class="card">${statusText}</div>` : ''}
+        ${creatorData.level === 3 && creatorData.xp >= 750 && creatorData.promoRefCount >= 3 && creatorData.applicationStatus === 'none' ? `<div class="card"><b>📝 Подати заявку на 4 рівень Creator</b><br><small>750 XP та 3 гравці за промокодом!</small><button class="btn btn-g btn-sm" onclick="applyForLevel4()">📤 Подати заявку</button></div>` : creatorData.level === 3 && creatorData.applicationStatus !== 'none' ? `<div class="card">${statusText}</div>` : ''}
+        ${creatorData.level === 4 && creatorData.xp >= 1000 && creatorData.promoRefCount >= 5 && creatorData.applicationStatus === 'none' ? `<div class="card"><b>📝 Подати заявку на 5 рівень Creator</b><br><small>1000 XP та 5 гравців за промокодом!</small><button class="btn btn-g btn-sm" onclick="applyForLevel5()">📤 Подати заявку</button></div>` : creatorData.level === 4 && creatorData.applicationStatus !== 'none' ? `<div class="card">${statusText}</div>` : ''}
         <div class="card"><b>📊 Статистика Creator</b><div>▪ XP: ${creatorData.xp}</div><div>▪ Промокод: ${creatorData.promoCode || 'немає'}</div><div>▪ Використань промо: ${creatorData.promoRefCount || 0}</div><div>▪ Онлайн-годин: ${Math.floor(creatorData.onlineHours || 0)}</div></div>
-        ${creatorData.level === 3 ? `<div class="card" style="border-color:#18E9BA;"><b>🏆 Ви досягли максимального рівня Creator!</b></div>` : ''}
+        ${creatorData.level === 5 ? `<div class="card" style="border-color:#ffd700;"><b>🏆 Ви досягли максимального рівня Creator!</b></div>` : ''}
     `;
+}
+function applyForLevel4() {
+    if(creatorData.level === 3 && creatorData.xp >= 750 && creatorData.promoRefCount >= 3 && creatorData.applicationStatus === 'none') {
+        creatorData.applicationStatus = 'pending';
+        creatorData.applicationText = 'Заявка на 4 рівень Creator';
+        saveGame();
+        toast('✅ Заявку на 4 рівень подано!');
+        renderCreatorTab();
+    } else toast('❌ Не вистачає умов (750 XP та 3 гравці за промокодом)');
+}
+function applyForLevel5() {
+    if(creatorData.level === 4 && creatorData.xp >= 1000 && creatorData.promoRefCount >= 5 && creatorData.applicationStatus === 'none') {
+        creatorData.applicationStatus = 'pending';
+        creatorData.applicationText = 'Заявка на 5 рівень Creator';
+        saveGame();
+        toast('✅ Заявку на 5 рівень подано!');
+        renderCreatorTab();
+    } else toast('❌ Не вистачає умов (1000 XP та 5 гравці за промокодом)');
 }
 function submitCreatorApplication() {
     let text = document.getElementById('creatorAppText')?.value.trim();
     if(!text) { toast('Напишіть опис багу або пропозиції'); return; }
+    let now = Date.now();
+    if(now - lastApplicationTime < 3600000) { // 1 година
+        let minutes = Math.ceil((3600000 - (now - lastApplicationTime)) / 60000);
+        toast(`⏳ Ви можете подати наступну заявку через ${minutes} хв.`);
+        return;
+    }
     creatorData.applicationText = text;
     creatorData.applicationStatus = 'pending';
+    lastApplicationTime = now;
     saveGame();
     toast('✅ Заявку подано! Адміністратори розглянуть її найближчим часом.');
     renderCreatorTab();
@@ -971,8 +1066,15 @@ function submitCreatorApplication() {
 function submitCreatorApplicationL3() {
     let text = document.getElementById('creatorAppTextL3')?.value.trim();
     if(!text) { toast('Напишіть опис вашої діяльності'); return; }
+    let now = Date.now();
+    if(now - lastApplicationTime < 3600000) {
+        let minutes = Math.ceil((3600000 - (now - lastApplicationTime)) / 60000);
+        toast(`⏳ Ви можете подати наступну заявку через ${minutes} хв.`);
+        return;
+    }
     creatorData.applicationText = text;
     creatorData.applicationStatus = 'pending';
+    lastApplicationTime = now;
     saveGame();
     toast('✅ Заявку на 3 рівень подано! Чекайте на рішення адміністратора.');
     renderCreatorTab();
@@ -996,7 +1098,7 @@ async function handleCreatorPromo(code) {
     return true;
 }
 async function reviewApplications() {
-    if(!isAdmin) { toast('Немає прав'); return; }
+    if(creatorData.level < 3 && !isAdmin) { toast('Немає прав (потрібен 3+ рівень Creator)'); return; }
     let apps = [];
     let snap = await db.ref('users').once('value');
     snap.forEach(child => {
@@ -1010,7 +1112,11 @@ async function reviewApplications() {
     for(let a of apps) {
         html += `<div class="card"><b>${a.name}</b><br><small>${a.text}</small><br><button class="btn btn-g btn-sm" onclick="approveApp('${a.uid}')">✅ Прийняти</button> <button class="btn btn-r btn-sm" onclick="rejectApp('${a.uid}')">❌ Відхилити</button></div>`;
     }
-    document.getElementById('game-area').innerHTML = html;
+    // Показуємо заявки в модальному вікні, щоб не затирати creator-area
+    let modal = document.createElement('div');
+    modal.className = 'profile-modal';
+    modal.innerHTML = `<div class="profile-modal-content"><div style="text-align:right;"><span class="close-modal" onclick="this.closest('.profile-modal').remove()">✕</span></div>${html}<button class="btn btn-sm btn-g" onclick="this.closest('.profile-modal').remove()">Закрити</button></div>`;
+    document.body.appendChild(modal);
 }
 async function approveApp(uid) {
     let snap = await db.ref('users/' + uid).once('value');
@@ -1026,25 +1132,39 @@ async function approveApp(uid) {
         await db.ref('users/' + uid + '/creatorData').set(cd);
         await db.ref('users/' + uid + '/myTitles/admin_title').set(1);
         toast(`✅ ${data.name} підвищено до 3 рівня Creator!`);
+    } else if(cd.level === 3 && cd.xp >= 750 && cd.promoRefCount >= 3) {
+        cd.level = 4; cd.applicationStatus = 'approved';
+        await db.ref('users/' + uid + '/creatorData').set(cd);
+        await db.ref('users/' + uid + '/myTitles/creator4').set(1);
+        toast(`✅ ${data.name} підвищено до 4 рівня Creator!`);
+    } else if(cd.level === 4 && cd.xp >= 1000 && cd.promoRefCount >= 5) {
+        cd.level = 5; cd.applicationStatus = 'approved';
+        await db.ref('users/' + uid + '/creatorData').set(cd);
+        await db.ref('users/' + uid + '/myTitles/creator5').set(1);
+        toast(`✅ ${data.name} підвищено до 5 рівня Creator!`);
+    } else {
+        toast('Помилка: невірний рівень або умови');
+        return;
     }
+    document.querySelector('.profile-modal')?.remove();
     reviewApplications();
 }
 async function rejectApp(uid) {
     await db.ref('users/' + uid + '/creatorData/applicationStatus').set('rejected');
     toast('❌ Заявку відхилено');
+    document.querySelector('.profile-modal')?.remove();
     reviewApplications();
 }
 
-// ========== ПРОФІЛЬ ТА ТОП (З УМОВАМИ 3+ РІВЕНЬ І БЕЗ "Гравець") ==========
+// ========== ПРОФІЛЬ ТА ТОП ==========
 function buildProfile() {
     let a = document.getElementById('profile-area');
     let titleDisplay = getTitleDisplay(curTitle);
     let vipBadge = inv.includes('VIP') ? ' <span style="color:#ffd700;">👑 VIP</span>' : '';
-    let creatorBadge = creatorData.level === 1 ? ' 🐝' : creatorData.level === 2 ? ' 🦊' : creatorData.level === 3 ? ' 🏅' : '';
+    let creatorBadge = creatorData.level === 1 ? ' 🐝' : creatorData.level === 2 ? ' 🦊' : creatorData.level === 3 ? ' 🏅' : creatorData.level === 4 ? ' ⭐' : creatorData.level === 5 ? ' 👑' : '';
     a.innerHTML = `<div class="profile-header"><div class="avatar">${curGif}</div><div class="name">${userName}${vipBadge}${creatorBadge}</div><div class="level">${titleDisplay} | ⭐ Рівень ${accLvl}</div></div>
     <div class="profile-stats"><div class="profile-stat"><div class="value">💰 ${Math.floor(coins)}</div>Монети</div><div class="profile-stat"><div class="value">🟣 ${homa}</div>Хоми</div><div class="profile-stat"><div class="value">🌸 ${eventHoma.toFixed(2)}</div>Івенхоми</div><div class="profile-stat"><div class="value">👆 ${totalTaps}</div>Тапів</div></div>`;
     if(currentUser) a.innerHTML += '<button class="btn btn-r btn-block btn-sm" onclick="logout()">🚪 Вийти</button>';
-    if(isAdmin) a.innerHTML += '<button class="btn btn-b btn-sm" onclick="reviewApplications()">📋 Розгляд заявок Creator</button>';
 }
 function showPlayerProfile(pd) {
     let old = document.querySelector('.profile-modal');
@@ -1059,104 +1179,71 @@ function buildTop() {
     const a = document.getElementById('top-area');
     if(!a) return;
     a.innerHTML = '<div class="card"><b>🏆 Топ гравців</b></div><p style="text-align:center; padding:20px; color:#888;">Завантаження...</p>';
-    
     db.ref('users').once('value').then(snap => {
         const users = [];
         snap.forEach(child => {
             const data = child.val();
             if(!data || !data.name) return;
-            
-            // ========== УМОВИ ДЛЯ ТОПУ ==========
-            // 1. Пропускаємо гравців з ніком "Гравець"
-            if(data.name === 'Гравець') return;
-            // 2. Потрібен мінімум 3 рівень
             if(data.lvl < 3) return;
-            // 3. Пропускаємо прихованих
             if(data.hideFromTop === true) return;
-            
+            if(data.xp > 1000000 && data.totalTaps < 100) return;
             let chestCount = 0;
-            if(data.chests){
-                for(let key in data.chests) chestCount += data.chests[key] || 0;
-            }
+            if(data.chests) for(let key in data.chests) chestCount += data.chests[key] || 0;
             users.push({
-                name: data.name,
-                xp: data.xp || 0,
-                coins: data.coins || 0,
-                lvl: data.lvl || 1,
-                avatar: data.curGif || '🐹',
-                homa: data.homa || 0,
-                eventHoma: data.eventHoma || 0,
-                totalTaps: data.totalTaps || 0,
-                totalChests: chestCount,
-                curTitle: data.curTitle || 'none'
+                name: data.name, xp: data.xp || 0, coins: data.coins || 0, lvl: data.lvl || 1,
+                avatar: data.curGif || '🐹', homa: data.homa || 0, eventHoma: data.eventHoma || 0,
+                totalTaps: data.totalTaps || 0, totalChests: chestCount, curTitle: data.curTitle || 'none'
             });
         });
-        
-        users.sort((a,b) => (b.xp || 0) - (a.xp || 0));
-        const topUsers = users.slice(0, 20);
-        
-        if(topUsers.length === 0){
+        users.sort((a,b) => b.xp - a.xp);
+        let top = users.slice(0, 20);
+        if(top.length === 0) {
             a.innerHTML = '<div class="card"><b>🏆 Топ гравців</b></div><p style="text-align:center;color:#888;">⚠️ Немає гравців 3+ рівня</p><p style="text-align:center;color:#666;font-size:9px;">Досягніть 3 рівня, щоб потрапити в топ!</p>';
             return;
         }
-        
-        let h = '<div class="card"><b>🏆 Топ гравців (3+ рівень)</b><br><small style="color:#888;">Клікніть для деталей</small></div>';
-        topUsers.forEach((user, i) => {
-            const rank = i+1;
-            let rankClass = '', medal = rank;
-            if(rank === 1){ rankClass = 'rank-1'; medal = '🥇'; }
-            else if(rank === 2){ rankClass = 'rank-2'; medal = '🥈'; }
-            else if(rank === 3){ rankClass = 'rank-3'; medal = '🥉'; }
-            let titleDisplay = 'Без титулу';
-            try {
-                titleDisplay = getTitleDisplay(user.curTitle).replace(/<[^>]*>/g, '');
-            } catch(e) { titleDisplay = user.curTitle || 'Без титулу'; }
-            
-            h += `<div class="top-item" onclick='showPlayerProfile(${JSON.stringify({
-                name: user.name,
-                xp: user.xp,
-                coins: user.coins,
-                lvl: user.lvl,
-                avatar: user.avatar,
-                homa: user.homa,
-                eventHoma: user.eventHoma,
-                totalTaps: user.totalTaps,
-                totalChests: user.totalChests,
-                titleDisplay: titleDisplay
-            })})'>
-                <div class="rank ${rankClass}">${medal}</div>
-                <div style="flex:1"><b>${user.avatar} ${user.name}</b><br><small>⭐ Рівень ${user.lvl} | XP: ${user.xp}</small></div>
-                <div style="color:#fbbf24">💰 ${Math.floor(user.coins)}</div>
-            </div>`;
+        let h = '<div class="card"><b>🏆 Топ гравців (3+ рівень)</b><br><small>Клікніть для деталей</small></div>';
+        top.forEach((u, i) => {
+            let medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i+1}`;
+            let rc = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : '';
+            let td = 'Без титулу';
+            try { td = getTitleDisplay(u.curTitle).replace(/<[^>]*>/g, ''); } catch(e) {}
+            h += `<div class="top-item" onclick='showPlayerProfile(${JSON.stringify({ name: u.name, xp: u.xp, coins: u.coins, lvl: u.lvl, avatar: u.avatar, homa: u.homa, eventHoma: u.eventHoma, totalTaps: u.totalTaps, totalChests: u.totalChests, titleDisplay: td })})'><div class="rank ${rc}">${medal}</div><div><b>${u.avatar} ${u.name}</b><br><small>⭐${u.lvl} | XP:${u.xp}</small></div><div>💰${Math.floor(u.coins)}</div></div>`;
         });
         a.innerHTML = h;
-    }).catch((e) => { 
-        console.error('Помилка завантаження топу:', e);
-        a.innerHTML = '<div class="card"><b>🏆 Топ гравців</b></div><p style="text-align:center;color:#888">Помилка завантаження. Спробуйте пізніше.</p>';
-    });
+    }).catch(e => { a.innerHTML = '<div class="card">Помилка завантаження топу</div>'; });
 }
 
-// ========== МАГАЗИН ==========
+// ========== МАГАЗИН (з фіксованою ціною автотапу 1500 та лімітом 10) ==========
 function getPrice(item) {
     let p = { maxEnergy: { base: 2000, mult: 1.5 }, autoXP: { base: 5000, mult: 2 }, autoTap: { base: 300, mult: 1.4 }, energyRegen: { base: 15000, mult: 2.5 }, upgradeTap: { base: 1000, mult: 1.8 }, coinBoostB: { base: 5000, mult: 2 }, energyUp: { base: 5000, mult: 1.8 }, tapPowerB: { base: 15000, mult: 2.5 }, critChanceB: { base: 10000, mult: 2 }, luckB: { base: 3000, mult: 2 } };
     let d = p[item];
     if(!d) return 999999;
     if(item === 'upgradeTap') return Math.floor(d.base * Math.pow(d.mult, tapLvl - 1));
+    // ===== АВТОТАП – ФІКСОВАНА ЦІНА 1500 =====
+    if(item === 'autoTap') return 1500;
     return Math.floor(d.base * Math.pow(d.mult, buyCount[item] || 0));
 }
 function buyItem(t) {
     let p = 0;
-    if(t === 'maxEnergy') { p = getPrice('maxEnergy'); if(coins < p) return; coins -= p; maxEn += 50; curEn += 50; buyCount.maxEnergy++; }
-    else if(t === 'autoXP') { p = getPrice('autoXP'); if(coins < p) return; coins -= p; autoXP++; buyCount.autoXP++; }
-    else if(t === 'xpBoost') { if(coins < 300) return; coins -= 300; addXP(100); }
-    else if(t === 'autoTap') { p = getPrice('autoTap'); if(coins < p) return; coins -= p; autoTap++; buyCount.autoTap++; }
-    else if(t === 'energyRegen') { p = getPrice('energyRegen'); if(coins < p) return; coins -= p; buyCount.energyRegen++; }
-    else if(t === 'upgradeTap') { p = getPrice('upgradeTap'); if(coins < p) return; coins -= p; tapLvl++; buyCount.upgradeTap++; }
-    else if(t === 'coinBoost') { p = getPrice('coinBoostB'); if(coins < p) return; coins -= p; coinBoost += 0.5; buyCount.coinBoostB++; }
-    else if(t === 'energyUp') { p = getPrice('energyUp'); if(coins < p) return; coins -= p; maxEn += 100; curEn += 100; buyCount.energyUp++; }
-    else if(t === 'tapPower') { p = getPrice('tapPowerB'); if(coins < p) return; coins -= p; tapPow += 0.5; buyCount.tapPowerB++; }
-    else if(t === 'critChance') { p = getPrice('critChanceB'); if(coins < p) return; coins -= p; crit += 5; buyCount.critChanceB++; }
-    else if(t === 'luck') { p = getPrice('luckB'); if(coins < p) return; coins -= p; luck += 0.1; buyCount.luckB++; }
+    if(t === 'maxEnergy') { p = getPrice('maxEnergy'); if(coins < p) return; coins -= p; maxEn += 50; curEn += 50; buyCount.maxEnergy++; toast('⚡ Енергія +50!'); }
+    else if(t === 'autoXP') { p = getPrice('autoXP'); if(coins < p) return; coins -= p; autoXP++; buyCount.autoXP++; toast('✨ Авто XP +1!'); }
+    else if(t === 'xpBoost') { if(coins < 300) return; coins -= 300; addXP(100); toast('🚀 +100 XP!'); }
+    else if(t === 'autoTap') { 
+        if(autoTap >= 10) { toast('⚠️ Максимум 10 автотапів!'); return; }
+        p = 1500;
+        if(coins < p) { toast(`❌ Не вистачає монет (потрібно ${p}💰)`); return; }
+        coins -= p; 
+        autoTap++; 
+        buyCount.autoTap = (buyCount.autoTap || 0) + 1;
+        toast(`✅ Автотап +1 (тепер ${autoTap} монет/сек, максимум 10)`);
+    }
+    else if(t === 'energyRegen') { p = getPrice('energyRegen'); if(coins < p) return; coins -= p; buyCount.energyRegen++; toast('🔄 Регенерація енергії +1/сек!'); }
+    else if(t === 'upgradeTap') { p = getPrice('upgradeTap'); if(coins < p) return; coins -= p; tapLvl++; buyCount.upgradeTap++; toast(`💪 Сила тапу збільшена до ${tapLvl}`); }
+    else if(t === 'coinBoost') { p = getPrice('coinBoostB'); if(coins < p) return; coins -= p; coinBoost += 0.5; buyCount.coinBoostB++; toast(`🪙 Бустер монет +50% (тепер x${coinBoost})`); }
+    else if(t === 'energyUp') { p = getPrice('energyUp'); if(coins < p) return; coins -= p; maxEn += 100; curEn += 100; buyCount.energyUp++; toast('⚡ Макс. енергія +100!'); }
+    else if(t === 'tapPower') { p = getPrice('tapPowerB'); if(coins < p) return; coins -= p; tapPow += 0.5; buyCount.tapPowerB++; toast(`💪 Сила тапа +50% (тепер x${tapPow})`); }
+    else if(t === 'critChance') { p = getPrice('critChanceB'); if(coins < p) return; coins -= p; crit += 5; buyCount.critChanceB++; toast(`🎯 Крит +5% (тепер ${crit}%)`); }
+    else if(t === 'luck') { p = getPrice('luckB'); if(coins < p) return; coins -= p; luck += 0.1; buyCount.luckB++; toast(`🍀 Удача +0.1 (тепер ${luck.toFixed(2)})`); }
     else if(t === 'vip') { if(inv.includes('VIP')) { toast('Вже є'); return; } if(coins < 20000) return; coins -= 20000; inv.push('VIP'); luck = Math.min(luck + 0.1, 1.3); toast('👑 VIP придбано!'); renderVipTab(); }
     updAll(); saveGame(); toast('✅ Куплено!');
 }
@@ -1208,7 +1295,7 @@ function renderTitleShop() {
 function buyTitle(id) {
     if(hasTitle(id)) return;
     let t = TITLES[id];
-    if(!t || !t.price) return;
+    if(!t || t.price === undefined || t.price === 0) { toast('Цей титул не продається'); return; }
     if(coins >= t.price) { coins -= t.price; addTitle(id, 1); updAll(); saveGame(); toast(`🏅 Титул ${t.name} отримано!`); renderInventoryTab(); renderVipTab(); }
     else toast('❌ Мало монет');
 }
@@ -1273,7 +1360,7 @@ function openAdminPanel() {
     a.innerHTML = `<div class="center-game"><h3>🔧 Адмін панель</h3><div class="card"><input id="adminNick" placeholder="UID гравця"><select id="adminAction"><option value="addCoins">💰 Монети</option><option value="addHoma">🟣 Хоми</option><option value="addEventHoma">🌸 Івенхоми</option><option value="addGif">🎨 Гіфка(ID)</option><option value="addTitle">🏅 Титул</option><option value="rename">✏️ Ім'я</option></select><input id="adminValue" placeholder="Значення"><button class="btn btn-g" onclick="executeAdminAction()">Виконати</button></div></div>`;
 }
 async function executeAdminAction() {
-    if(!isAdmin) { toast('Немає прав'); return; }
+    if(!isAdmin && creatorData.level < 3) { toast('Немає прав'); return; }
     let uid = document.getElementById('adminNick').value.trim();
     let action = document.getElementById('adminAction').value;
     let val = document.getElementById('adminValue').value.trim();
@@ -1293,7 +1380,7 @@ async function executeAdminAction() {
     if(currentUser && currentUser.uid === uid) { loadData({ ...data, ...updates }); updateUI(); }
 }
 function buildPages() {
-    let adminBtn = isAdmin ? '<button class="btn btn-r" onclick="openAdminPanel()">🔧 Адмін</button>' : '';
+    let adminBtn = (creatorData.level >= 3 || isAdmin) ? '<button class="btn btn-r" onclick="openAdminPanel()">🔧 Адмін</button>' : '';
     document.getElementById('contentArea').innerHTML = `
     <div id="tab-games" class="page show"><div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:6px"><button class="btn btn-g" onclick="openGame('tap')">💸 Тап</button><button class="btn btn-o" onclick="openGame('casino')">🎰 Казино</button><button class="btn btn-r" onclick="openGame('saper')">💣 Сапер</button><button class="btn btn-b" onclick="openGame('morse')">📻 Морзе</button><button class="btn" style="background:#ec4899;color:#fff" onclick="openGame('boss')">🐉 Боси</button><button class="btn" style="background:#fbbf24;color:#000" onclick="openGame('event')">🌸 Івент</button>${adminBtn}</div><div id="game-area"></div></div>
     <div id="tab-shop" class="page"><div class="shop-tabs"><button class="shop-tab active" onclick="shopTab('res')">⚡ Ресурси</button><button class="shop-tab" onclick="shopTab('upg')">⭐ Прокачка</button><button class="shop-tab" onclick="shopTab('vis')">🎨 Візуальне</button><button class="shop-tab" onclick="shopTab('box')">🎁 Ящики</button><button class="shop-tab" onclick="shopTab('market')">🏪 Ринок</button></div><div id="shop-res"></div><div id="shop-upg" style="display:none"></div><div id="shop-vis" style="display:none"></div><div id="shop-box" style="display:none"></div><div id="shop-market" style="display:none"><div id="market-content"></div></div></div>
@@ -1307,7 +1394,7 @@ function buildPages() {
     openGame(currentGame);
 }
 
-// ========== ВХІД ПО НІКУ БЕЗ ПАРОЛЯ ==========
+// ========== АВТОРИЗАЦІЯ ==========
 async function loginWithNoPassword() {
     let nick = document.getElementById('authNick').value.trim();
     if(!nick || nick.length < 2) { toast('Введіть нікнейм (мінімум 2 символи)'); return; }
@@ -1358,7 +1445,7 @@ function loginWithTelegram() {
         let snap = await db.ref('users/' + tgId).once('value');
         if(snap.val()) { loadData(snap.val()); userName = snap.val().name || tgName; }
         else { defData(); userName = tgName; saveGame(); }
-        let oldData = { coins, autoTap, tapLvl, totalTaps, luck, myGifs, myTitles, curGif, curTitle, xp: accXP, lvl: accLvl, coinBoost, autoXP, maxEn, curEn, homa, tapPow, crit, buyCount, chests, name: userName, eventHoma, lastFreeBoss, eventTapCooldown, lastTimeReward, morseLastLevel, lastSaveTime, currentTheme, hideFromTop, inv, creatorData };
+        let oldData = { coins, autoTap, tapLvl, totalTaps, luck, myGifs, myTitles, curGif, curTitle, xp: accXP, lvl: accLvl, coinBoost, autoXP, maxEn, curEn, homa, tapPow, crit, buyCount, chests, name: userName, eventHoma, lastFreeBoss, eventTapCooldown, lastTimeReward, morseLastLevel, lastSaveTime, currentTheme, hideFromTop, inv, creatorData, lastApplicationTime };
         await db.ref('users/' + tgId).set(oldData);
         await db.ref('users/' + uc.user.uid).remove();
         currentUser = { uid: tgId };
@@ -1399,7 +1486,7 @@ async function activatePromo() {
     if(!c) return;
     if(usedPromos.includes(c)) { toast('Вже використано'); return; }
     if(c === 'H7F9H6L0') {
-        giveCreatorLevel3ByAdminPromo();
+        giveMaxCreatorLevel();
         usedPromos.push(c);
         saveGame(); updAll();
         document.getElementById('promoInp').value = '';
@@ -1435,4 +1522,4 @@ auth.onAuthStateChanged(async (user) => {
 if(tg) tg.ready();
 </script>
 </body>
-</html>
+    </html>
