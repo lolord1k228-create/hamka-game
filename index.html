@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>🐹 hamka – фінальна версія (топ+ринок)</title>
+    <title>🐹 hamka – фікс ринок + топ</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
@@ -324,7 +324,6 @@ function buildTop(){
             const data=child.val();
             if(!data||!data.name) return;
             if(data.hideFromTop===true) return;
-            // Більше НЕ фільтруємо за рівнем! Показуємо всіх
             users.push({
                 name:data.name, xp:data.xp||0, lvl:data.lvl||1,
                 avatar:data.avatar||'🐹', homa:data.homa||0, eventHoma:data.eventHoma||0,
