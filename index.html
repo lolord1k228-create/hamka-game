@@ -416,12 +416,13 @@ try {
 }
 
 // ============================================================
-//  📦 DATA & CONFIG (скорочено для економії місця)
+//  📦 DATA & CONFIG (ПОВНІСТЮ ВІДНОВЛЕНО)
 // ============================================================
 const GIFS = [
     {id:'🐹',r:'common'},{id:'🐱',r:'common'},{id:'🐶',r:'common'},{id:'🦊',r:'common'},{id:'🐻',r:'common'},
     {id:'🐯',r:'rare'},{id:'🦁',r:'rare'},{id:'🐺',r:'rare'},{id:'👑',r:'superrare'},{id:'💎',r:'superrare'},
-    {id:'🌟',r:'epic'},{id:'🔥',r:'epic'},{id:'🚀',r:'mythic'},{id:'🦄',r:'legendary'},{id:'🐲',r:'legendary'}
+    {id:'🌟',r:'epic'},{id:'🔥',r:'epic'},{id:'🚀',r:'mythic'},{id:'🦄',r:'legendary'},{id:'🐲',r:'legendary'},
+    {id:'⚔️',r:'exclusive'},{id:'☀️',r:'rare'},{id:'🏖️',r:'rare'},{id:'🍉',r:'summer'},{id:'🍦',r:'summer'}
 ];
 const RARITY_PRICES = { common:1000, rare:3000, superrare:8000, epic:50000, mythic:150000, legendary:500000 };
 
@@ -441,16 +442,32 @@ const TITLES = {
     'veteran':{name:'🎖️ Ветеран',color:'#f97316',price:1000000},
     'elite':{name:'💎 Елітний',color:'#06b6d4',price:2500000},
     'legend':{name:'🏆 Легендарний',color:'#ffd700',price:5000000,class:'title-legendary'},
-    'mythic':{name:'✨ Міфічний',color:'#ec4899',price:10000000,class:'title-neon'},
+    'mythic':{name:'✨ Міфічний',color:'#ec4899',price:10000000,class:'title-cosmic'},
     'god':{name:'👑 Бог',color:'#00ff88',price:25000000,class:'title-gold'},
-    'hamka':{name:'🐹 Хамка',color:'#00ff88',price:25000,class:'title-cyber'}
+    'hamka':{name:'🐹 Хамка',color:'#00ff88',price:25000,class:'title-cyber'},
+    'cyber':{name:'🖥️ Кіберпанк',color:'#0f0',price:15000000,class:'title-cyber'},
+    'neon':{name:'💜 Неоновий',color:'#ff00cc',price:20000000,class:'title-neon'},
+    'cosmic':{name:'🌌 Космічний',color:'#ff66cc',price:40000000,class:'title-cosmic'},
+    'void':{name:'🕳️ Порожнеча',color:'#8a2be2',price:50000000,class:'title-void'},
+    'fire':{name:'🔥 Вогняний',color:'#ff3300',price:35000000,class:'title-fire'},
+    'ice':{name:'❄️ Крижаний',color:'#00ffff',price:35000000,class:'title-ice'},
+    'king':{name:'👑 Король',color:'#ffd700',class:'title-royal'},
+    'lord':{name:'🗡️ Лорд',color:'#9ca3af',class:'title-royal'},
+    'knight':{name:'🛡️ Лицар',color:'#3b82f6'},
+    'letniy':{name:'🌞 Літній',color:'#fbbf24'},
+    'sunny':{name:'☀️ Сонячний',color:'#ffaa00'},
+    'leto':{name:'💜 ĹÈŤO',color:'#ec4899'}
 };
 
 const UPGRADE_ITEMS = [
     {id:'figurine_durov',name:"Durov's Figurine",price:160256075,image:"🎭",rarity:'legendary'},
     {id:'astral_shard',name:"Astral Shard",price:364927800,image:"💎",rarity:'mythic'},
     {id:'pepe_gucci',name:"Plush Pepe (Gucci)",price:237725750,image:"🐸",rarity:'epic'},
-    {id:'nessie',name:"Pool Float (Nessie)",price:793356832,image:"🦕",rarity:'legendary'}
+    {id:'nessie',name:"Pool Float (Nessie)",price:793356832,image:"🦕",rarity:'legendary'},
+    {id:'crypto_pendant',name:"Crypto Pendant",price:50000000,image:"🔮",rarity:'rare'},
+    {id:'golden_coin',name:"Golden Coin",price:25000000,image:"🪙",rarity:'rare'},
+    {id:'diamond_ring',name:"Diamond Ring",price:150000000,image:"💍",rarity:'epic'},
+    {id:'hamka_crown',name:"Hamka Crown",price:500000000,image:"👑",rarity:'legendary'}
 ];
 
 const BOSSES = [
@@ -472,7 +489,7 @@ const BOXES = [
 ];
 
 // ============================================================
-//  🎮 GAME STATE
+//  🎮 GAME STATE (ПОВНІСТЮ)
 // ============================================================
 let G = {
     uid: null,
@@ -509,6 +526,7 @@ let G = {
     hideFromTop: false,
     inv: [],
     upgradeInventory: {"figurine_durov":1},
+    creatorData: {level:1,xp:0,promoCode:'',promoRefCount:0},
     upgrades: {
         maxEnergy: 0,
         autoXP: 0,
@@ -527,7 +545,9 @@ let G = {
     marketListings: [],
     traders: [
         {id:'trader1',name:'🤖 Крипто-магнат',crypto:'HAM',items:['figurine_durov','astral_shard'],multiplier:1.2},
-        {id:'trader2',name:'💎 Діамантовий трейдер',crypto:'HAMG',items:['pepe_gucci','nessie'],multiplier:1.5}
+        {id:'trader2',name:'💎 Діамантовий трейдер',crypto:'HAMG',items:['pepe_gucci','golden_coin'],multiplier:1.5},
+        {id:'trader3',name:'🔥 Вогняний трейдер',crypto:'HAMC',items:['nessie','diamond_ring'],multiplier:1.8},
+        {id:'trader4',name:'👑 Королівський трейдер',crypto:'HAM',items:['hamka_crown','crypto_pendant'],multiplier:2.0}
     ]
 };
 
@@ -583,6 +603,12 @@ function addGif(id, n=1) { G.ownedGifs[id] = (G.ownedGifs[id] || 0) + n; }
 function hasTitle(id) { return G.ownedTitles[id] && G.ownedTitles[id] > 0; }
 function addTitle(id, n=1) { G.ownedTitles[id] = (G.ownedTitles[id] || 0) + n; }
 
+function getTitleDisplay(id) {
+    const t = TITLES[id] || {name:id, color:'#fff', class:''};
+    if (t.class) return `<span class="${t.class}">${t.name}</span>`;
+    return `<span style="color:${t.color}">${t.name}</span>`;
+}
+
 // ============================================================
 //  💾 SAVE / LOAD
 // ============================================================
@@ -604,7 +630,9 @@ function saveGame() {
 function loadGame(data) {
     if (!data) return;
     Object.keys(data).forEach(key => {
-        if (key === 'upgrades') {
+        if (key === 'creatorData') {
+            Object.assign(G.creatorData, data.creatorData);
+        } else if (key === 'upgrades') {
             Object.assign(G.upgrades, data.upgrades);
         } else if (key === 'ownedGifs') {
             G.ownedGifs = data.ownedGifs || {'🐹':1};
@@ -614,6 +642,8 @@ function loadGame(data) {
             G.chests = data.chests || {};
         } else if (key === 'upgradeInventory') {
             G.upgradeInventory = data.upgradeInventory || {"figurine_durov":1};
+        } else if (key === 'inv') {
+            G.inv = data.inv || [];
         } else if (key === 'marketListings') {
             G.marketListings = data.marketListings || [];
         } else if (key === 'cryptoHistory') {
@@ -784,6 +814,7 @@ function buildPages() {
                 <button class="btn btn-o btn-lg" onclick="openGame('casino')">🎰</button>
                 <button class="btn btn-p btn-lg" onclick="openGame('upgrader')">🔧</button>
                 <button class="btn" style="background:#f97316;font-size:12px;padding:12px;" onclick="openGame('boss')">🐉</button>
+                <button class="btn" style="background:#ec4899;font-size:12px;padding:12px;" onclick="openGame('event')">🌸</button>
             </div>
             <div id="game-area"></div>
         </div>
@@ -822,6 +853,18 @@ function handleTap(e) {
     if (G.totalTaps % 30 === 0) {
         G.crypto.HAM = (G.crypto.HAM || 0) + 0.02;
         toast('₿ +0.02 HAM за 30 тапів!');
+    }
+    if (G.totalTaps % 100 === 0) {
+        G.crypto.HAMG = (G.crypto.HAMG || 0) + 0.01;
+        toast('🪙 +0.01 HAMG за 100 тапів!');
+    }
+    if (G.totalTaps % 200 === 0) {
+        G.crypto.HAMC = (G.crypto.HAMC || 0) + 0.005;
+        toast('💎 +0.005 HAMC за 200 тапів!');
+    }
+    if (G.totalTaps % 100 === 0) {
+        G.eventHoma += 1;
+        toast('🌸 +1 івенхом за 100 тапів!');
     }
     updateUI();
     showTapAnimation(x, y, inc);
@@ -896,6 +939,8 @@ function openGame(g) {
         renderUpgrader();
     } else if (g === 'boss') {
         renderBosses();
+    } else if (g === 'event') {
+        renderEvent();
     }
 }
 
@@ -932,7 +977,7 @@ function spinSlot() {
 }
 
 // ============================================================
-//  🔧 UPGRADER
+//  🔧 UPGRADER (З ВИКОРИСТАННЯМ ГІФОК)
 // ============================================================
 function renderUpgrader() {
     const inItem = G.selectedItemIn ? UPGRADE_ITEMS.find(i => i.id === G.selectedItemIn) : null;
@@ -941,11 +986,19 @@ function renderUpgrader() {
     if (inItem && outItem) {
         chance = Math.min(100, (inItem.price / outItem.price) * 100);
     }
+    
+    // Отримуємо гіфки для відображення
+    const gifKeys = Object.keys(G.ownedGifs);
+    const gifDisplay = gifKeys.slice(0, 6).map(id => 
+        `<div class="gif-cell" style="border-color:${G.activeGif === id ? 'var(--primary)' : 'var(--border)'};" onclick="G.activeGif='${id}';renderUpgrader();updateUI();">${id}</div>`
+    ).join('');
+    
     let html = `<div class="upgrader-container">
         <div class="upgrader-card ${inItem ? 'selected' : ''}" onclick="if(!inItem)G.selectedItemIn=null;renderUpgrader()">
             <div class="icon-wrap">${inItem ? inItem.image : '➕'}</div>
             <div class="item-name">${inItem ? inItem.name : 'Оберіть предмет'}</div>
             <div class="item-price">${inItem ? '$' + inItem.price.toLocaleString() : '—'}</div>
+            ${inItem ? `<div style="font-size:6px;color:var(--text-secondary);margin-top:2px;">${inItem.rarity}</div>` : ''}
         </div>
         <div class="upgrader-center">
             <div><div class="chance-value">${chance.toFixed(0)}%</div><div class="chance-label">Шанс</div></div>
@@ -955,6 +1008,7 @@ function renderUpgrader() {
             <div class="icon-wrap">${outItem ? outItem.image : '❓'}</div>
             <div class="item-name">${outItem ? outItem.name : 'Бажаний'}</div>
             <div class="item-price">${outItem ? '$' + outItem.price.toLocaleString() : '—'}</div>
+            ${outItem ? `<div style="font-size:6px;color:var(--text-secondary);margin-top:2px;">${outItem.rarity}</div>` : ''}
         </div>
     </div>
     <div class="card"><div class="card-title">🎁 Ваші предмети</div><div class="inventory-grid">`;
@@ -965,11 +1019,23 @@ function renderUpgrader() {
                 html += `<div class="inv-item ${G.selectedItemIn === id ? 'selected' : ''}" onclick="G.selectedItemIn='${id}';renderUpgrader()">
                     <span class="icon">${item.image}</span>
                     <span class="count">x${count}</span>
+                    <span class="name">${item.name.slice(0,5)}</span>
                 </div>`;
             }
         }
     }
-    html += `</div></div>`;
+    html += `</div></div>
+    <div class="card"><div class="card-title">🎯 Бажані предмети</div><div class="inventory-grid">`;
+    UPGRADE_ITEMS.forEach(item => {
+        html += `<div class="inv-item ${G.selectedItemOut === item.id ? 'selected' : ''}" onclick="G.selectedItemOut='${item.id}';renderUpgrader()">
+            <span class="icon">${item.image}</span>
+            <span class="name">${item.name.slice(0,5)}</span>
+        </div>`;
+    });
+    html += `</div></div>
+    <div class="card"><div class="card-title">🎨 Ваші гіфки</div><div class="gif-row">${gifDisplay}</div>
+    <div style="font-size:8px;color:var(--text-secondary);margin-top:4px;">Активна: ${G.activeGif}</div>
+    </div>`;
     document.getElementById('game-area').innerHTML = html;
 }
 
@@ -1003,6 +1069,10 @@ function performUpgrade() {
             G.upgradeInventory[G.selectedItemOut] = (G.upgradeInventory[G.selectedItemOut] || 0) + 1;
             toast('✅ Успіх! +' + outItem.name);
             G.crypto.HAM = (G.crypto.HAM || 0) + 0.5;
+            // Додаємо випадкову гіфку за успіх
+            const randGif = GIFS[rand(0, GIFS.length-1)];
+            addGif(randGif.id);
+            toast('🎨 +' + randGif.id + ' за успіх!');
         } else {
             G.upgradeInventory[G.selectedItemIn]--;
             if (G.upgradeInventory[G.selectedItemIn] === 0) delete G.upgradeInventory[G.selectedItemIn];
@@ -1038,7 +1108,7 @@ function fightBoss(idx) {
                 G.homa += reward;
                 toast(`🎉 Перемога! +${reward}🟣`);
             } else {
-                let rew = ['gif','homa','title','chest','kreita','crypto'][rand(0,5)];
+                let rew = ['gif','homa','title','chest','kreita','crypto','eventHoma'][rand(0,6)];
                 if (rew === 'gif') {
                     let av = GIFS.filter(g => !g.id.includes('⚔️'));
                     let g = av[rand(0, av.length-1)];
@@ -1058,8 +1128,12 @@ function fightBoss(idx) {
                     let a = rand(1, 10) / 100;
                     G.crypto[type] = (G.crypto[type] || 0) + a;
                     toast(`₿ +${a.toFixed(2)} ${type}`);
+                } else if (rew === 'eventHoma') {
+                    let a = rand(1, 5);
+                    G.eventHoma += a;
+                    toast(`🌸 +${a} івенхомів`);
                 } else if (rew === 'title') {
-                    let titles = ['king','lord','knight','hamka','pro','player','noob'];
+                    let titles = ['king','lord','knight','hamka','pro','player','noob','cyber','neon','cosmic','void','fire','ice','letniy','sunny','leto'];
                     let nt = titles[rand(0, titles.length-1)];
                     addTitle(nt);
                     toast('🏅 Титул ' + (TITLES[nt]?.name || nt));
@@ -1091,6 +1165,62 @@ function renderBosses() {
     });
     html += '</div>';
     document.getElementById('game-area').innerHTML = html;
+}
+
+// ============================================================
+//  🌸 ІВЕНТ
+// ============================================================
+function renderEvent() {
+    document.getElementById('game-area').innerHTML = `
+        <div class="center-game"><h3 style="color:#ec4899;font-size:13px;">🌸 Літній бум</h3>
+            <div class="card"><b>🪙 Івенхоми:</b> ${G.eventHoma.toFixed(2)}</div>
+            <div class="card"><b>📦 Івенхоум</b> (1)<br><button class="btn btn-o btn-sm" onclick="openEventChest(1)">Відкрити</button></div>
+            <div class="card"><b>📦 Великий івенхоум</b> (10)<br><button class="btn btn-o btn-sm" onclick="openEventChest(10)">Відкрити</button></div>
+            <div class="card"><button class="btn btn-b btn-sm" onclick="tapEventHoma()">⚡ Тапнути (+0.25)</button><br><small>Раз на 5 сек</small></div>
+        </div>
+    `;
+}
+
+function tapEventHoma() {
+    let now = Date.now();
+    if (now - G.eventTapCooldown < 5000) {
+        toast(`⏳ ${Math.ceil((5000-(now-G.eventTapCooldown))/1000)} сек`);
+        return;
+    }
+    G.eventTapCooldown = now;
+    G.eventHoma += 0.25;
+    toast('+0.25 івенхома');
+    updateUI();
+    saveGame();
+    renderEvent();
+}
+
+function openEventChest(cost) {
+    if (G.eventHoma < cost) { toast('❌ Не вистачає івенхом'); return; }
+    G.eventHoma -= cost;
+    let r = Math.random(), msg = '';
+    if (cost === 1) {
+        if (r < 0.34) { G.homa += 5; msg = '5 хом'; }
+        else if (r < 0.6) { G.homa += 20; msg = '20 хом'; }
+        else if (r < 0.75) { addGif('☀️'); msg = 'гіфка ☀️'; }
+        else if (r < 0.85) { addGif('🏖️'); msg = 'гіфка 🏖️'; }
+        else if (r < 0.95) { addTitle('letniy'); msg = 'титул летний'; }
+        else if (r < 0.99) { G.homa += 150; msg = '150 хом'; }
+        else { addTitle('leto'); msg = 'титул ĹÈŤO'; }
+    } else {
+        if (r < 0.2) { G.homa += 50; msg = '50 хом'; }
+        else if (r < 0.4) { G.homa += 150; msg = '150 хом'; }
+        else if (r < 0.55) { addGif('☀️'); msg = 'гіфка ☀️'; }
+        else if (r < 0.7) { addGif('🏖️'); msg = 'гіфка 🏖️'; }
+        else if (r < 0.85) { addTitle('letniy'); msg = 'титул летний'; }
+        else if (r < 0.95) { G.homa += 500; msg = '500 хом'; }
+        else if (r < 0.997) { addTitle('leto'); msg = 'титул ĹÈŤO'; }
+        else { addTitle('sunny'); msg = 'титул сонячний'; }
+    }
+    toast('🎁 ' + msg);
+    updateUI();
+    saveGame();
+    renderEvent();
 }
 
 // ============================================================
@@ -1438,15 +1568,10 @@ function renderProfile() {
             <div class="profile-stat"><div class="value crypto3">${(G.crypto.HAMC||0).toFixed(2)}</div>💎 HAMC</div>
             <div class="profile-stat"><div class="value">${G.totalTaps}</div>👆</div>
             <div class="profile-stat"><div class="value">${G.vip ? '✅' : '❌'}</div>👑</div>
+            <div class="profile-stat"><div class="value">${G.eventHoma.toFixed(2)}</div>🌸</div>
         </div>
         <button class="btn btn-r btn-block" onclick="resetGame()" style="width:100%;margin-top:6px;padding:12px;font-size:12px;">🔄 Скинути прогрес</button>
     `;
-}
-
-function getTitleDisplay(id) {
-    const t = TITLES[id] || {name:id, color:'#fff', class:''};
-    if (t.class) return `<span class="${t.class}">${t.name}</span>`;
-    return `<span style="color:${t.color}">${t.name}</span>`;
 }
 
 // ============================================================
@@ -1785,9 +1910,9 @@ if (firebaseReady && auth) {
 }
 
 console.log('🐹 Hamka — Повна гра');
-console.log('✅ Збільшені кнопки');
+console.log('✅ Всі функції відновлено');
+console.log('🎨 Апгрейдер використовує гіфки');
 console.log('📱 Вхід через Email + Telegram');
-console.log('📧 Email: нік@hamka.ua');
 </script>
 </body>
 </html>
