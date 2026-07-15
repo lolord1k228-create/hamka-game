@@ -1241,8 +1241,11 @@
             isBanned: false,
             currentGame: 'tap',
             isTelegramUser: false,
-            hasPlow: false,
-            usePlow: false
+            // Скіни
+            skins: {
+                plow: { has: false, use: false, file: 'Plow.jpg' },
+                ronaldo: { has: false, use: false, file: 'Ronaldo.jpg' }
+            }
         };
 
         function rand(a, b) { return Math.floor(Math.random() * (b - a + 1)) + a; }
@@ -1309,18 +1312,30 @@
             const btn = document.getElementById('tapBtn');
             if (!btn) return;
             btn.innerHTML = '';
-            if (G.usePlow && G.hasPlow) {
+
+            // Перевіряємо який скін активний
+            let skinFile = null;
+            let skinName = '';
+            if (G.skins.plow.use && G.skins.plow.has) {
+                skinFile = G.skins.plow.file;
+                skinName = 'PLOW';
+            } else if (G.skins.ronaldo.use && G.skins.ronaldo.has) {
+                skinFile = G.skins.ronaldo.file;
+                skinName = 'RONALDO';
+            }
+
+            if (skinFile) {
                 const img = document.createElement('img');
                 img.className = 'tap-image';
-                img.src = 'Plow.jpg';
-                img.alt = 'Plow';
+                img.src = skinFile;
+                img.alt = skinName;
                 img.onerror = function() {
                     this.style.display = 'none';
                     const emoji = document.createElement('span');
                     emoji.className = 'tap-emoji';
                     emoji.textContent = '📂';
                     btn.appendChild(emoji);
-                    toast('⚠️ Файл Plow.jpg не знайдено');
+                    toast('⚠️ Файл ' + skinFile + ' не знайдено');
                 };
                 btn.appendChild(img);
             } else {
@@ -1331,24 +1346,59 @@
             }
         }
 
+        // Отримати активний скін для відображення
+        function getActiveSkinName() {
+            if (G.skins.plow.use && G.skins.plow.has) return 'PLOW';
+            if (G.skins.ronaldo.use && G.skins.ronaldo.has) return 'RONALDO';
+            return G.activeGif;
+        }
+
         // Промокоди
         function activatePromo() {
             let code = document.getElementById('promoInp').value.trim().toUpperCase();
             if (!code) { toast('❌ Введіть промокод');
                 return; }
+
+            // Скін PLOW
             if (code === 'PLOW') {
-                if (G.hasPlow) {
+                if (G.skins.plow.has) {
                     toast('✅ Скін PLOW вже активовано!');
                 } else {
-                    G.hasPlow = true;
-                    G.usePlow = true;
+                    G.skins.plow.has = true;
+                    G.skins.plow.use = true;
+                    // Вимикаємо інші скіни
+                    G.skins.ronaldo.use = false;
                     toast('🚜 Скін PLOW активовано! (Plow.jpg)');
                     saveGame();
                     updateTapButton();
                     renderVip();
                     renderInventory();
                 }
-            } else if (code === 'LETO') { G.eventHoma += 50;
+                document.getElementById('promoInp').value = '';
+                return;
+            }
+
+            // Скін RONALDO
+            if (code === 'RONALDO') {
+                if (G.skins.ronaldo.has) {
+                    toast('✅ Скін RONALDO вже активовано!');
+                } else {
+                    G.skins.ronaldo.has = true;
+                    G.skins.ronaldo.use = true;
+                    // Вимикаємо інші скіни
+                    G.skins.plow.use = false;
+                    toast('⚽ Скін RONALDO активовано! (Ronaldo.jpg)');
+                    saveGame();
+                    updateTapButton();
+                    renderVip();
+                    renderInventory();
+                }
+                document.getElementById('promoInp').value = '';
+                return;
+            }
+
+            // Інші промокоди
+            if (code === 'LETO') { G.eventHoma += 50;
                 toast('🌸 +50');
                 updateUI();
                 saveGame(); } else if (code === 'START') { G.coins += 1000;
@@ -1374,17 +1424,43 @@
             document.getElementById('promoInp').value = '';
         }
 
+        // Переключення скіна
+        function toggleSkin(skinName) {
+            const skin = G.skins[skinName];
+            if (!skin || !skin.has) return;
+
+            // Якщо вже використовується - вимикаємо
+            if (skin.use) {
+                skin.use = false;
+                toast('🐹 Виключено скін ' + skinName.toUpperCase());
+            } else {
+                // Вмикаємо цей скін, вимикаємо всі інші
+                Object.keys(G.skins).forEach(key => {
+                    if (key !== skinName) G.skins[key].use = false;
+                });
+                skin.use = true;
+                toast('🎨 Включено скін ' + skinName.toUpperCase());
+            }
+            saveGame();
+            updateTapButton();
+            renderVip();
+            renderInventory();
+        }
+
+        // VIP
         function renderVip() {
             const el = document.getElementById('vip-area');
             if (!el) return;
+
+            // Скін PLOW
             let plowHtml = '';
-            if (G.hasPlow) {
+            if (G.skins.plow.has) {
                 plowHtml = `
-                    <div class="card" style="border-color:var(--gold);">
+                    <div class="card" style="border-color:${G.skins.plow.use ? 'var(--gold)' : 'var(--border)'};">
                         <div class="flex">
                             <b>🚜 PLOW Скін</b>
-                            <button class="btn ${G.usePlow ? 'btn-g' : 'btn-sm'}" onclick="togglePlow()">
-                                ${G.usePlow ? '✅ Використовується' : '🔘 Використовувати'}
+                            <button class="btn ${G.skins.plow.use ? 'btn-g' : 'btn-sm'}" onclick="toggleSkin('plow')">
+                                ${G.skins.plow.use ? '✅ Використовується' : '🔘 Використовувати'}
                             </button>
                         </div>
                         <div style="font-size:6px;color:var(--text-secondary);margin-top:2px;">📂 Plow.jpg</div>
@@ -1400,32 +1476,103 @@
                     </div>
                 `;
             }
+
+            // Скін RONALDO
+            let ronaldoHtml = '';
+            if (G.skins.ronaldo.has) {
+                ronaldoHtml = `
+                    <div class="card" style="border-color:${G.skins.ronaldo.use ? 'var(--gold)' : 'var(--border)'};">
+                        <div class="flex">
+                            <b>⚽ RONALDO Скін</b>
+                            <button class="btn ${G.skins.ronaldo.use ? 'btn-g' : 'btn-sm'}" onclick="toggleSkin('ronaldo')">
+                                ${G.skins.ronaldo.use ? '✅ Використовується' : '🔘 Використовувати'}
+                            </button>
+                        </div>
+                        <div style="font-size:6px;color:var(--text-secondary);margin-top:2px;">📂 Ronaldo.jpg</div>
+                    </div>
+                `;
+            } else {
+                ronaldoHtml = `
+                    <div class="card" style="opacity:0.5;">
+                        <div class="flex">
+                            <b>⚽ RONALDO Скін</b>
+                            <span style="font-size:6px;color:var(--text-secondary);">🎁 Промокод RONALDO</span>
+                        </div>
+                    </div>
+                `;
+            }
+
             el.innerHTML = `
                 <div class="card"><div class="flex"><b>👑 VIP</b> ${G.vip ? '✅ Активний' : '20000💰'} <button class="btn btn-g btn-sm" onclick="buyItem('vip')">${G.vip ? 'Вже є' : 'Купити'}</button></div></div>
                 <div class="card" style="${G.vip ? '' : 'opacity:0.5;pointer-events:none;'}">
                     <div class="card-title">🎨 Зміна гіфки</div>
                     <div class="gif-row">
-                    ${Object.keys(G.ownedGifs).map(id => `<div class="gif-cell ${G.activeGif===id && !G.usePlow ? 'sel' : ''}" onclick="if(G.vip){G.activeGif='${id}';G.usePlow=false;updateUI();saveGame();renderVip();updateTapButton();}">${id}</div>`).join('')}</div>
+                    ${Object.keys(G.ownedGifs).map(id => {
+                        const isActive = G.activeGif === id && !G.skins.plow.use && !G.skins.ronaldo.use;
+                        return `<div class="gif-cell ${isActive ? 'sel' : ''}" onclick="if(G.vip){G.activeGif='${id}';G.skins.plow.use=false;G.skins.ronaldo.use=false;updateUI();saveGame();renderVip();updateTapButton();}">${id}</div>`;
+                    }).join('')}</div>
                     <div class="card-title" style="margin-top:4px;">🏅 Зміна титулу</div>
                     <div style="display:flex;flex-wrap:wrap;gap:4px;margin:4px 0;">
                     ${Object.keys(G.ownedTitles).map(id => `<button class="btn ${G.activeTitle===id?'btn-g':'btn-sm'}" style="font-size:6px;padding:3px 8px;" onclick="if(G.vip){G.activeTitle='${id}';updateUI();saveGame();renderVip()}">${TITLES[id]?.name||id}</button>`).join('')}</div>
                 </div>
                 ${plowHtml}
+                ${ronaldoHtml}
             `;
         }
 
-        function togglePlow() {
-            G.usePlow = !G.usePlow;
-            if (G.usePlow) {
-                toast('🚜 Включено PLOW скін');
-            } else {
-                toast('🐹 Включено звичайну гіфку');
+        // ====== ІНВЕНТАР ======
+        function renderInventory() {
+            let gifs = Object.entries(G.ownedGifs).map(([id, c]) =>
+                `<div class="inv-item"><span class="icon">${id}</span><span class="count">x${c}</span></div>`
+            ).join('');
+            let titles = Object.entries(G.ownedTitles).map(([id, c]) =>
+                `<div class="inv-item"><span style="font-size:7px;">${TITLES[id]?.name || id}</span><span class="count">x${c}</span></div>`
+            ).join('');
+            let chests = Object.entries(G.chests).filter(([_, c]) => c > 0).map(([id, c]) => {
+                let box = BOXES.find(b => b.id === id);
+                return `<div class="inv-item"><span class="icon">${box?.emoji || '📦'}</span><span class="count">x${c}</span></div>`;
+            }).join('');
+            let upItems = Object.entries(G.upgradeInventory).filter(([_, c]) => c > 0).map(([id, c]) =>
+                `<div class="inv-item"><span class="icon">${UPGRADE_ITEMS[id]?.image || '❓'}</span><span class="count">x${c}</span></div>`
+            ).join('');
+
+            // Скіни в інвентарі
+            let skinsHtml = '';
+            if (G.skins.plow.has) {
+                skinsHtml += `
+                    <div class="card" style="border-color:${G.skins.plow.use ? 'var(--gold)' : 'var(--border)'};">
+                        <div class="flex">
+                            <span>🚜 PLOW</span>
+                            <span style="font-size:6px;color:var(--text-secondary);">Plow.jpg</span>
+                            <button class="btn ${G.skins.plow.use ? 'btn-g' : 'btn-sm'}" onclick="toggleSkin('plow')">
+                                ${G.skins.plow.use ? '✅' : '🔘'}
+                            </button>
+                        </div>
+                    </div>
+                `;
             }
-            updateUI();
-            saveGame();
-            renderVip();
-            renderInventory();
-            updateTapButton();
+            if (G.skins.ronaldo.has) {
+                skinsHtml += `
+                    <div class="card" style="border-color:${G.skins.ronaldo.use ? 'var(--gold)' : 'var(--border)'};">
+                        <div class="flex">
+                            <span>⚽ RONALDO</span>
+                            <span style="font-size:6px;color:var(--text-secondary);">Ronaldo.jpg</span>
+                            <button class="btn ${G.skins.ronaldo.use ? 'btn-g' : 'btn-sm'}" onclick="toggleSkin('ronaldo')">
+                                ${G.skins.ronaldo.use ? '✅' : '🔘'}
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            document.getElementById('inventory-area').innerHTML = `
+                ${skinsHtml}
+                ${gifs ? `<div class="card"><div class="card-title">🎨 Гіфки</div><div class="inventory-grid">${gifs}</div></div>` : ''}
+                ${titles ? `<div class="card"><div class="card-title">🏅 Титули</div><div class="inventory-grid">${titles}</div></div>` : ''}
+                ${chests ? `<div class="card"><div class="card-title">📦 Ящики</div><div class="inventory-grid">${chests}</div></div>` : ''}
+                ${upItems ? `<div class="card"><div class="card-title">🔧 Предмети</div><div class="inventory-grid">${upItems}</div></div>` : ''}
+                <div class="card" style="text-align:center;color:var(--text-muted);font-size:7px;">Всього: ${Object.values(G.ownedGifs).reduce((a,b)=>a+b,0) + Object.values(G.ownedTitles).reduce((a,b)=>a+b,0)}</div>
+            `;
         }
 
         // ====== КРИПТА ======
@@ -1555,22 +1702,35 @@
         function autoLoginWithTelegram() {
             if (!tg || !tgUserId) return false;
             document.getElementById('authStatus').textContent = '📱 Вхід через Telegram...';
+
             const uid = 'tg_' + tgUserId;
             G.uid = uid;
             G.isTelegramUser = true;
+
             const tgUser = tg.initDataUnsafe?.user;
             if (tgUser) {
                 let name = tgUser.first_name || 'TelegramUser';
                 if (tgUser.last_name) name += ' ' + tgUser.last_name;
                 G.name = name;
             }
+
+            // Перевіряємо в Firebase
             db.ref('users/' + uid).once('value').then(snap => {
-                if (snap.val()) { loadGame(snap.val());
-                    toast('✅ Дані завантажено!'); } else { toast('👋 Ласкаво просимо!');
-                    saveGame(); }
+                if (snap.val()) {
+                    loadGame(snap.val());
+                    toast('✅ Дані завантажено!');
+                } else {
+                    // Новий користувач - створюємо
+                    saveGame();
+                    toast('👋 Ласкаво просимо!');
+                }
                 startGame();
-            }).catch(e => { console.error('Load error:', e);
-                startGame(); });
+            }).catch(e => {
+                console.error('Load error:', e);
+                // Навіть якщо помилка - запускаємо гру
+                startGame();
+            });
+
             return true;
         }
 
@@ -1579,28 +1739,38 @@
                 return; }
             if (!tg || !tgUserId) { document.getElementById('authError').textContent = '❌ Запустіть гру в Telegram';
                 return; }
+
             const error = document.getElementById('authError');
             const success = document.getElementById('authSuccess');
             error.textContent = '';
             success.textContent = '⏳ Вхід через Telegram...';
+
             const uid = 'tg_' + tgUserId;
             G.uid = uid;
             G.isTelegramUser = true;
+
             const tgUser = tg.initDataUnsafe?.user;
             if (tgUser) {
                 let name = tgUser.first_name || 'TelegramUser';
                 if (tgUser.last_name) name += ' ' + tgUser.last_name;
                 G.name = name;
             }
+
             db.ref('users/' + uid).once('value').then(snap => {
-                if (snap.val()) { loadGame(snap.val());
-                    success.textContent = '✅ Вхід виконано!'; } else { saveGame();
-                    success.textContent = '✅ Новий акаунт створено!'; }
+                if (snap.val()) {
+                    loadGame(snap.val());
+                    success.textContent = '✅ Вхід виконано!';
+                } else {
+                    saveGame();
+                    success.textContent = '✅ Новий акаунт створено!';
+                }
                 startGame();
                 error.textContent = '';
-            }).catch(e => { console.error('Login error:', e);
+            }).catch(e => {
+                console.error('Login error:', e);
                 error.textContent = '❌ ' + e.message;
-                success.textContent = ''; });
+                success.textContent = '';
+            });
         }
 
         function handleGuest() {
@@ -1610,22 +1780,30 @@
             const success = document.getElementById('authSuccess');
             error.textContent = '';
             success.textContent = '⏳ Вхід як гість...';
+
             auth.signInAnonymously()
                 .then(userCredential => {
                     const uid = userCredential.user.uid;
                     G.uid = uid;
                     G.isTelegramUser = false;
                     G.name = 'Гість';
+
                     db.ref('users/' + uid).once('value').then(snap => {
-                        if (snap.val()) { loadGame(snap.val()); } else { saveGame(); }
+                        if (snap.val()) {
+                            loadGame(snap.val());
+                        } else {
+                            saveGame();
+                        }
                         success.textContent = '✅ Гостьовий вхід!';
                         error.textContent = '';
                         startGame();
                     });
                 })
-                .catch(e => { console.error('Guest error:', e);
+                .catch(e => {
+                    console.error('Guest error:', e);
                     error.textContent = '❌ ' + e.message;
-                    success.textContent = ''; });
+                    success.textContent = '';
+                });
         }
 
         function handleLogin() {
@@ -1644,27 +1822,39 @@
             error.textContent = '';
             success.textContent = '⏳ Вхід...';
             const email = nick.toLowerCase().replace(/[^a-z0-9]/g, '') + '@hamka.ua';
+
             auth.signInWithEmailAndPassword(email, pass)
                 .then(userCredential => {
                     G.uid = userCredential.user.uid;
                     G.isTelegramUser = false;
                     G.name = nick;
+
                     db.ref('users/' + G.uid).once('value').then(snap => {
-                        if (snap.val()) { loadGame(snap.val()); } else { saveGame(); }
+                        if (snap.val()) {
+                            loadGame(snap.val());
+                        } else {
+                            saveGame();
+                        }
                         success.textContent = '✅ Вхід виконано!';
                         error.textContent = '';
                         startGame();
                     });
                 })
-                .catch(e => { console.error('Login error:', e);
+                .catch(e => {
+                    console.error('Login error:', e);
                     error.textContent = '❌ ' + e.message;
-                    success.textContent = ''; });
+                    success.textContent = '';
+                });
         }
 
         function logout() {
             if (confirm('Вийти?')) {
-                if (G.isTelegramUser) { location.reload(); } else { auth.signOut();
-                    location.reload(); }
+                if (G.isTelegramUser) {
+                    location.reload();
+                } else {
+                    auth.signOut();
+                    location.reload();
+                }
             }
         }
 
@@ -1676,6 +1866,7 @@
             document.getElementById('game').style.display = 'flex';
             updateUI();
             buildPages();
+
             if (db) {
                 db.ref('global/cryptoRate').once('value').then(snap => {
                     if (snap.val()) {
@@ -1688,8 +1879,10 @@
                     }
                 }).catch(e => console.warn('Load global rate error:', e));
             }
+
             setInterval(() => { updateCryptoRate(); }, 3000);
             setInterval(() => { G.tapCountMinute = 0; }, 60000);
+
             setInterval(() => {
                 let regen = G.energyRegen + G.upgrades.energyRegen;
                 G.energy = Math.min(G.maxEnergy, G.energy + regen);
@@ -1704,6 +1897,7 @@
                 updateUI();
                 saveGame();
             }, 1000);
+
             setTimeout(updateTapButton, 100);
             saveGame();
             toast('🐹 Ласкаво просимо до Hamka!');
@@ -1744,6 +1938,7 @@
                 return; }
             if (G.energy < 1) { toast('⚡ Немає енергії! Зачекай.');
                 return; }
+
             G.tapCountMinute++;
             if (G.tapCountMinute > 900) {
                 G.isBanned = true;
@@ -1756,6 +1951,7 @@
                 }, 30000);
                 return;
             }
+
             let x = e.clientX || e.touches?.[0]?.clientX || window.innerWidth / 2;
             let y = e.clientY || e.touches?.[0]?.clientY || window.innerHeight / 2;
             G.energy--;
@@ -1765,10 +1961,12 @@
             G.totalTaps++;
             addXP(1);
             G.seasonPoints = (G.seasonPoints || 0) + 1;
+
             if (G.totalTaps % 30 === 0) { G.crypto += 0.5;
                 toast('₿ +0.5 крипти!'); }
             if (G.totalTaps % 100 === 0) { G.eventHoma += 1;
                 toast('🌸 +1 івенхом!'); }
+
             updateUI();
             showTapAnimation(x, y, inc);
             if (G.taps % 10 === 0) saveGame();
@@ -1782,6 +1980,7 @@
             num.style.top = (y - 30) + 'px';
             document.body.appendChild(num);
             setTimeout(() => num.remove(), 800);
+
             for (let i = 0; i < 6; i++) {
                 const coin = document.createElement('div');
                 coin.className = 'coin-particle';
@@ -1795,6 +1994,7 @@
                 document.body.appendChild(coin);
                 setTimeout(() => coin.remove(), 600);
             }
+
             const btn = document.getElementById('tapBtn');
             if (btn) {
                 const ripple = document.createElement('div');
@@ -1872,10 +2072,15 @@
             const outItem = G.selectedItemOut ? UPGRADE_ITEMS.find(i => i.id === G.selectedItemOut) : null;
             let chance = 0;
             if (inItem && outItem) { chance = Math.min(75, (inItem.price / outItem.price) * 100); }
+
+            // Показуємо який скін активний в апгрейдері
+            const activeSkin = getActiveSkinName();
             const gifKeys = Object.keys(G.ownedGifs);
-            const gifDisplay = gifKeys.slice(0, 8).map(id =>
-                `<div class="gif-cell ${G.activeGif === id && !G.usePlow ? 'sel' : ''}" onclick="G.activeGif='${id}';G.usePlow=false;updateUI();saveGame();renderUpgrader();updateTapButton();">${id}</div>`
-            ).join('');
+            const gifDisplay = gifKeys.slice(0, 8).map(id => {
+                const isActive = G.activeGif === id && !G.skins.plow.use && !G.skins.ronaldo.use;
+                return `<div class="gif-cell ${isActive ? 'sel' : ''}" onclick="G.activeGif='${id}';G.skins.plow.use=false;G.skins.ronaldo.use=false;updateUI();saveGame();renderUpgrader();updateTapButton();">${id}</div>`;
+            }).join('');
+
             let html = `
                 <div class="upgrader-container">
                     <div class="upgrader-card ${inItem ? 'selected' : ''}" onclick="if(!inItem)G.selectedItemIn=null;renderUpgrader()">
@@ -1896,6 +2101,7 @@
                     </div>
                 </div>
                 <div class="card"><div class="card-title">🎁 Ваші предмети</div><div class="inventory-grid">`;
+
             let hasItems = false;
             for (let [id, count] of Object.entries(G.upgradeInventory)) {
                 if (count > 0) {
@@ -1911,6 +2117,7 @@
                 }
             }
             if (!hasItems) { html += `<div style="color:var(--text-muted);font-size:7px;padding:6px;">Немає предметів</div>`; }
+
             html += `</div></div>
                 <div class="card"><div class="card-title">🎯 Бажані предмети</div><div class="inventory-grid">`;
             UPGRADE_ITEMS.forEach(item => {
@@ -1920,8 +2127,8 @@
                 </div>`;
             });
             html += `</div></div>
-                <div class="card"><div class="card-title">🎨 Гіфки (${gifKeys.length})</div><div class="gif-row">${gifDisplay}</div>
-                <div style="font-size:7px;color:var(--text-secondary);margin-top:3px;">Активна: ${G.usePlow ? '🚜 PLOW' : G.activeGif}</div>
+                <div class="card"><div class="card-title">🎨 Гіфки</div><div class="gif-row">${gifDisplay}</div>
+                <div style="font-size:7px;color:var(--text-secondary);margin-top:3px;">Активний: ${activeSkin}</div>
             </div>`;
             document.getElementById('game-area').innerHTML = html;
         }
@@ -1934,6 +2141,7 @@
             const inItem = UPGRADE_ITEMS.find(i => i.id === G.selectedItemIn);
             const outItem = UPGRADE_ITEMS.find(i => i.id === G.selectedItemOut);
             if (!inItem || !outItem) return;
+
             const btn = document.querySelector('.upgrade-btn');
             if (btn) {
                 btn.style.transform = 'scale(0.9)';
@@ -1943,6 +2151,7 @@
                     btn.style.opacity = '1';
                     btn.textContent = '🚀'; }, 400);
             }
+
             let chance = Math.min(75, (inItem.price / outItem.price) * 100);
             setTimeout(() => {
                 if (Math.random() * 100 <= chance) {
@@ -2120,6 +2329,9 @@
             if (btns[idx]) btns[idx].classList.add('active');
             const el = document.getElementById('shop-inner');
             if (!el) return;
+
+            // --- решта функцій магазину (скорочено для економії місця) ---
+            // Вони залишаються незмінними з попередньої версії
             if (tab === 'res') {
                 el.innerHTML = `
                     <div class="card"><div class="flex"><b>⚡ Енергія +50</b> <span style="color:var(--gold);">${getPrice('maxEnergy')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItem('maxEnergy')">Купити</button></div></div>
@@ -2391,49 +2603,11 @@
             `;
         }
 
-        // ====== ІНВЕНТАР ======
-        function renderInventory() {
-            let gifs = Object.entries(G.ownedGifs).map(([id, c]) =>
-                `<div class="inv-item"><span class="icon">${id}</span><span class="count">x${c}</span></div>`
-            ).join('');
-            let titles = Object.entries(G.ownedTitles).map(([id, c]) =>
-                `<div class="inv-item"><span style="font-size:7px;">${TITLES[id]?.name || id}</span><span class="count">x${c}</span></div>`
-            ).join('');
-            let chests = Object.entries(G.chests).filter(([_, c]) => c > 0).map(([id, c]) => {
-                let box = BOXES.find(b => b.id === id);
-                return `<div class="inv-item"><span class="icon">${box?.emoji || '📦'}</span><span class="count">x${c}</span></div>`;
-            }).join('');
-            let upItems = Object.entries(G.upgradeInventory).filter(([_, c]) => c > 0).map(([id, c]) =>
-                `<div class="inv-item"><span class="icon">${UPGRADE_ITEMS[id]?.image || '❓'}</span><span class="count">x${c}</span></div>`
-            ).join('');
-            let plowHtml = '';
-            if (G.hasPlow) {
-                plowHtml = `
-                    <div class="card" style="border-color:var(--gold);">
-                        <div class="card-title">🚜 PLOW Скін</div>
-                        <div class="flex">
-                            <span>📂 Plow.jpg</span>
-                            <button class="btn ${G.usePlow ? 'btn-g' : 'btn-sm'}" onclick="togglePlow()">
-                                ${G.usePlow ? '✅ Використовується' : '🔘 Використовувати'}
-                            </button>
-                        </div>
-                    </div>
-                `;
-            }
-            document.getElementById('inventory-area').innerHTML = `
-                ${gifs ? `<div class="card"><div class="card-title">🎨 Гіфки</div><div class="inventory-grid">${gifs}</div></div>` : ''}
-                ${titles ? `<div class="card"><div class="card-title">🏅 Титули</div><div class="inventory-grid">${titles}</div></div>` : ''}
-                ${chests ? `<div class="card"><div class="card-title">📦 Ящики</div><div class="inventory-grid">${chests}</div></div>` : ''}
-                ${upItems ? `<div class="card"><div class="card-title">🔧 Предмети</div><div class="inventory-grid">${upItems}</div></div>` : ''}
-                ${plowHtml}
-                <div class="card" style="text-align:center;color:var(--text-muted);font-size:7px;">Всього: ${Object.values(G.ownedGifs).reduce((a,b)=>a+b,0) + Object.values(G.ownedTitles).reduce((a,b)=>a+b,0)}</div>
-            `;
-        }
-
         // ====== ТОП ======
         function renderTop() {
             const el = document.getElementById('top-area');
             if (!el) return;
+
             el.innerHTML = `
                 <div class="season-card">
                     <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:4px;">
@@ -2446,11 +2620,13 @@
                 <div class="card"><div class="flex"><b style="color:var(--gold);">🏆 Топ</b><button class="btn btn-g btn-sm" onclick="renderTop()">🔄</button></div></div>
                 <p style="text-align:center;color:var(--text-secondary);font-size:6px;padding:4px;">⏳ Завантаження...</p>
             `;
+
             if (!db) {
                 el.innerHTML =
                     '<div class="card"><div class="flex"><b style="color:var(--gold);">🏆 Топ</b><button class="btn btn-g btn-sm" onclick="renderTop()">🔄</button></div></div><p style="text-align:center;color:#f88;font-size:6px;padding:4px;">❌ Firebase не готовий</p>';
                 return;
             }
+
             db.ref('public_users').once('value').then(snap => {
                 const users = [];
                 snap.forEach(child => {
@@ -2671,9 +2847,12 @@
                         .marketListings = data.marketListings || []; } else if (key === 'cryptoHistory') { G
                         .cryptoHistory = data.cryptoHistory || []; } else if (key === 'seasonPoints') { G
                         .seasonPoints = data.seasonPoints || 0; } else if (key === 'seasonRewardClaimed') { G
-                        .seasonRewardClaimed = data.seasonRewardClaimed || false; } else if (key === 'hasPlow') { G
-                        .hasPlow = data.hasPlow || false; } else if (key === 'usePlow') { G.usePlow = data
-                        .usePlow || false; } else { G[key] = data[key]; }
+                        .seasonRewardClaimed = data.seasonRewardClaimed || false; } else if (key === 'skins') {
+                    if (data.skins) {
+                        if (data.skins.plow) Object.assign(G.skins.plow, data.skins.plow);
+                        if (data.skins.ronaldo) Object.assign(G.skins.ronaldo, data.skins.ronaldo);
+                    }
+                } else { G[key] = data[key]; }
             });
             G.maxEnergy = calcMaxEnergy();
             G.energy = Math.min(G.energy, G.maxEnergy);
@@ -2710,8 +2889,11 @@
         // ====== ЗАПУСК ======
         if (tg && tgUserId) {
             setTimeout(() => {
-                if (db) { autoLoginWithTelegram(); } else { document.getElementById('authStatus').textContent =
-                        '❌ Помилка підключення до сервера'; }
+                if (db) {
+                    autoLoginWithTelegram();
+                } else {
+                    document.getElementById('authStatus').textContent = '❌ Помилка підключення до сервера';
+                }
             }, 500);
         } else {
             document.getElementById('authStatus').textContent = '🔐 Виберіть спосіб входу';
@@ -2720,13 +2902,17 @@
                     G.uid = user.uid;
                     G.isTelegramUser = false;
                     db.ref('users/' + user.uid).once('value').then(snap => {
-                        if (snap.val()) { loadGame(snap.val()); } else {
+                        if (snap.val()) {
+                            loadGame(snap.val());
+                        } else {
                             G.name = user.isAnonymous ? 'Гість' : 'Гравець';
                             saveGame();
                         }
                         startGame();
-                    }).catch(e => { console.error('Load error:', e);
-                        startGame(); });
+                    }).catch(e => {
+                        console.error('Load error:', e);
+                        startGame();
+                    });
                 } else {
                     document.getElementById('authScreen').style.display = 'flex';
                     document.getElementById('game').style.display = 'none';
@@ -2735,11 +2921,9 @@
             });
         }
         console.log('🐹 Hamka — Повністю робоча версія');
-        console.log('✅ Промокод PLOW дає скін з файлу Plow.jpg');
-        console.log('✅ Можна переключати між гіфкою та PLOW');
+        console.log('✅ Промокоди: PLOW, RONALDO');
         console.log('✅ Прогрес синхронізується між пристроями');
-        console.log('✅ Ціна крипти: 1000-1000000💰');
-        console.log('✅ Велика кнопка для тапа');
+        console.log('✅ Вхід через Telegram працює');
     </script>
 </body>
 </html>
