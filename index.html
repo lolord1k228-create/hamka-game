@@ -54,7 +54,6 @@
             overflow: hidden;
         }
 
-        /* ===== АВТОРИЗАЦІЯ ===== */
         #authScreen {
             display: flex;
             flex-direction: column;
@@ -200,7 +199,6 @@
             text-align: center;
         }
 
-        /* ===== ВЕРХНЯ ПАНЕЛЬ ===== */
         .top-bar {
             display: flex;
             justify-content: space-between;
@@ -235,7 +233,6 @@
             color: var(--crypto);
         }
 
-        /* ===== НАВІГАЦІЯ ===== */
         .tab-nav {
             display: flex;
             gap: 2px;
@@ -288,7 +285,6 @@
             margin-top: 1px;
         }
 
-        /* ===== КОНТЕНТ ===== */
         .content-area {
             flex: 1;
             overflow-y: auto;
@@ -323,7 +319,6 @@
             }
         }
 
-        /* ===== ГРА ===== */
         .center-game {
             display: flex;
             flex-direction: column;
@@ -415,7 +410,6 @@
             }
         }
 
-        /* ===== БАРИ ===== */
         .bar-wrap {
             width: 92%;
             margin: 2px auto;
@@ -446,7 +440,6 @@
             margin-top: 1px;
         }
 
-        /* ===== БАЛАНС ===== */
         .bal {
             text-align: center;
             padding: 3px;
@@ -455,7 +448,6 @@
             color: var(--gold);
         }
 
-        /* ===== СТАТИСТИКА ===== */
         .stats-row {
             display: flex;
             flex-wrap: wrap;
@@ -477,7 +469,6 @@
             color: var(--primary);
         }
 
-        /* ===== КНОПКИ ===== */
         .btn {
             padding: 4px 10px;
             border: none;
@@ -540,7 +531,6 @@
             pointer-events: none;
         }
 
-        /* ===== КАРТКИ ===== */
         .card {
             background: var(--bg-card);
             padding: 6px 8px;
@@ -562,7 +552,6 @@
             margin-bottom: 3px;
         }
 
-        /* ===== ТОСТ ===== */
         .toast {
             position: fixed;
             bottom: 60px;
@@ -586,7 +575,6 @@
             transform: translateX(-50%) translateY(0);
         }
 
-        /* ===== АНІМАЦІЇ ===== */
         .floating-number {
             position: fixed;
             font-size: 24px;
@@ -631,7 +619,6 @@
             }
         }
 
-        /* ===== МАГАЗИН ===== */
         .shop-tabs {
             display: flex;
             gap: 2px;
@@ -658,7 +645,6 @@
             border-color: var(--primary);
         }
 
-        /* ===== ІНВЕНТАР ===== */
         .inventory-grid {
             display: flex;
             flex-wrap: wrap;
@@ -699,7 +685,6 @@
             box-shadow: 0 0 30px rgba(0, 255, 136, 0.2);
         }
 
-        /* ===== ВІДКРИТТЯ ЯЩИКА (модалка) ===== */
         .chest-modal {
             position: fixed;
             top: 0;
@@ -797,30 +782,7 @@
         .chest-modal .close-btn:active {
             transform: scale(0.95);
         }
-        .chest-modal .reward-item {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 6px 12px;
-            border-radius: var(--radius);
-            margin: 6px 0;
-        }
-        .chest-modal .reward-item .ri {
-            font-size: 24px;
-        }
-        .chest-modal .reward-item .rn {
-            font-size: 12px;
-            font-weight: 600;
-        }
-        .chest-modal .reward-item .rv {
-            font-size: 12px;
-            color: var(--gold);
-            font-weight: 700;
-        }
 
-        /* ===== ПРОМО ===== */
         .promo-row {
             display: flex;
             gap: 2px;
@@ -838,13 +800,11 @@
             border-radius: var(--radius);
             font-size: 6px;
             outline: none;
-            display: none;
         }
         .promo-row .promo-btn {
-            display: none;
+            display: block;
         }
 
-        /* ===== КРИПТА ===== */
         .crypto-card {
             background: linear-gradient(135deg, rgba(26, 26, 46, 0.9), rgba(18, 18, 26, 0.9));
             border: 1px solid var(--border);
@@ -887,7 +847,6 @@
             height: 80px;
         }
 
-        /* ===== РИНОК ===== */
         .market-item {
             display: flex;
             justify-content: space-between;
@@ -912,7 +871,6 @@
             font-size: 7px;
         }
 
-        /* ===== ТРЕЙДЕРИ ===== */
         .trader-card {
             background: linear-gradient(135deg, rgba(26, 26, 46, 0.9), rgba(18, 18, 26, 0.9));
             border: 1px solid var(--border);
@@ -949,7 +907,6 @@
             color: var(--crypto);
         }
 
-        /* ===== АПГРЕЙДЕР ===== */
         .upgrader-container {
             display: flex;
             gap: 4px;
@@ -1041,7 +998,6 @@
             pointer-events: none;
         }
 
-        /* ===== АНТИБОТ ===== */
         .antibot-warning {
             background: rgba(239, 68, 68, 0.15);
             border: 1px solid #ef4444;
@@ -1057,7 +1013,6 @@
             display: block;
         }
 
-        /* ===== ПРОФІЛЬ ===== */
         .profile-header {
             text-align: center;
             padding: 4px;
@@ -1094,7 +1049,6 @@
             color: var(--crypto);
         }
 
-        /* ===== ТОП ===== */
         .top-item {
             display: flex;
             align-items: center;
@@ -1170,7 +1124,6 @@
             box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
         }
 
-        /* ===== СЛОТИ ===== */
         .slot-machine {
             display: flex;
             gap: 4px;
@@ -1224,7 +1177,6 @@
 </head>
 <body>
     <div class="app" id="app">
-        <!-- ===== ЕКРАН ВХОДУ ===== -->
         <div id="authScreen">
             <div class="logo">🐹</div>
             <h2>Hamka</h2>
@@ -1247,7 +1199,6 @@
             <button class="btn btn-p" onclick="handleGuest()">🎮 Гість</button>
         </div>
 
-        <!-- ===== ГРА ===== -->
         <div id="game" style="display:none;flex-direction:column;height:100%">
             <div class="top-bar">
                 <div class="stat">🐹 <span class="val" id="userName">Гравець</span></div>
@@ -1287,15 +1238,14 @@
                 <div class="bar-label"><span>XP: <span id="xpDisp">0</span></span><span>Рівень <span id="lvlDisp2">1</span></span></div>
             </div>
             <div class="promo-row">
-                <input type="text" id="promoInp" placeholder="🎁 Промокод" style="display:none;">
-                <button class="btn btn-g btn-sm promo-btn" onclick="activatePromo()" style="display:none;">OK</button>
+                <input type="text" id="promoInp" placeholder="🎁 Промокод">
+                <button class="btn btn-g btn-sm promo-btn" onclick="activatePromo()">OK</button>
                 <button class="btn btn-r btn-sm" onclick="logout()">🚪</button>
             </div>
             <div class="antibot-warning" id="antibotWarning">⚠️ Перевищено ліміт тапів! Зачекайте 30 секунд.</div>
         </div>
     </div>
 
-    <!-- ===== МОДАЛКА ДЛЯ ВІДКРИТТЯ ЯЩИКІВ ===== -->
     <div class="chest-modal" id="chestModal">
         <div class="modal-content">
             <div class="chest-icon" id="chestIcon">📦</div>
@@ -1422,6 +1372,15 @@
                 color: '#ec4899' }
         ];
 
+        // ===== СКІНИ В МАГАЗИНІ (ЦІНИ ЗБІЛЬШЕНО В 3 РАЗИ) =====
+        const SHOP_SKINS = [
+            { id: 'skin_potuzhnolit', name: 'Потужноліт', file: '4dbb8688-018b-4109-8ff7-2f6a0e877171.png', price: 150000,
+                emoji: '💪' },
+            { id: 'skin_homyak', name: 'Хомяк', file: '01790a98-cfd2-4abb-8e1b-04450faefe1b.png', price: 300000,
+                emoji: '🐹' },
+            { id: 'skin_polisya', name: 'Поліся', file: 'Skin3.jpg', price: 600000, emoji: '🌲' }
+        ];
+
         // ============================================================
         //  🎮 ГРАВЕЦЬ
         // ============================================================
@@ -1491,6 +1450,10 @@
             isBanned: false,
             currentGame: 'tap',
             isTelegramUser: false,
+            // Скіни (куплені)
+            ownedShopSkins: [],
+            activeShopSkin: null,
+            // Секретні скіни
             skins: {
                 plow: { has: false, use: false, file: 'Plow.jpg' },
                 ronaldo: { has: false, use: false, file: 'Ronaldo.jpg' }
@@ -1568,25 +1531,34 @@
             btn.innerHTML = '';
 
             let skinFile = null;
-            let skinName = '';
-            if (G.skins.plow.use && G.skins.plow.has) {
-                skinFile = G.skins.plow.file;
-                skinName = 'PLOW';
-            } else if (G.skins.ronaldo.use && G.skins.ronaldo.has) {
-                skinFile = G.skins.ronaldo.file;
-                skinName = 'RONALDO';
+
+            // Перевіряємо активний скін з магазину
+            if (G.activeShopSkin) {
+                const shopSkin = SHOP_SKINS.find(s => s.id === G.activeShopSkin);
+                if (shopSkin && G.ownedShopSkins.includes(G.activeShopSkin)) {
+                    skinFile = shopSkin.file;
+                }
+            }
+
+            // Перевіряємо секретні скіни
+            if (!skinFile) {
+                if (G.skins.plow.use && G.skins.plow.has) {
+                    skinFile = G.skins.plow.file;
+                } else if (G.skins.ronaldo.use && G.skins.ronaldo.has) {
+                    skinFile = G.skins.ronaldo.file;
+                }
             }
 
             if (skinFile) {
                 const img = document.createElement('img');
                 img.className = 'tap-image';
                 img.src = skinFile;
-                img.alt = skinName;
+                img.alt = 'Skin';
                 img.onerror = function() {
                     this.style.display = 'none';
                     const emoji = document.createElement('span');
                     emoji.className = 'tap-emoji';
-                    emoji.textContent = '📂';
+                    emoji.textContent = '🐹';
                     btn.appendChild(emoji);
                 };
                 btn.appendChild(img);
@@ -1599,20 +1571,60 @@
         }
 
         function getActiveSkinName() {
+            if (G.activeShopSkin) {
+                const shopSkin = SHOP_SKINS.find(s => s.id === G.activeShopSkin);
+                if (shopSkin && G.ownedShopSkins.includes(G.activeShopSkin)) {
+                    return shopSkin.name;
+                }
+            }
             if (G.skins.plow.use && G.skins.plow.has) return 'PLOW';
             if (G.skins.ronaldo.use && G.skins.ronaldo.has) return 'RONALDO';
             return G.activeGif;
         }
 
         // ============================================================
-        //  🎁 ПРОМОКОДИ (ПРИХОВАНІ)
+        //  🛒 ПОКУПКА СКІНІВ
+        // ============================================================
+        function buyShopSkin(skinId) {
+            const skin = SHOP_SKINS.find(s => s.id === skinId);
+            if (!skin) return;
+            if (G.ownedShopSkins.includes(skinId)) {
+                G.activeShopSkin = skinId;
+                G.skins.plow.use = false;
+                G.skins.ronaldo.use = false;
+                toast(`🎨 Активовано скін «${skin.name}»`);
+                saveGame();
+                updateTapButton();
+                renderShop();
+                renderVip();
+                renderInventory();
+                return;
+            }
+            if (G.coins < skin.price) {
+                toast(`❌ Потрібно ${skin.price}💰`);
+                return;
+            }
+            G.coins -= skin.price;
+            G.ownedShopSkins.push(skinId);
+            G.activeShopSkin = skinId;
+            G.skins.plow.use = false;
+            G.skins.ronaldo.use = false;
+            toast(`✅ Куплено скін «${skin.name}»!`);
+            saveGame();
+            updateTapButton();
+            renderShop();
+            renderVip();
+            renderInventory();
+        }
+
+        // ============================================================
+        //  🎁 ПРОМОКОДИ
         // ============================================================
         function activatePromo() {
             let code = document.getElementById('promoInp').value.trim().toUpperCase();
             if (!code) { toast('❌ Введіть промокод');
                 return; }
 
-            // Секретні промокоди (гравці не знають)
             if (code === 'PLOW') {
                 if (G.skins.plow.has) {
                     toast('✅ Скін PLOW вже активовано!');
@@ -1620,6 +1632,7 @@
                     G.skins.plow.has = true;
                     G.skins.plow.use = true;
                     G.skins.ronaldo.use = false;
+                    G.activeShopSkin = null;
                     toast('🚜 Скін PLOW активовано!');
                     saveGame();
                     updateTapButton();
@@ -1637,6 +1650,7 @@
                     G.skins.ronaldo.has = true;
                     G.skins.ronaldo.use = true;
                     G.skins.plow.use = false;
+                    G.activeShopSkin = null;
                     toast('⚽ Скін RONALDO активовано!');
                     saveGame();
                     updateTapButton();
@@ -1684,6 +1698,7 @@
                 toast('🐹 Виключено скін ' + skinName.toUpperCase());
             } else {
                 Object.keys(G.skins).forEach(key => { if (key !== skinName) G.skins[key].use = false; });
+                G.activeShopSkin = null;
                 skin.use = true;
                 toast('🎨 Включено скін ' + skinName.toUpperCase());
             }
@@ -1697,6 +1712,24 @@
             const el = document.getElementById('vip-area');
             if (!el) return;
 
+            let shopSkinsHtml = '';
+            SHOP_SKINS.forEach(skin => {
+                const owned = G.ownedShopSkins.includes(skin.id);
+                const active = G.activeShopSkin === skin.id;
+                shopSkinsHtml += `
+                    <div class="card" style="border-color:${active ? 'var(--gold)' : 'var(--border)'};">
+                        <div class="flex">
+                            <b>${skin.emoji} ${skin.name}</b>
+                            <span style="color:var(--gold);font-size:6px;">${owned ? '✅' : skin.price + '💰'}</span>
+                            <button class="btn ${active ? 'btn-g' : 'btn-sm'}" onclick="buyShopSkin('${skin.id}')">
+                                ${active ? '✅' : (owned ? '🔘' : 'Купити')}
+                            </button>
+                        </div>
+                        <div style="font-size:5px;color:var(--text-secondary);">📂 ${skin.file}</div>
+                    </div>
+                `;
+            });
+
             let plowHtml = '';
             if (G.skins.plow.has) {
                 plowHtml = `
@@ -1707,17 +1740,9 @@
                                 ${G.skins.plow.use ? '✅' : '🔘'}
                             </button>
                         </div>
-                        <div style="font-size:6px;color:var(--text-secondary);">📂 Plow.jpg</div>
-                    </div>
-                `;
-            } else {
-                plowHtml = `
-                    <div class="card" style="opacity:0.5;">
-                        <div class="flex"><b>🚜 PLOW Скін</b><span style="font-size:6px;color:var(--text-secondary);">🔒</span></div>
                     </div>
                 `;
             }
-
             let ronaldoHtml = '';
             if (G.skins.ronaldo.has) {
                 ronaldoHtml = `
@@ -1728,13 +1753,6 @@
                                 ${G.skins.ronaldo.use ? '✅' : '🔘'}
                             </button>
                         </div>
-                        <div style="font-size:6px;color:var(--text-secondary);">📂 Ronaldo.jpg</div>
-                    </div>
-                `;
-            } else {
-                ronaldoHtml = `
-                    <div class="card" style="opacity:0.5;">
-                        <div class="flex"><b>⚽ RONALDO Скін</b><span style="font-size:6px;color:var(--text-secondary);">🔒</span></div>
                     </div>
                 `;
             }
@@ -1745,20 +1763,22 @@
                     <div class="card-title">🎨 Гіфки</div>
                     <div class="gif-row">
                     ${Object.keys(G.ownedGifs).map(id => {
-                        const isActive = G.activeGif === id && !G.skins.plow.use && !G.skins.ronaldo.use;
-                        return `<div class="gif-cell ${isActive ? 'sel' : ''}" onclick="if(G.vip){G.activeGif='${id}';G.skins.plow.use=false;G.skins.ronaldo.use=false;updateUI();saveGame();renderVip();updateTapButton();}">${id}</div>`;
+                        const isActive = G.activeGif === id && !G.activeShopSkin && !G.skins.plow.use && !G.skins.ronaldo.use;
+                        return `<div class="gif-cell ${isActive ? 'sel' : ''}" onclick="if(G.vip){G.activeGif='${id}';G.activeShopSkin=null;G.skins.plow.use=false;G.skins.ronaldo.use=false;updateUI();saveGame();renderVip();updateTapButton();}">${id}</div>`;
                     }).join('')}</div>
                     <div class="card-title" style="margin-top:4px;">🏅 Титули</div>
                     <div style="display:flex;flex-wrap:wrap;gap:4px;margin:4px 0;">
                     ${Object.keys(G.ownedTitles).map(id => `<button class="btn ${G.activeTitle===id?'btn-g':'btn-sm'}" style="font-size:6px;padding:3px 8px;" onclick="if(G.vip){G.activeTitle='${id}';updateUI();saveGame();renderVip()}">${TITLES[id]?.name||id}</button>`).join('')}</div>
                 </div>
+                <div class="card"><div class="card-title">🛒 Скіни з магазину</div>
+                ${shopSkinsHtml}</div>
                 ${plowHtml}
                 ${ronaldoHtml}
             `;
         }
 
         // ============================================================
-        //  📦 ЯЩИКИ (відкриття в інвентарі, як у Standoff 2)
+        //  📦 ЯЩИКИ
         // ============================================================
         function openChestModal(type) {
             const modal = document.getElementById('chestModal');
@@ -1772,34 +1792,27 @@
                 return;
             }
 
-            // Віднімаємо ящик
             G.chests[type]--;
             if (G.chests[type] === 0) delete G.chests[type];
 
-            // Визначаємо нагороду
             const reward = rand(box.homyMin, box.homyMax);
             const bonus = Math.floor(reward * (1 + G.luck * 0.1));
             const finalReward = bonus;
 
-            // Додаємо нагороду
             G.homa += finalReward;
 
-            // Показуємо модалку
             icon.textContent = box.emoji;
             rewardText.textContent = `🎉 +${finalReward} 🟣 Хом!`;
             rewardDesc.textContent = `Ящик «${box.name}» відкрито!`;
 
             modal.classList.add('show');
 
-            // Анімація іконки
             icon.style.animation = 'none';
             setTimeout(() => {
                 icon.style.animation = 'chestShake 0.5s ease';
             }, 10);
 
-            // Додаємо випадковий бонус
             if (Math.random() < 0.15) {
-                // Бонус: додаткові монети
                 const bonusCoins = rand(100, 500);
                 G.coins += bonusCoins;
                 setTimeout(() => {
@@ -1808,7 +1821,6 @@
             }
 
             if (Math.random() < 0.05) {
-                // Бонус: гіфка
                 const g = GIFS[rand(0, GIFS.length - 1)];
                 addGif(g.id);
                 setTimeout(() => {
@@ -1944,7 +1956,8 @@
                 <div class="shop-tabs">
                     <button class="shop-tab active" onclick="renderShopTab('res')">⚡ Ресурси</button>
                     <button class="shop-tab" onclick="renderShopTab('upg')">⭐ Прокачка</button>
-                    <button class="shop-tab" onclick="renderShopTab('vis')">🎨 Візуальне</button>
+                    <button class="shop-tab" onclick="renderShopTab('skins')">🎨 Скіни</button>
+                    <button class="shop-tab" onclick="renderShopTab('vis')">🎨 Гіфки</button>
                     <button class="shop-tab" onclick="renderShopTab('box')">📦 Ящики</button>
                     <button class="shop-tab" onclick="renderShopTab('market')">🏪 Ринок</button>
                 </div>
@@ -1956,7 +1969,7 @@
         function renderShopTab(tab) {
             document.querySelectorAll('.shop-tab').forEach(t => t.classList.remove('active'));
             const btns = document.querySelectorAll('.shop-tab');
-            const tabs = ['res', 'upg', 'vis', 'box', 'market'];
+            const tabs = ['res', 'upg', 'skins', 'vis', 'box', 'market'];
             const idx = tabs.indexOf(tab);
             if (btns[idx]) btns[idx].classList.add('active');
             const el = document.getElementById('shop-inner');
@@ -1981,6 +1994,30 @@
                     <div class="card"><div class="flex"><b>🎯 Крит +5%</b> <span style="color:var(--gold);">${getPrice('critChance')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItem('critChance')">Купити</button></div></div>
                     <div class="card"><div class="flex"><b>🍀 Удача +0.1</b> <span style="color:var(--gold);">${getPrice('luckB')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItem('luckB')">Купити</button></div></div>
                     <div class="card"><div class="flex"><b>👑 VIP</b> <span style="color:var(--gold);">20000💰</span> <button class="btn btn-g btn-sm" onclick="buyItem('vip')">Купити</button></div></div>
+                `;
+            } else if (tab === 'skins') {
+                let skinsHtml = SHOP_SKINS.map(skin => {
+                    const owned = G.ownedShopSkins.includes(skin.id);
+                    const active = G.activeShopSkin === skin.id;
+                    return `
+                        <div class="card" style="border-color:${active ? 'var(--gold)' : 'var(--border)'};">
+                            <div class="flex">
+                                <b>${skin.emoji} ${skin.name}</b>
+                                <span style="color:${owned ? 'var(--primary)' : 'var(--gold)'};font-size:6px;">${owned ? '✅ Куплено' : skin.price + '💰'}</span>
+                                <button class="btn ${active ? 'btn-g' : 'btn-sm'}" onclick="buyShopSkin('${skin.id}')">
+                                    ${active ? '✅' : (owned ? '🔘' : 'Купити')}
+                                </button>
+                            </div>
+                            <div style="font-size:5px;color:var(--text-secondary);">📂 ${skin.file}</div>
+                            ${active ? '<div style="font-size:5px;color:var(--primary);margin-top:2px;">✔️ Активний</div>' : ''}
+                        </div>
+                    `;
+                }).join('');
+                el.innerHTML = `
+                    <div class="card"><div class="card-title">🎨 Скіни для тапалки</div>
+                    ${skinsHtml}
+                    <div style="font-size:6px;color:var(--text-secondary);margin-top:6px;text-align:center;">💡 Купіть скін і він з'явиться на кнопці тапа!</div>
+                    </div>
                 `;
             } else if (tab === 'vis') {
                 let gifs = GIFS.map(g => {
@@ -2227,8 +2264,8 @@
             const activeSkin = getActiveSkinName();
             const gifKeys = Object.keys(G.ownedGifs);
             const gifDisplay = gifKeys.slice(0, 8).map(id => {
-                const isActive = G.activeGif === id && !G.skins.plow.use && !G.skins.ronaldo.use;
-                return `<div class="gif-cell ${isActive ? 'sel' : ''}" onclick="G.activeGif='${id}';G.skins.plow.use=false;G.skins.ronaldo.use=false;updateUI();saveGame();renderUpgrader();updateTapButton();">${id}</div>`;
+                const isActive = G.activeGif === id && !G.activeShopSkin && !G.skins.plow.use && !G.skins.ronaldo.use;
+                return `<div class="gif-cell ${isActive ? 'sel' : ''}" onclick="G.activeGif='${id}';G.activeShopSkin=null;G.skins.plow.use=false;G.skins.ronaldo.use=false;updateUI();saveGame();renderUpgrader();updateTapButton();">${id}</div>`;
             }).join('');
 
             let html = `
@@ -2492,12 +2529,14 @@
         //  👤 ПРОФІЛЬ
         // ============================================================
         function renderProfile() {
+            const activeSkin = getActiveSkinName();
             document.getElementById('profile-area').innerHTML = `
                 <div class="profile-header">
                     <div class="avatar">${G.activeGif}</div>
                     <div class="name">${G.name}</div>
                     <div style="font-size:10px;">${getTitleDisplay(G.activeTitle)}</div>
                     <div style="font-size:9px;color:var(--text-secondary);">⭐ Рівень ${G.level} · ${formatNum(G.xp)} XP</div>
+                    <div style="font-size:7px;color:var(--crypto);">🎨 Активний скін: ${activeSkin}</div>
                 </div>
                 <div class="profile-stats">
                     <div class="profile-stat"><div class="value">${formatNum(G.coins)}</div>💰</div>
@@ -2507,6 +2546,7 @@
                     <div class="profile-stat"><div class="value">${G.vip ? '✅' : '❌'}</div>👑</div>
                     <div class="profile-stat"><div class="value">🏆 Сезон ${G.season || 1}</div></div>
                     <div class="profile-stat"><div class="value">${G.seasonPoints || 0}</div>🌸</div>
+                    <div class="profile-stat"><div class="value">${G.ownedShopSkins.length}</div>🎨</div>
                 </div>
                 <button class="btn btn-r btn-block" onclick="resetGame()" style="width:100%;margin-top:6px;padding:10px;font-size:10px;">🔄 Скинути прогрес</button>
             `;
@@ -2534,14 +2574,29 @@
                 `<div class="inv-item"><span class="icon">${UPGRADE_ITEMS[id]?.image || '❓'}</span><span class="count">x${c}</span></div>`
             ).join('');
 
-            // Скіни в інвентарі
             let skinsHtml = '';
+            G.ownedShopSkins.forEach(skinId => {
+                const skin = SHOP_SKINS.find(s => s.id === skinId);
+                if (skin) {
+                    const active = G.activeShopSkin === skinId;
+                    skinsHtml += `
+                        <div class="card" style="border-color:${active ? 'var(--gold)' : 'var(--border)'};">
+                            <div class="flex">
+                                <span>${skin.emoji} ${skin.name}</span>
+                                <button class="btn ${active ? 'btn-g' : 'btn-sm'}" onclick="buyShopSkin('${skinId}')">
+                                    ${active ? '✅' : '🔘'}
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+
             if (G.skins.plow.has) {
                 skinsHtml += `
                     <div class="card" style="border-color:${G.skins.plow.use ? 'var(--gold)' : 'var(--border)'};">
                         <div class="flex">
                             <span>🚜 PLOW</span>
-                            <span style="font-size:6px;color:var(--text-secondary);">Plow.jpg</span>
                             <button class="btn ${G.skins.plow.use ? 'btn-g' : 'btn-sm'}" onclick="toggleSkin('plow')">
                                 ${G.skins.plow.use ? '✅' : '🔘'}
                             </button>
@@ -2554,7 +2609,6 @@
                     <div class="card" style="border-color:${G.skins.ronaldo.use ? 'var(--gold)' : 'var(--border)'};">
                         <div class="flex">
                             <span>⚽ RONALDO</span>
-                            <span style="font-size:6px;color:var(--text-secondary);">Ronaldo.jpg</span>
                             <button class="btn ${G.skins.ronaldo.use ? 'btn-g' : 'btn-sm'}" onclick="toggleSkin('ronaldo')">
                                 ${G.skins.ronaldo.use ? '✅' : '🔘'}
                             </button>
@@ -2564,7 +2618,7 @@
             }
 
             document.getElementById('inventory-area').innerHTML = `
-                ${skinsHtml}
+                ${skinsHtml ? `<div class="card"><div class="card-title">🎨 Скіни</div>${skinsHtml}</div>` : ''}
                 ${chests ? `<div class="card"><div class="card-title">📦 Ящики (натисніть щоб відкрити)</div><div class="inventory-grid">${chests}</div></div>` : ''}
                 ${gifs ? `<div class="card"><div class="card-title">🎨 Гіфки</div><div class="inventory-grid">${gifs}</div></div>` : ''}
                 ${titles ? `<div class="card"><div class="card-title">🏅 Титули</div><div class="inventory-grid">${titles}</div></div>` : ''}
@@ -2613,7 +2667,6 @@
                 users.sort((a, b) => (b.xp || 0) - (a.xp || 0));
                 const topUsers = users.slice(0, 50);
 
-                // Перевіряємо чи є поточний гравець в топі
                 const isInTop = topUsers.some(u => u.uid === G.uid);
 
                 if (topUsers.length === 0) {
@@ -2840,7 +2893,9 @@
                         if (data.skins.plow) Object.assign(G.skins.plow, data.skins.plow);
                         if (data.skins.ronaldo) Object.assign(G.skins.ronaldo, data.skins.ronaldo);
                     }
-                } else if (key === 'season') { G.season = data.season || 2; } else { G[key] = data[key]; }
+                } else if (key === 'ownedShopSkins') { G.ownedShopSkins = data.ownedShopSkins || []; } else if (
+                    key === 'activeShopSkin') { G.activeShopSkin = data.activeShopSkin || null; } else if (key ===
+                    'season') { G.season = data.season || 2; } else { G[key] = data[key]; }
             });
             G.maxEnergy = calcMaxEnergy();
             G.energy = Math.min(G.energy, G.maxEnergy);
@@ -3304,11 +3359,10 @@
 
         console.log('🐹 Hamka — Сезон 2');
         console.log('✅ Кнопка тапа збільшена в 3 рази');
-        console.log('✅ Ящики відкриваються в інвентарі (як Standoff 2)');
-        console.log('✅ Промокоди приховані');
-        console.log('✅ Авто тап без ліміту');
-        console.log('✅ Виправлено топ');
-        console.log('✅ Додано ящики за хоми та івенхоми');
+        console.log('✅ Скіни: Потужноліт (150k💰), Хомяк (300k💰), Поліся (600k💰)');
+        console.log('✅ Промокоди працюють');
+        console.log('✅ Топ виправлено');
+        console.log('✅ Сезон 2');
     </script>
 </body>
     </html>
