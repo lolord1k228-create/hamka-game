@@ -514,6 +514,10 @@
             background: linear-gradient(135deg, #fbbf24, #f59e0b);
             color: #000;
         }
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: #fff;
+        }
         .btn-block {
             width: 100%;
             justify-content: center;
@@ -1372,7 +1376,6 @@
                 color: '#ec4899' }
         ];
 
-        // ===== СКІНИ В МАГАЗИНІ (ЦІНИ ЗБІЛЬШЕНО В 3 РАЗИ) =====
         const SHOP_SKINS = [
             { id: 'skin_potuzhnolit', name: 'Потужноліт', file: '4dbb8688-018b-4109-8ff7-2f6a0e877171.png', price: 150000,
                 emoji: '💪' },
@@ -1450,10 +1453,8 @@
             isBanned: false,
             currentGame: 'tap',
             isTelegramUser: false,
-            // Скіни (куплені)
             ownedShopSkins: [],
             activeShopSkin: null,
-            // Секретні скіни
             skins: {
                 plow: { has: false, use: false, file: 'Plow.jpg' },
                 ronaldo: { has: false, use: false, file: 'Ronaldo.jpg' }
@@ -1531,16 +1532,12 @@
             btn.innerHTML = '';
 
             let skinFile = null;
-
-            // Перевіряємо активний скін з магазину
             if (G.activeShopSkin) {
                 const shopSkin = SHOP_SKINS.find(s => s.id === G.activeShopSkin);
                 if (shopSkin && G.ownedShopSkins.includes(G.activeShopSkin)) {
                     skinFile = shopSkin.file;
                 }
             }
-
-            // Перевіряємо секретні скіни
             if (!skinFile) {
                 if (G.skins.plow.use && G.skins.plow.has) {
                     skinFile = G.skins.plow.file;
@@ -1624,11 +1621,8 @@
             let code = document.getElementById('promoInp').value.trim().toUpperCase();
             if (!code) { toast('❌ Введіть промокод');
                 return; }
-
             if (code === 'PLOW') {
-                if (G.skins.plow.has) {
-                    toast('✅ Скін PLOW вже активовано!');
-                } else {
+                if (G.skins.plow.has) { toast('✅ Скін PLOW вже активовано!'); } else {
                     G.skins.plow.has = true;
                     G.skins.plow.use = true;
                     G.skins.ronaldo.use = false;
@@ -1642,11 +1636,8 @@
                 document.getElementById('promoInp').value = '';
                 return;
             }
-
             if (code === 'RONALDO') {
-                if (G.skins.ronaldo.has) {
-                    toast('✅ Скін RONALDO вже активовано!');
-                } else {
+                if (G.skins.ronaldo.has) { toast('✅ Скін RONALDO вже активовано!'); } else {
                     G.skins.ronaldo.has = true;
                     G.skins.ronaldo.use = true;
                     G.skins.plow.use = false;
@@ -1660,7 +1651,6 @@
                 document.getElementById('promoInp').value = '';
                 return;
             }
-
             if (code === 'LETO') { G.eventHoma += 50;
                 toast('🌸 +50');
                 updateUI();
@@ -1685,6 +1675,49 @@
                 updateUI();
                 saveGame(); } else { toast('❌ Невірний код'); }
             document.getElementById('promoInp').value = '';
+        }
+
+        // ============================================================
+        //  🗑️ ВИДАЛЕННЯ АККАУНТА
+        // ============================================================
+        function deleteAccount() {
+            if (!G.uid) { toast('❌ Немає акаунта'); return; }
+            if (!confirm('⚠️ ВИ ВПЕВНЕНІ? Це видалить ВЕСЬ ваш прогрес назавжди!')) return;
+            if (!confirm('🔄 ДРУГЕ ПІДТВЕРДЖЕННЯ: Всі дані будуть втрачені!')) return;
+
+            toast('⏳ Видалення акаунта...');
+
+            // 1. Видаляємо дані з Firebase
+            const deletePromises = [];
+
+            // Видаляємо з users
+            deletePromises.push(db.ref('users/' + G.uid).remove().catch(e => console.warn('User delete error:', e)));
+
+            // Видаляємо з public_users
+            deletePromises.push(db.ref('public_users/' + G.uid).remove().catch(e => console.warn('Public delete error:', e)));
+
+            // Видаляємо з auth (якщо це не Telegram)
+            if (!G.isTelegramUser && auth.currentUser) {
+                deletePromises.push(auth.currentUser.delete().catch(e => {
+                    console.warn('Auth delete error:', e);
+                    // Якщо не вийшло видалити auth - просто виходимо
+                    auth.signOut();
+                }));
+            }
+
+            Promise.all(deletePromises).then(() => {
+                toast('✅ Акаунт видалено!');
+                // Очищаємо локальні дані
+                localStorage.removeItem('hamka_guest_save');
+                localStorage.removeItem('hamka_save');
+                // Виходимо
+                setTimeout(() => {
+                    location.reload();
+                }, 1000);
+            }).catch(e => {
+                console.error('Delete error:', e);
+                toast('❌ Помилка видалення: ' + e.message);
+            });
         }
 
         // ============================================================
@@ -1847,17 +1880,13 @@
             G.cryptoRate = Math.round(newRate);
             G.cryptoHistory.push(G.cryptoRate);
             if (G.cryptoHistory.length > 60) G.cryptoHistory.shift();
-
             if (db) {
                 db.ref('global/cryptoRate').set(G.cryptoRate).catch(e => console.warn('Save global rate error:', e));
             }
-
             const rateDisp = document.getElementById('cryptoRateDisp');
             if (rateDisp) rateDisp.textContent = G.cryptoRate;
-
             const chartContainer = document.getElementById('cryptoChart');
             if (chartContainer) drawLineChart();
-
             saveGame();
         }
 
@@ -2526,7 +2555,7 @@
         }
 
         // ============================================================
-        //  👤 ПРОФІЛЬ
+        //  👤 ПРОФІЛЬ (з кнопкою видалення)
         // ============================================================
         function renderProfile() {
             const activeSkin = getActiveSkinName();
@@ -2537,6 +2566,7 @@
                     <div style="font-size:10px;">${getTitleDisplay(G.activeTitle)}</div>
                     <div style="font-size:9px;color:var(--text-secondary);">⭐ Рівень ${G.level} · ${formatNum(G.xp)} XP</div>
                     <div style="font-size:7px;color:var(--crypto);">🎨 Активний скін: ${activeSkin}</div>
+                    <div style="font-size:7px;color:var(--text-secondary);">🆔 ${G.uid ? G.uid.slice(0,12)+'...' : '—'}</div>
                 </div>
                 <div class="profile-stats">
                     <div class="profile-stat"><div class="value">${formatNum(G.coins)}</div>💰</div>
@@ -2548,7 +2578,12 @@
                     <div class="profile-stat"><div class="value">${G.seasonPoints || 0}</div>🌸</div>
                     <div class="profile-stat"><div class="value">${G.ownedShopSkins.length}</div>🎨</div>
                 </div>
-                <button class="btn btn-r btn-block" onclick="resetGame()" style="width:100%;margin-top:6px;padding:10px;font-size:10px;">🔄 Скинути прогрес</button>
+                <button class="btn btn-danger btn-block" onclick="deleteAccount()" style="width:100%;margin-top:6px;padding:10px;font-size:10px;">
+                    🗑️ ВИДАЛИТИ АККАУНТ
+                </button>
+                <button class="btn btn-r btn-block" onclick="resetGame()" style="width:100%;margin-top:4px;padding:10px;font-size:10px;">
+                    🔄 Скинути прогрес
+                </button>
             `;
         }
 
@@ -2655,15 +2690,23 @@
 
             db.ref('public_users').once('value').then(snap => {
                 const users = [];
+                const now = Date.now();
+                const weekAgo = now - 7 * 24 * 60 * 60 * 1000; // 7 днів
+
                 snap.forEach(child => {
                     const uid = child.key;
                     const data = child.val();
+                    // Фільтр: тільки активні за останні 7 днів
                     if (data && data.name && !data.hideFromTop) {
-                        users.push({ uid: uid, name: data.name || 'Анонім', level: data.level || 1,
-                            xp: data.xp || 0, avatar: data.avatar || '🐹', title: data.title ||
-                            'none' });
+                        const lastUpdate = data.lastUpdate || 0;
+                        if (lastUpdate >= weekAgo) {
+                            users.push({ uid: uid, name: data.name || 'Анонім', level: data.level || 1,
+                                xp: data.xp || 0, avatar: data.avatar || '🐹', title: data.title ||
+                                'none' });
+                        }
                     }
                 });
+
                 users.sort((a, b) => (b.xp || 0) - (a.xp || 0));
                 const topUsers = users.slice(0, 50);
 
@@ -2680,7 +2723,7 @@
                             ${G.seasonRewardClaimed ? '<div style="color:var(--gold);font-size:7px;margin-top:3px;">✅ Отримано!</div>' : ''}
                         </div>
                         <div class="card"><div class="flex"><b style="color:var(--gold);">🏆 Топ</b><button class="btn btn-g btn-sm" onclick="renderTop()">🔄</button></div></div>
-                        <p style="text-align:center;color:var(--text-secondary);font-size:6px;padding:10px;">😅 Немає гравців у топі</p>
+                        <p style="text-align:center;color:var(--text-secondary);font-size:6px;padding:10px;">😅 Немає активних гравців</p>
                     `;
                     return;
                 }
@@ -2873,6 +2916,8 @@
             }
             G.lastSave = Date.now();
             const data = { ...G };
+            // Додаємо час останнього оновлення
+            data.lastUpdate = Date.now();
             db.ref('users/' + G.uid).set(data).catch(e => console.warn('Save error:', e));
             updatePublicProfile();
         }
@@ -2895,7 +2940,8 @@
                     }
                 } else if (key === 'ownedShopSkins') { G.ownedShopSkins = data.ownedShopSkins || []; } else if (
                     key === 'activeShopSkin') { G.activeShopSkin = data.activeShopSkin || null; } else if (key ===
-                    'season') { G.season = data.season || 2; } else { G[key] = data[key]; }
+                    'season') { G.season = data.season || 2; } else if (key === 'lastUpdate') { G.lastUpdate =
+                        data.lastUpdate || Date.now(); } else { G[key] = data[key]; }
             });
             G.maxEnergy = calcMaxEnergy();
             G.energy = Math.min(G.energy, G.maxEnergy);
@@ -3359,10 +3405,9 @@
 
         console.log('🐹 Hamka — Сезон 2');
         console.log('✅ Кнопка тапа збільшена в 3 рази');
+        console.log('✅ Додано видалення акаунта в профілі');
+        console.log('✅ Топ показує тільки активних гравців (7 днів)');
         console.log('✅ Скіни: Потужноліт (150k💰), Хомяк (300k💰), Поліся (600k💰)');
-        console.log('✅ Промокоди працюють');
-        console.log('✅ Топ виправлено');
-        console.log('✅ Сезон 2');
     </script>
 </body>
-    </html>
+</html>
