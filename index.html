@@ -13,6 +13,7 @@
     <script src="https://telegram.org/js/telegram-web-app.js">
     </script>
     <style>
+        /* ===== ВСІ СТИЛІ ===== */
         :root {
             --primary: #00ff88;
             --bg: #07070b;
@@ -23,6 +24,7 @@
             --gold: #fbbf24;
             --crypto: #f472b6;
             --radius: 12px;
+            --box-shadow: 0 0 30px rgba(0, 255, 136, 0.15);
         }
         * {
             margin: 0;
@@ -51,6 +53,8 @@
             flex-direction: column;
             overflow: hidden;
         }
+
+        /* ===== АВТОРИЗАЦІЯ ===== */
         #authScreen {
             display: flex;
             flex-direction: column;
@@ -59,6 +63,7 @@
             height: 100%;
             padding: 30px 24px;
             background: radial-gradient(ellipse at center, #0a0a1a, #07070b);
+            overflow-y: auto;
         }
         #authScreen .logo {
             font-size: 72px;
@@ -86,6 +91,34 @@
             color: var(--text-secondary);
             font-size: 12px;
             margin-bottom: 18px;
+        }
+        #authScreen .auth-tabs {
+            display: flex;
+            gap: 4px;
+            width: 100%;
+            max-width: 300px;
+            margin-bottom: 12px;
+        }
+        #authScreen .auth-tab {
+            flex: 1;
+            padding: 8px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        #authScreen .auth-tab.active {
+            border-color: var(--primary);
+            color: var(--text);
+            background: rgba(0, 255, 136, 0.08);
+        }
+        #authScreen .auth-tab:active {
+            transform: scale(0.95);
         }
         #authScreen input {
             background: var(--bg-card);
@@ -166,6 +199,8 @@
             min-height: 18px;
             text-align: center;
         }
+
+        /* ===== ВЕРХНЯ ПАНЕЛЬ ===== */
         .top-bar {
             display: flex;
             justify-content: space-between;
@@ -199,6 +234,8 @@
         .top-bar .stat .crypto {
             color: var(--crypto);
         }
+
+        /* ===== НАВІГАЦІЯ ===== */
         .tab-nav {
             display: flex;
             gap: 2px;
@@ -250,6 +287,8 @@
             display: block;
             margin-top: 1px;
         }
+
+        /* ===== КОНТЕНТ ===== */
         .content-area {
             flex: 1;
             overflow-y: auto;
@@ -283,6 +322,8 @@
                 transform: translateY(0)
             }
         }
+
+        /* ===== ГРА ===== */
         .center-game {
             display: flex;
             flex-direction: column;
@@ -292,18 +333,19 @@
             gap: 4px;
             padding: 4px 0;
         }
+
         .tap-circle {
-            width: 160px;
-            height: 160px;
+            width: 300px;
+            height: 300px;
             border-radius: 50%;
             background: radial-gradient(circle at 30% 30%, #2a2a3a, #12121a);
-            border: 4px solid var(--primary);
+            border: 6px solid var(--primary);
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            font-size: 64px;
-            box-shadow: 0 0 50px rgba(0, 255, 136, 0.2), inset 0 0 30px rgba(0, 255, 136, 0.05);
+            font-size: 120px;
+            box-shadow: 0 0 80px rgba(0, 255, 136, 0.3), inset 0 0 50px rgba(0, 255, 136, 0.08);
             transition: transform 0.08s linear;
             touch-action: manipulation;
             position: relative;
@@ -311,12 +353,12 @@
         }
         .tap-circle:active {
             transform: scale(0.92);
-            box-shadow: 0 0 80px rgba(0, 255, 136, 0.4);
+            box-shadow: 0 0 120px rgba(0, 255, 136, 0.5);
         }
         .tap-circle .tap-ripple {
             position: absolute;
             border-radius: 50%;
-            border: 2px solid var(--primary);
+            border: 3px solid var(--primary);
             animation: ripple 0.7s ease-out forwards;
             pointer-events: none;
         }
@@ -327,8 +369,8 @@
                 opacity: 1
             }
             100% {
-                width: 190px;
-                height: 190px;
+                width: 330px;
+                height: 330px;
                 opacity: 0
             }
         }
@@ -339,15 +381,41 @@
             border-radius: 50%;
         }
         .tap-circle .tap-emoji {
-            font-size: 64px;
+            font-size: 120px;
             z-index: 1;
         }
         .tap-balance {
-            font-size: 14px;
+            font-size: 18px;
             color: var(--gold);
             font-weight: 800;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
         }
+
+        @media (max-width:400px) {
+            .tap-circle {
+                width: 250px;
+                height: 250px;
+                font-size: 100px;
+            }
+            .tap-circle .tap-emoji {
+                font-size: 100px;
+            }
+            .tap-balance {
+                font-size: 16px;
+            }
+        }
+        @media (min-width:600px) {
+            .tap-circle {
+                width: 350px;
+                height: 350px;
+                font-size: 140px;
+            }
+            .tap-circle .tap-emoji {
+                font-size: 140px;
+            }
+        }
+
+        /* ===== БАРИ ===== */
         .bar-wrap {
             width: 92%;
             margin: 2px auto;
@@ -377,6 +445,8 @@
             color: var(--text-secondary);
             margin-top: 1px;
         }
+
+        /* ===== БАЛАНС ===== */
         .bal {
             text-align: center;
             padding: 3px;
@@ -384,6 +454,8 @@
             font-weight: 800;
             color: var(--gold);
         }
+
+        /* ===== СТАТИСТИКА ===== */
         .stats-row {
             display: flex;
             flex-wrap: wrap;
@@ -404,6 +476,8 @@
         .stats-row .stat-item .highlight {
             color: var(--primary);
         }
+
+        /* ===== КНОПКИ ===== */
         .btn {
             padding: 4px 10px;
             border: none;
@@ -445,6 +519,10 @@
             background: linear-gradient(135deg, var(--crypto), #db2777);
             color: #fff;
         }
+        .btn-gold {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #000;
+        }
         .btn-block {
             width: 100%;
             justify-content: center;
@@ -461,6 +539,8 @@
             opacity: 0.4;
             pointer-events: none;
         }
+
+        /* ===== КАРТКИ ===== */
         .card {
             background: var(--bg-card);
             padding: 6px 8px;
@@ -481,6 +561,8 @@
             color: var(--text-secondary);
             margin-bottom: 3px;
         }
+
+        /* ===== ТОСТ ===== */
         .toast {
             position: fixed;
             bottom: 60px;
@@ -503,9 +585,11 @@
             opacity: 1;
             transform: translateX(-50%) translateY(0);
         }
+
+        /* ===== АНІМАЦІЇ ===== */
         .floating-number {
             position: fixed;
-            font-size: 18px;
+            font-size: 24px;
             font-weight: 800;
             pointer-events: none;
             z-index: 1000;
@@ -529,9 +613,9 @@
         }
         .coin-particle {
             position: fixed;
-            width: 14px;
-            height: 14px;
-            font-size: 12px;
+            width: 18px;
+            height: 18px;
+            font-size: 16px;
             pointer-events: none;
             z-index: 999;
             animation: coinFly 0.6s ease-out forwards;
@@ -543,9 +627,11 @@
             }
             100% {
                 opacity: 0;
-                transform: translate(var(--dx, 40px), var(--dy, -55px)) scale(0.3)
+                transform: translate(var(--dx, 50px), var(--dy, -65px)) scale(0.3)
             }
         }
+
+        /* ===== МАГАЗИН ===== */
         .shop-tabs {
             display: flex;
             gap: 2px;
@@ -571,6 +657,8 @@
             color: #000;
             border-color: var(--primary);
         }
+
+        /* ===== ІНВЕНТАР ===== */
         .inventory-grid {
             display: flex;
             flex-wrap: wrap;
@@ -585,6 +673,10 @@
             min-width: 34px;
             border: 1px solid var(--border);
             cursor: pointer;
+            transition: all 0.3s;
+        }
+        .inv-item:active {
+            transform: scale(0.95);
         }
         .inv-item .icon {
             font-size: 14px;
@@ -594,162 +686,141 @@
             font-size: 5px;
             color: var(--gold);
         }
-        .gif-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 2px;
-            margin: 2px 0;
+        .inv-item .name {
+            font-size: 5px;
+            color: var(--text-secondary);
         }
-        .gif-cell {
-            width: 28px;
-            height: 28px;
-            border-radius: var(--radius);
-            background: rgba(255, 255, 255, 0.03);
-            cursor: pointer;
-            border: 2px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            transition: all 0.3s;
+        .inv-item.chest {
+            border-color: var(--gold);
+            background: rgba(251, 191, 36, 0.08);
         }
-        .gif-cell.sel {
+        .inv-item.chest:active {
             border-color: var(--primary);
-            box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.2);
         }
-        .slot-machine {
-            display: flex;
-            gap: 4px;
+
+        /* ===== ВІДКРИТТЯ ЯЩИКА (модалка) ===== */
+        .chest-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: none;
             justify-content: center;
-            margin: 3px 0;
-        }
-        .slot {
-            width: 32px;
-            height: 32px;
-            background: var(--bg);
-            border: 2px solid var(--border);
-            border-radius: var(--radius);
-            display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 16px;
+            z-index: 2000;
+            animation: fadeIn 0.3s ease;
+            backdrop-filter: blur(10px);
         }
-        .slot.spinning {
-            animation: slotSpin 0.3s ease;
+        .chest-modal.show {
+            display: flex;
         }
-        @keyframes slotSpin {
+        @keyframes fadeIn {
             0% {
-                transform: scale(1)
-            }
-            50% {
-                transform: scale(0.9)
+                opacity: 0;
             }
             100% {
-                transform: scale(1)
+                opacity: 1;
             }
         }
-        .bet-row {
-            display: flex;
-            align-items: center;
-            gap: 3px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        .bet-row input {
-            width: 38px;
-            text-align: center;
-            background: var(--bg);
-            color: var(--text);
-            border: 1px solid var(--border);
-            padding: 2px;
-            border-radius: var(--radius);
-            font-size: 7px;
-            outline: none;
-        }
-        .profile-header {
-            text-align: center;
-            padding: 4px;
-        }
-        .profile-header .avatar {
-            font-size: 38px;
-        }
-        .profile-header .name {
-            font-size: 13px;
-            font-weight: 700;
-            margin-top: 2px;
-        }
-        .profile-stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 2px;
-            margin-top: 3px;
-        }
-        .profile-stat {
-            background: rgba(255, 255, 255, 0.03);
-            padding: 2px;
-            border-radius: var(--radius);
-            text-align: center;
-            font-size: 4px;
-            color: var(--text-secondary);
-            border: 1px solid var(--border);
-        }
-        .profile-stat .value {
-            font-size: 9px;
-            font-weight: 800;
-            color: var(--gold);
-        }
-        .profile-stat .value.crypto {
-            color: var(--crypto);
-        }
-        .top-item {
-            display: flex;
-            align-items: center;
-            gap: 3px;
-            padding: 3px 5px;
-            background: rgba(255, 255, 255, 0.02);
-            border-radius: var(--radius);
-            margin: 2px 0;
-            font-size: 6px;
-            border: 1px solid var(--border);
-        }
-        .top-item .rank {
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 800;
-            font-size: 6px;
-        }
-        .rank-1 {
-            background: linear-gradient(135deg, #ffd700, #f59e0b);
-            color: #000;
-        }
-        .rank-2 {
-            background: linear-gradient(135deg, #c0c0c0, #9ca3af);
-            color: #000;
-        }
-        .rank-3 {
-            background: linear-gradient(135deg, #cd7f32, #b45309);
-            color: #000;
-        }
-        .season-badge {
-            background: linear-gradient(135deg, #fbbf24, #f59e0b);
-            color: #000;
-            padding: 2px 10px;
-            border-radius: 20px;
-            font-size: 7px;
-            font-weight: 700;
-            display: inline-block;
-        }
-        .season-card {
-            background: linear-gradient(135deg, #1a1a2e, #16213e);
+        .chest-modal .modal-content {
+            background: var(--bg-card);
             border: 2px solid var(--gold);
             border-radius: var(--radius);
-            padding: 8px;
-            margin-bottom: 4px;
+            padding: 20px;
+            max-width: 320px;
+            width: 90%;
+            text-align: center;
+            animation: modalPop 0.4s ease;
+            position: relative;
+            overflow: hidden;
         }
+        @keyframes modalPop {
+            0% {
+                transform: scale(0.7);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        .chest-modal .chest-icon {
+            font-size: 80px;
+            margin-bottom: 10px;
+            animation: chestShake 0.5s ease;
+        }
+        @keyframes chestShake {
+            0% {
+                transform: rotate(0deg) scale(1);
+            }
+            25% {
+                transform: rotate(-15deg) scale(1.1);
+            }
+            50% {
+                transform: rotate(15deg) scale(1.1);
+            }
+            75% {
+                transform: rotate(-10deg) scale(1.05);
+            }
+            100% {
+                transform: rotate(0deg) scale(1);
+            }
+        }
+        .chest-modal .reward-text {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--gold);
+            margin: 8px 0;
+        }
+        .chest-modal .reward-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+        .chest-modal .close-btn {
+            padding: 8px 24px;
+            font-size: 12px;
+            font-weight: 700;
+            border: none;
+            border-radius: var(--radius);
+            background: linear-gradient(135deg, var(--primary), #00cc66);
+            color: #000;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .chest-modal .close-btn:active {
+            transform: scale(0.95);
+        }
+        .chest-modal .reward-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 6px 12px;
+            border-radius: var(--radius);
+            margin: 6px 0;
+        }
+        .chest-modal .reward-item .ri {
+            font-size: 24px;
+        }
+        .chest-modal .reward-item .rn {
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .chest-modal .reward-item .rv {
+            font-size: 12px;
+            color: var(--gold);
+            font-weight: 700;
+        }
+
+        /* ===== ПРОМО ===== */
         .promo-row {
             display: flex;
             gap: 2px;
@@ -767,7 +838,13 @@
             border-radius: var(--radius);
             font-size: 6px;
             outline: none;
+            display: none;
         }
+        .promo-row .promo-btn {
+            display: none;
+        }
+
+        /* ===== КРИПТА ===== */
         .crypto-card {
             background: linear-gradient(135deg, rgba(26, 26, 46, 0.9), rgba(18, 18, 26, 0.9));
             border: 1px solid var(--border);
@@ -800,6 +877,7 @@
         .crypto-card .change.down {
             color: #ef4444;
         }
+
         .chart-container {
             background: var(--bg-card);
             border-radius: var(--radius);
@@ -808,6 +886,8 @@
             margin-bottom: 3px;
             height: 80px;
         }
+
+        /* ===== РИНОК ===== */
         .market-item {
             display: flex;
             justify-content: space-between;
@@ -831,6 +911,8 @@
             font-weight: 700;
             font-size: 7px;
         }
+
+        /* ===== ТРЕЙДЕРИ ===== */
         .trader-card {
             background: linear-gradient(135deg, rgba(26, 26, 46, 0.9), rgba(18, 18, 26, 0.9));
             border: 1px solid var(--border);
@@ -866,6 +948,8 @@
             font-size: 4px;
             color: var(--crypto);
         }
+
+        /* ===== АПГРЕЙДЕР ===== */
         .upgrader-container {
             display: flex;
             gap: 4px;
@@ -956,6 +1040,8 @@
             opacity: 0.4;
             pointer-events: none;
         }
+
+        /* ===== АНТИБОТ ===== */
         .antibot-warning {
             background: rgba(239, 68, 68, 0.15);
             border: 1px solid #ef4444;
@@ -970,79 +1056,198 @@
         .antibot-warning.show {
             display: block;
         }
-        @media (max-width:400px) {
-            .tap-circle {
-                width: 140px;
-                height: 140px;
-                font-size: 56px;
+
+        /* ===== ПРОФІЛЬ ===== */
+        .profile-header {
+            text-align: center;
+            padding: 4px;
+        }
+        .profile-header .avatar {
+            font-size: 38px;
+        }
+        .profile-header .name {
+            font-size: 13px;
+            font-weight: 700;
+            margin-top: 2px;
+        }
+        .profile-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 2px;
+            margin-top: 3px;
+        }
+        .profile-stat {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 2px;
+            border-radius: var(--radius);
+            text-align: center;
+            font-size: 4px;
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+        .profile-stat .value {
+            font-size: 9px;
+            font-weight: 800;
+            color: var(--gold);
+        }
+        .profile-stat .value.crypto {
+            color: var(--crypto);
+        }
+
+        /* ===== ТОП ===== */
+        .top-item {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            padding: 3px 5px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: var(--radius);
+            margin: 2px 0;
+            font-size: 6px;
+            border: 1px solid var(--border);
+        }
+        .top-item .rank {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 6px;
+        }
+        .rank-1 {
+            background: linear-gradient(135deg, #ffd700, #f59e0b);
+            color: #000;
+        }
+        .rank-2 {
+            background: linear-gradient(135deg, #c0c0c0, #9ca3af);
+            color: #000;
+        }
+        .rank-3 {
+            background: linear-gradient(135deg, #cd7f32, #b45309);
+            color: #000;
+        }
+
+        .season-badge {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #000;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 7px;
+            font-weight: 700;
+            display: inline-block;
+        }
+        .season-card {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border: 2px solid var(--gold);
+            border-radius: var(--radius);
+            padding: 8px;
+            margin-bottom: 4px;
+        }
+
+        .gif-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2px;
+            margin: 2px 0;
+        }
+        .gif-cell {
+            width: 28px;
+            height: 28px;
+            border-radius: var(--radius);
+            background: rgba(255, 255, 255, 0.03);
+            cursor: pointer;
+            border: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+        .gif-cell.sel {
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
+        }
+
+        /* ===== СЛОТИ ===== */
+        .slot-machine {
+            display: flex;
+            gap: 4px;
+            justify-content: center;
+            margin: 3px 0;
+        }
+        .slot {
+            width: 32px;
+            height: 32px;
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+        .slot.spinning {
+            animation: slotSpin 0.3s ease;
+        }
+        @keyframes slotSpin {
+            0% {
+                transform: scale(1)
             }
-            .tap-circle .tap-emoji {
-                font-size: 56px;
+            50% {
+                transform: scale(0.9)
             }
-            .bal {
-                font-size: 12px;
-            }
-            .top-bar .stat {
-                font-size: 5px;
-                padding: 1px 4px;
-            }
-            .tab-nav button .tab-label {
-                font-size: 4px;
-            }
-            .tab-nav button .tab-icon {
-                font-size: 10px;
-            }
-            .upgrader-container {
-                flex-direction: column;
-            }
-            .upgrader-center {
-                flex-direction: row;
-                padding: 4px;
-            }
-            .chance-value {
-                font-size: 14px;
-            }
-            .profile-stats {
-                grid-template-columns: 1fr 1fr 1fr;
-            }
-            #authScreen .btn {
-                font-size: 12px;
-                padding: 10px;
-            }
-            #authScreen input {
-                font-size: 12px;
-                padding: 10px;
+            100% {
+                transform: scale(1)
             }
         }
-        @media (min-width:600px) {
-            .tap-circle {
-                width: 200px;
-                height: 200px;
-                font-size: 72px;
-            }
-            .tap-circle .tap-emoji {
-                font-size: 72px;
-            }
+        .bet-row {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .bet-row input {
+            width: 38px;
+            text-align: center;
+            background: var(--bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+            padding: 2px;
+            border-radius: var(--radius);
+            font-size: 7px;
+            outline: none;
         }
     </style>
 </head>
 <body>
     <div class="app" id="app">
+        <!-- ===== ЕКРАН ВХОДУ ===== -->
         <div id="authScreen">
             <div class="logo">🐹</div>
             <h2>Hamka</h2>
             <p class="subtitle">Крипто-клікер з апгрейдами</p>
+            <div class="auth-tabs">
+                <button class="auth-tab active" onclick="switchAuthTab('login')">Вхід</button>
+                <button class="auth-tab" onclick="switchAuthTab('register')">Реєстрація</button>
+            </div>
             <div id="authStatus" style="color:var(--text-secondary);font-size:11px;margin-bottom:10px;text-align:center;">🔐 Виберіть спосіб входу</div>
-            <input type="text" id="authNick" placeholder="👤 Нікнейм (наприклад: Lord1k)">
-            <input type="password" id="authPass" placeholder="🔑 Пароль (мін. 4)">
+            <div id="authFields">
+                <input type="text" id="authNick" placeholder="👤 Нікнейм">
+                <input type="password" id="authPass" placeholder="🔑 Пароль (мін. 4)">
+            </div>
             <div class="error" id="authError"></div>
             <div class="success" id="authSuccess"></div>
-            <button class="btn btn-g" onclick="handleLogin()">🔐 Увійти</button>
+            <button class="btn btn-g" id="authMainBtn" onclick="handleLogin()">🔐 Увійти</button>
             <div class="divider">або</div>
             <button class="btn btn-tg" onclick="handleTelegramGuest()">📱 Увійти через Telegram</button>
             <div class="divider">або</div>
             <button class="btn btn-p" onclick="handleGuest()">🎮 Гість</button>
         </div>
+
+        <!-- ===== ГРА ===== -->
         <div id="game" style="display:none;flex-direction:column;height:100%">
             <div class="top-bar">
                 <div class="stat">🐹 <span class="val" id="userName">Гравець</span></div>
@@ -1050,8 +1255,9 @@
                 <div class="stat">🟣 <span class="val gold" id="homaDisp">0</span></div>
                 <div class="stat">₿ <span class="val crypto" id="cryptoDisp">0</span></div>
                 <div class="stat">⭐ <span class="val" id="lvlDisp">1</span></div>
-                <div class="stat" id="seasonBadge" style="background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#000;padding:2px 8px;border-radius:20px;font-size:6px;font-weight:700;">🏆 Сезон 1</div>
+                <div class="stat" id="seasonBadge" style="background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#000;padding:2px 8px;border-radius:20px;font-size:6px;font-weight:700;">🏆 Сезон 2</div>
             </div>
+
             <div class="tab-nav" id="tabNav">
                 <button class="active" onclick="switchTab('games')"><span class="tab-icon">🎮</span><span class="tab-label">Гра</span></button>
                 <button onclick="switchTab('shop')"><span class="tab-icon">🛒</span><span class="tab-label">Магазин</span></button>
@@ -1061,7 +1267,9 @@
                 <button onclick="switchTab('inventory')"><span class="tab-icon">🎒</span><span class="tab-label">Інвентар</span></button>
                 <button onclick="switchTab('top')"><span class="tab-icon">🏆</span><span class="tab-label">Топ</span></button>
             </div>
+
             <div class="content-area" id="contentArea"></div>
+
             <div class="stats-row">
                 <span class="stat-item">⚡ <span id="energyText">100</span>/<span id="maxEnergyText">100</span></span>
                 <span class="stat-item" style="color:#f97316;">−1⚡</span>
@@ -1079,15 +1287,30 @@
                 <div class="bar-label"><span>XP: <span id="xpDisp">0</span></span><span>Рівень <span id="lvlDisp2">1</span></span></div>
             </div>
             <div class="promo-row">
-                <input type="text" id="promoInp" placeholder="🎁 Промокод">
-                <button class="btn btn-g btn-sm" onclick="activatePromo()">OK</button>
+                <input type="text" id="promoInp" placeholder="🎁 Промокод" style="display:none;">
+                <button class="btn btn-g btn-sm promo-btn" onclick="activatePromo()" style="display:none;">OK</button>
                 <button class="btn btn-r btn-sm" onclick="logout()">🚪</button>
             </div>
             <div class="antibot-warning" id="antibotWarning">⚠️ Перевищено ліміт тапів! Зачекайте 30 секунд.</div>
         </div>
     </div>
+
+    <!-- ===== МОДАЛКА ДЛЯ ВІДКРИТТЯ ЯЩИКІВ ===== -->
+    <div class="chest-modal" id="chestModal">
+        <div class="modal-content">
+            <div class="chest-icon" id="chestIcon">📦</div>
+            <div class="reward-text" id="chestRewardText">🎉 Ви отримали!</div>
+            <div class="reward-desc" id="chestRewardDesc"></div>
+            <button class="close-btn" onclick="closeChestModal()">Отримано!</button>
+        </div>
+    </div>
+
     <div class="toast" id="toast"></div>
+
     <script>
+        // ============================================================
+        //  🔥 FIREBASE CONFIG
+        // ============================================================
         const firebaseConfig = {
             apiKey: "AIzaSyD1-UDrqRzfUw_32nOzqT2mAozzab5DJZk",
             authDomain: "hamka-game.firebaseapp.com",
@@ -1097,11 +1320,14 @@
             messagingSenderId: "975050013138",
             appId: "1:975050013138:web:19f42c1c5f2b2d35d6300b"
         };
+
         let auth = null,
             db = null,
             gameStarted = false;
         let tg = window.Telegram?.WebApp;
         let tgUserId = null;
+        let authMode = 'login';
+
         try {
             firebase.initializeApp(firebaseConfig);
             auth = firebase.auth();
@@ -1120,26 +1346,34 @@
             console.error('❌ Помилка Firebase:', e);
             document.getElementById('authError').textContent = '❌ Помилка підключення до сервера';
         }
-        const GIFS = [{ id: '🐹', r: 'common' }, { id: '🐱', r: 'common' }, { id: '🐶', r: 'common' }, { id: '🦊',
-                r: 'common' }, { id: '🐻', r: 'common' },
-            { id: '🐯', r: 'rare' }, { id: '🦁', r: 'rare' }, { id: '🐺', r: 'rare' }, { id: '👑', r: 'superrare' },
-            { id: '💎', r: 'superrare' },
-            { id: '🌟', r: 'epic' }, { id: '🔥', r: 'epic' }, { id: '🚀', r: 'mythic' }, { id: '🦄',
-                r: 'legendary' }, { id: '🐲', r: 'legendary' }
+
+        // ============================================================
+        //  📦 КОНФІГУРАЦІЯ
+        // ============================================================
+        const GIFS = [
+            { id: '🐹', r: 'common' }, { id: '🐱', r: 'common' }, { id: '🐶', r: 'common' },
+            { id: '🦊', r: 'common' }, { id: '🐻', r: 'common' },
+            { id: '🐯', r: 'rare' }, { id: '🦁', r: 'rare' }, { id: '🐺', r: 'rare' },
+            { id: '👑', r: 'superrare' }, { id: '💎', r: 'superrare' },
+            { id: '🌟', r: 'epic' }, { id: '🔥', r: 'epic' }, { id: '🚀', r: 'mythic' },
+            { id: '🦄', r: 'legendary' }, { id: '🐲', r: 'legendary' }
         ];
         const RARITY_PRICES = { common: 1000, rare: 3000, superrare: 8000, epic: 50000, mythic: 150000,
             legendary: 500000 };
-        const LEVELS = [{ l: 1, x: 0, rw: 0 }, { l: 2, x: 200, rw: 20 }, { l: 3, x: 600, rw: 40 }, { l: 4, x: 1500,
-                rw: 80 }, { l: 5, x: 4000, rw: 160 },
-            { l: 6, x: 10000, rw: 320 }, { l: 7, x: 25000, rw: 640 }, { l: 8, x: 60000, rw: 1280 },
-            { l: 9, x: 150000, rw: 2500 }, { l: 10, x: 400000, rw: 5000 },
-            { l: 11, x: 1000000, rw: 10000 }, { l: 12, x: 2500000, rw: 25000 }, { l: 13, x: 6000000, rw: 50000 },
-            { l: 14, x: 15000000, rw: 100000 },
-            { l: 15, x: 40000000, rw: 250000 }, { l: 16, x: 100000000, rw: 500000 }, { l: 17, x: 250000000,
-                rw: 1000000 },
-            { l: 18, x: 600000000, rw: 2500000 },
-            { l: 19, x: 1500000000, rw: 5000000 }, { l: 20, x: 4000000000, rw: 10000000 }
+
+        const LEVELS = [
+            { l: 1, x: 0, rw: 0 }, { l: 2, x: 200, rw: 20 }, { l: 3, x: 600, rw: 40 },
+            { l: 4, x: 1500, rw: 80 }, { l: 5, x: 4000, rw: 160 },
+            { l: 6, x: 10000, rw: 320 }, { l: 7, x: 25000, rw: 640 },
+            { l: 8, x: 60000, rw: 1280 }, { l: 9, x: 150000, rw: 2500 },
+            { l: 10, x: 400000, rw: 5000 }, { l: 11, x: 1000000, rw: 10000 },
+            { l: 12, x: 2500000, rw: 25000 }, { l: 13, x: 6000000, rw: 50000 },
+            { l: 14, x: 15000000, rw: 100000 }, { l: 15, x: 40000000, rw: 250000 },
+            { l: 16, x: 100000000, rw: 500000 }, { l: 17, x: 250000000, rw: 1000000 },
+            { l: 18, x: 600000000, rw: 2500000 }, { l: 19, x: 1500000000, rw: 5000000 },
+            { l: 20, x: 4000000000, rw: 10000000 }
         ];
+
         const TITLES = {
             'none': { name: 'Без титулу', color: '#888' },
             'noob': { name: '🌱 Новачок', color: '#aaa', price: 50000 },
@@ -1152,17 +1386,24 @@
             'god': { name: '👑 Бог', color: '#00ff88', price: 25000000 },
             'hamka': { name: '🐹 Хамка', color: '#00ff88', price: 25000 }
         };
-        const UPGRADE_ITEMS = [{ id: 'figurine_durov', name: "Durov's Figurine", price: 160256075, image: "🎭",
-                rarity: 'legendary' },
+
+        const UPGRADE_ITEMS = [
+            { id: 'figurine_durov', name: "Durov's Figurine", price: 160256075, image: "🎭", rarity: 'legendary' },
             { id: 'astral_shard', name: "Astral Shard", price: 364927800, image: "💎", rarity: 'mythic' },
             { id: 'pepe_gucci', name: "Plush Pepe (Gucci)", price: 237725750, image: "🐸", rarity: 'epic' },
             { id: 'nessie', name: "Pool Float (Nessie)", price: 793356832, image: "🦕", rarity: 'legendary' },
             { id: 'crypto_pendant', name: "Crypto Pendant", price: 50000000, image: "🔮", rarity: 'rare' },
             { id: 'golden_coin', name: "Golden Coin", price: 25000000, image: "🪙", rarity: 'rare' },
             { id: 'diamond_ring', name: "Diamond Ring", price: 150000000, image: "💍", rarity: 'epic' },
-            { id: 'hamka_crown', name: "Hamka Crown", price: 500000000, image: "👑", rarity: 'legendary' }
+            { id: 'hamka_crown', name: "Hamka Crown", price: 500000000, image: "👑", rarity: 'legendary' },
+            { id: 'crystal_sword', name: "Crystal Sword", price: 75000000, image: "⚔️", rarity: 'epic' },
+            { id: 'magic_shield', name: "Magic Shield", price: 45000000, image: "🛡️", rarity: 'rare' },
+            { id: 'dragon_egg', name: "Dragon Egg", price: 250000000, image: "🥚", rarity: 'legendary' },
+            { id: 'phoenix_feather', name: "Phoenix Feather", price: 120000000, image: "🪶", rarity: 'mythic' }
         ];
-        const BOSSES = [{ id: 0, name: '🎁 Безкоштовний', cost: 0, chance: 0.40, rewardMin: 0, rewardMax: 0 },
+
+        const BOSSES = [
+            { id: 0, name: '🎁 Безкоштовний', cost: 0, chance: 0.40, rewardMin: 0, rewardMax: 0 },
             { id: 1, name: '👾 Бос 1', cost: 100, chance: 0.30, rewardMin: 50, rewardMax: 150 },
             { id: 2, name: '👾 Бос 2', cost: 500, chance: 0.30, rewardMin: 50, rewardMax: 150 },
             { id: 3, name: '👾 Бос 3', cost: 2000, chance: 0.30, rewardMin: 50, rewardMax: 150 },
@@ -1170,12 +1411,20 @@
             { id: 5, name: '👾 Бос 5', cost: 15000, chance: 0.40, rewardMin: 50, rewardMax: 150 },
             { id: 6, name: '👾 Бос 6', cost: 50000, chance: 0.40, rewardMin: 50, rewardMax: 150 }
         ];
-        const BOXES = [{ id: 'common', emoji: '📦', name: 'Простий', price: 30000, homyMin: 5, homyMax: 50 },
-            { id: 'rare', emoji: '📦', name: 'Рідкісний', price: 100000, homyMin: 10, homyMax: 100 },
-            { id: 'epic', emoji: '📦', name: 'Епічний', price: 500000, homyMin: 20, homyMax: 200 },
-            { id: 'legendary', emoji: '📦', name: 'Легендарний', price: 2000000, homyMin: 50, homyMax: 500 },
-            { id: 'mythic', emoji: '📦', name: 'Міфічний', price: 10000000, homyMin: 100, homyMax: 1000 }
+
+        const BOXES = [
+            { id: 'common', emoji: '📦', name: 'Простий', price: 30000, homyMin: 5, homyMax: 50, color: '#888' },
+            { id: 'rare', emoji: '📦', name: 'Рідкісний', price: 100000, homyMin: 10, homyMax: 100, color: '#3b82f6' },
+            { id: 'epic', emoji: '📦', name: 'Епічний', price: 500000, homyMin: 20, homyMax: 200, color: '#a855f7' },
+            { id: 'legendary', emoji: '📦', name: 'Легендарний', price: 2000000, homyMin: 50, homyMax: 500,
+                color: '#fbbf24' },
+            { id: 'mythic', emoji: '📦', name: 'Міфічний', price: 10000000, homyMin: 100, homyMax: 1000,
+                color: '#ec4899' }
         ];
+
+        // ============================================================
+        //  🎮 ГРАВЕЦЬ
+        // ============================================================
         let G = {
             uid: null,
             name: 'Гравець',
@@ -1226,14 +1475,15 @@
             selectedItemOut: null,
             lastSave: Date.now(),
             marketListings: [],
-            traders: [{ id: 'trader1', name: '🤖 Крипто-магнат', items: ['figurine_durov', 'astral_shard'],
+            traders: [
+                { id: 'trader1', name: '🤖 Крипто-магнат', items: ['figurine_durov', 'astral_shard'],
                     multiplier: 1.2 },
                 { id: 'trader2', name: '💎 Діамантовий трейдер', items: ['pepe_gucci', 'golden_coin'],
                     multiplier: 1.5 },
                 { id: 'trader3', name: '🔥 Вогняний трейдер', items: ['diamond_ring', 'hamka_crown'],
                     multiplier: 1.8 }
             ],
-            season: 1,
+            season: 2,
             seasonPoints: 0,
             seasonRewardClaimed: false,
             eventTapCooldown: 0,
@@ -1241,13 +1491,15 @@
             isBanned: false,
             currentGame: 'tap',
             isTelegramUser: false,
-            // Скіни
             skins: {
                 plow: { has: false, use: false, file: 'Plow.jpg' },
                 ronaldo: { has: false, use: false, file: 'Ronaldo.jpg' }
             }
         };
 
+        // ============================================================
+        //  🔧 ДОПОМІЖНІ ФУНКЦІЇ
+        // ============================================================
         function rand(a, b) { return Math.floor(Math.random() * (b - a + 1)) + a; }
 
         function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
@@ -1307,13 +1559,14 @@
             return `<span style="color:${t.color}">${t.name}</span>`;
         }
 
-        // Оновлення кнопки тапа
+        // ============================================================
+        //  🖼️ КНОПКА ТАПА
+        // ============================================================
         function updateTapButton() {
             const btn = document.getElementById('tapBtn');
             if (!btn) return;
             btn.innerHTML = '';
 
-            // Перевіряємо який скін активний
             let skinFile = null;
             let skinName = '';
             if (G.skins.plow.use && G.skins.plow.has) {
@@ -1335,7 +1588,6 @@
                     emoji.className = 'tap-emoji';
                     emoji.textContent = '📂';
                     btn.appendChild(emoji);
-                    toast('⚠️ Файл ' + skinFile + ' не знайдено');
                 };
                 btn.appendChild(img);
             } else {
@@ -1346,29 +1598,29 @@
             }
         }
 
-        // Отримати активний скін для відображення
         function getActiveSkinName() {
             if (G.skins.plow.use && G.skins.plow.has) return 'PLOW';
             if (G.skins.ronaldo.use && G.skins.ronaldo.has) return 'RONALDO';
             return G.activeGif;
         }
 
-        // Промокоди
+        // ============================================================
+        //  🎁 ПРОМОКОДИ (ПРИХОВАНІ)
+        // ============================================================
         function activatePromo() {
             let code = document.getElementById('promoInp').value.trim().toUpperCase();
             if (!code) { toast('❌ Введіть промокод');
                 return; }
 
-            // Скін PLOW
+            // Секретні промокоди (гравці не знають)
             if (code === 'PLOW') {
                 if (G.skins.plow.has) {
                     toast('✅ Скін PLOW вже активовано!');
                 } else {
                     G.skins.plow.has = true;
                     G.skins.plow.use = true;
-                    // Вимикаємо інші скіни
                     G.skins.ronaldo.use = false;
-                    toast('🚜 Скін PLOW активовано! (Plow.jpg)');
+                    toast('🚜 Скін PLOW активовано!');
                     saveGame();
                     updateTapButton();
                     renderVip();
@@ -1378,16 +1630,14 @@
                 return;
             }
 
-            // Скін RONALDO
             if (code === 'RONALDO') {
                 if (G.skins.ronaldo.has) {
                     toast('✅ Скін RONALDO вже активовано!');
                 } else {
                     G.skins.ronaldo.has = true;
                     G.skins.ronaldo.use = true;
-                    // Вимикаємо інші скіни
                     G.skins.plow.use = false;
-                    toast('⚽ Скін RONALDO активовано! (Ronaldo.jpg)');
+                    toast('⚽ Скін RONALDO активовано!');
                     saveGame();
                     updateTapButton();
                     renderVip();
@@ -1397,7 +1647,6 @@
                 return;
             }
 
-            // Інші промокоди
             if (code === 'LETO') { G.eventHoma += 50;
                 toast('🌸 +50');
                 updateUI();
@@ -1424,20 +1673,17 @@
             document.getElementById('promoInp').value = '';
         }
 
-        // Переключення скіна
+        // ============================================================
+        //  🎨 VIP ТА СКІНИ
+        // ============================================================
         function toggleSkin(skinName) {
             const skin = G.skins[skinName];
             if (!skin || !skin.has) return;
-
-            // Якщо вже використовується - вимикаємо
             if (skin.use) {
                 skin.use = false;
                 toast('🐹 Виключено скін ' + skinName.toUpperCase());
             } else {
-                // Вмикаємо цей скін, вимикаємо всі інші
-                Object.keys(G.skins).forEach(key => {
-                    if (key !== skinName) G.skins[key].use = false;
-                });
+                Object.keys(G.skins).forEach(key => { if (key !== skinName) G.skins[key].use = false; });
                 skin.use = true;
                 toast('🎨 Включено скін ' + skinName.toUpperCase());
             }
@@ -1447,12 +1693,10 @@
             renderInventory();
         }
 
-        // VIP
         function renderVip() {
             const el = document.getElementById('vip-area');
             if (!el) return;
 
-            // Скін PLOW
             let plowHtml = '';
             if (G.skins.plow.has) {
                 plowHtml = `
@@ -1460,24 +1704,20 @@
                         <div class="flex">
                             <b>🚜 PLOW Скін</b>
                             <button class="btn ${G.skins.plow.use ? 'btn-g' : 'btn-sm'}" onclick="toggleSkin('plow')">
-                                ${G.skins.plow.use ? '✅ Використовується' : '🔘 Використовувати'}
+                                ${G.skins.plow.use ? '✅' : '🔘'}
                             </button>
                         </div>
-                        <div style="font-size:6px;color:var(--text-secondary);margin-top:2px;">📂 Plow.jpg</div>
+                        <div style="font-size:6px;color:var(--text-secondary);">📂 Plow.jpg</div>
                     </div>
                 `;
             } else {
                 plowHtml = `
                     <div class="card" style="opacity:0.5;">
-                        <div class="flex">
-                            <b>🚜 PLOW Скін</b>
-                            <span style="font-size:6px;color:var(--text-secondary);">🎁 Промокод PLOW</span>
-                        </div>
+                        <div class="flex"><b>🚜 PLOW Скін</b><span style="font-size:6px;color:var(--text-secondary);">🔒</span></div>
                     </div>
                 `;
             }
 
-            // Скін RONALDO
             let ronaldoHtml = '';
             if (G.skins.ronaldo.has) {
                 ronaldoHtml = `
@@ -1485,33 +1725,30 @@
                         <div class="flex">
                             <b>⚽ RONALDO Скін</b>
                             <button class="btn ${G.skins.ronaldo.use ? 'btn-g' : 'btn-sm'}" onclick="toggleSkin('ronaldo')">
-                                ${G.skins.ronaldo.use ? '✅ Використовується' : '🔘 Використовувати'}
+                                ${G.skins.ronaldo.use ? '✅' : '🔘'}
                             </button>
                         </div>
-                        <div style="font-size:6px;color:var(--text-secondary);margin-top:2px;">📂 Ronaldo.jpg</div>
+                        <div style="font-size:6px;color:var(--text-secondary);">📂 Ronaldo.jpg</div>
                     </div>
                 `;
             } else {
                 ronaldoHtml = `
                     <div class="card" style="opacity:0.5;">
-                        <div class="flex">
-                            <b>⚽ RONALDO Скін</b>
-                            <span style="font-size:6px;color:var(--text-secondary);">🎁 Промокод RONALDO</span>
-                        </div>
+                        <div class="flex"><b>⚽ RONALDO Скін</b><span style="font-size:6px;color:var(--text-secondary);">🔒</span></div>
                     </div>
                 `;
             }
 
             el.innerHTML = `
-                <div class="card"><div class="flex"><b>👑 VIP</b> ${G.vip ? '✅ Активний' : '20000💰'} <button class="btn btn-g btn-sm" onclick="buyItem('vip')">${G.vip ? 'Вже є' : 'Купити'}</button></div></div>
+                <div class="card"><div class="flex"><b>👑 VIP</b> ${G.vip ? '✅' : '20000💰'} <button class="btn ${G.vip ? 'btn-g' : 'btn-g'}" onclick="buyItem('vip')">${G.vip ? 'Вже є' : 'Купити'}</button></div></div>
                 <div class="card" style="${G.vip ? '' : 'opacity:0.5;pointer-events:none;'}">
-                    <div class="card-title">🎨 Зміна гіфки</div>
+                    <div class="card-title">🎨 Гіфки</div>
                     <div class="gif-row">
                     ${Object.keys(G.ownedGifs).map(id => {
                         const isActive = G.activeGif === id && !G.skins.plow.use && !G.skins.ronaldo.use;
                         return `<div class="gif-cell ${isActive ? 'sel' : ''}" onclick="if(G.vip){G.activeGif='${id}';G.skins.plow.use=false;G.skins.ronaldo.use=false;updateUI();saveGame();renderVip();updateTapButton();}">${id}</div>`;
                     }).join('')}</div>
-                    <div class="card-title" style="margin-top:4px;">🏅 Зміна титулу</div>
+                    <div class="card-title" style="margin-top:4px;">🏅 Титули</div>
                     <div style="display:flex;flex-wrap:wrap;gap:4px;margin:4px 0;">
                     ${Object.keys(G.ownedTitles).map(id => `<button class="btn ${G.activeTitle===id?'btn-g':'btn-sm'}" style="font-size:6px;padding:3px 8px;" onclick="if(G.vip){G.activeTitle='${id}';updateUI();saveGame();renderVip()}">${TITLES[id]?.name||id}</button>`).join('')}</div>
                 </div>
@@ -1520,62 +1757,77 @@
             `;
         }
 
-        // ====== ІНВЕНТАР ======
-        function renderInventory() {
-            let gifs = Object.entries(G.ownedGifs).map(([id, c]) =>
-                `<div class="inv-item"><span class="icon">${id}</span><span class="count">x${c}</span></div>`
-            ).join('');
-            let titles = Object.entries(G.ownedTitles).map(([id, c]) =>
-                `<div class="inv-item"><span style="font-size:7px;">${TITLES[id]?.name || id}</span><span class="count">x${c}</span></div>`
-            ).join('');
-            let chests = Object.entries(G.chests).filter(([_, c]) => c > 0).map(([id, c]) => {
-                let box = BOXES.find(b => b.id === id);
-                return `<div class="inv-item"><span class="icon">${box?.emoji || '📦'}</span><span class="count">x${c}</span></div>`;
-            }).join('');
-            let upItems = Object.entries(G.upgradeInventory).filter(([_, c]) => c > 0).map(([id, c]) =>
-                `<div class="inv-item"><span class="icon">${UPGRADE_ITEMS[id]?.image || '❓'}</span><span class="count">x${c}</span></div>`
-            ).join('');
+        // ============================================================
+        //  📦 ЯЩИКИ (відкриття в інвентарі, як у Standoff 2)
+        // ============================================================
+        function openChestModal(type) {
+            const modal = document.getElementById('chestModal');
+            const icon = document.getElementById('chestIcon');
+            const rewardText = document.getElementById('chestRewardText');
+            const rewardDesc = document.getElementById('chestRewardDesc');
 
-            // Скіни в інвентарі
-            let skinsHtml = '';
-            if (G.skins.plow.has) {
-                skinsHtml += `
-                    <div class="card" style="border-color:${G.skins.plow.use ? 'var(--gold)' : 'var(--border)'};">
-                        <div class="flex">
-                            <span>🚜 PLOW</span>
-                            <span style="font-size:6px;color:var(--text-secondary);">Plow.jpg</span>
-                            <button class="btn ${G.skins.plow.use ? 'btn-g' : 'btn-sm'}" onclick="toggleSkin('plow')">
-                                ${G.skins.plow.use ? '✅' : '🔘'}
-                            </button>
-                        </div>
-                    </div>
-                `;
-            }
-            if (G.skins.ronaldo.has) {
-                skinsHtml += `
-                    <div class="card" style="border-color:${G.skins.ronaldo.use ? 'var(--gold)' : 'var(--border)'};">
-                        <div class="flex">
-                            <span>⚽ RONALDO</span>
-                            <span style="font-size:6px;color:var(--text-secondary);">Ronaldo.jpg</span>
-                            <button class="btn ${G.skins.ronaldo.use ? 'btn-g' : 'btn-sm'}" onclick="toggleSkin('ronaldo')">
-                                ${G.skins.ronaldo.use ? '✅' : '🔘'}
-                            </button>
-                        </div>
-                    </div>
-                `;
+            const box = BOXES.find(b => b.id === type);
+            if (!box || !G.chests[type] || G.chests[type] <= 0) {
+                toast('❌ Немає ящиків');
+                return;
             }
 
-            document.getElementById('inventory-area').innerHTML = `
-                ${skinsHtml}
-                ${gifs ? `<div class="card"><div class="card-title">🎨 Гіфки</div><div class="inventory-grid">${gifs}</div></div>` : ''}
-                ${titles ? `<div class="card"><div class="card-title">🏅 Титули</div><div class="inventory-grid">${titles}</div></div>` : ''}
-                ${chests ? `<div class="card"><div class="card-title">📦 Ящики</div><div class="inventory-grid">${chests}</div></div>` : ''}
-                ${upItems ? `<div class="card"><div class="card-title">🔧 Предмети</div><div class="inventory-grid">${upItems}</div></div>` : ''}
-                <div class="card" style="text-align:center;color:var(--text-muted);font-size:7px;">Всього: ${Object.values(G.ownedGifs).reduce((a,b)=>a+b,0) + Object.values(G.ownedTitles).reduce((a,b)=>a+b,0)}</div>
-            `;
+            // Віднімаємо ящик
+            G.chests[type]--;
+            if (G.chests[type] === 0) delete G.chests[type];
+
+            // Визначаємо нагороду
+            const reward = rand(box.homyMin, box.homyMax);
+            const bonus = Math.floor(reward * (1 + G.luck * 0.1));
+            const finalReward = bonus;
+
+            // Додаємо нагороду
+            G.homa += finalReward;
+
+            // Показуємо модалку
+            icon.textContent = box.emoji;
+            rewardText.textContent = `🎉 +${finalReward} 🟣 Хом!`;
+            rewardDesc.textContent = `Ящик «${box.name}» відкрито!`;
+
+            modal.classList.add('show');
+
+            // Анімація іконки
+            icon.style.animation = 'none';
+            setTimeout(() => {
+                icon.style.animation = 'chestShake 0.5s ease';
+            }, 10);
+
+            // Додаємо випадковий бонус
+            if (Math.random() < 0.15) {
+                // Бонус: додаткові монети
+                const bonusCoins = rand(100, 500);
+                G.coins += bonusCoins;
+                setTimeout(() => {
+                    toast(`💥 Бонус! +${bonusCoins}💰`);
+                }, 300);
+            }
+
+            if (Math.random() < 0.05) {
+                // Бонус: гіфка
+                const g = GIFS[rand(0, GIFS.length - 1)];
+                addGif(g.id);
+                setTimeout(() => {
+                    toast(`🎨 +${g.id}`);
+                }, 600);
+            }
+
+            saveGame();
+            updateUI();
+            renderInventory();
         }
 
-        // ====== КРИПТА ======
+        function closeChestModal() {
+            document.getElementById('chestModal').classList.remove('show');
+        }
+
+        // ============================================================
+        //  📊 КРИПТА
+        // ============================================================
         function updateCryptoRate() {
             let change = (Math.random() - 0.48) * 100;
             let newRate = G.cryptoRate + change;
@@ -1583,13 +1835,17 @@
             G.cryptoRate = Math.round(newRate);
             G.cryptoHistory.push(G.cryptoRate);
             if (G.cryptoHistory.length > 60) G.cryptoHistory.shift();
+
             if (db) {
                 db.ref('global/cryptoRate').set(G.cryptoRate).catch(e => console.warn('Save global rate error:', e));
             }
+
             const rateDisp = document.getElementById('cryptoRateDisp');
             if (rateDisp) rateDisp.textContent = G.cryptoRate;
+
             const chartContainer = document.getElementById('cryptoChart');
             if (chartContainer) drawLineChart();
+
             saveGame();
         }
 
@@ -1678,402 +1934,296 @@
             renderCrypto();
         }
 
-        // ====== ВКЛАДКИ ======
-        function switchTab(t) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('show'));
-            const tabs = { games: 'tab-games', shop: 'tab-shop', crypto: 'tab-crypto', vip: 'tab-vip',
-                profile: 'tab-profile', inventory: 'tab-inventory', top: 'tab-top' };
-            const page = document.getElementById(tabs[t]);
-            if (page) page.classList.add('show');
-            document.querySelectorAll('.tab-nav button').forEach((b, i) => {
-                const names = ['games', 'shop', 'crypto', 'vip', 'profile', 'inventory', 'top'];
-                b.classList.toggle('active', names[i] === t);
-            });
-            if (t === 'games') openGame(G.currentGame || 'tap');
-            if (t === 'shop') renderShop();
-            if (t === 'crypto') renderCrypto();
-            if (t === 'vip') renderVip();
-            if (t === 'profile') renderProfile();
-            if (t === 'inventory') renderInventory();
-            if (t === 'top') renderTop();
+        // ============================================================
+        //  🏪 МАГАЗИН
+        // ============================================================
+        function renderShop() {
+            const el = document.getElementById('shop-content');
+            if (!el) return;
+            el.innerHTML = `
+                <div class="shop-tabs">
+                    <button class="shop-tab active" onclick="renderShopTab('res')">⚡ Ресурси</button>
+                    <button class="shop-tab" onclick="renderShopTab('upg')">⭐ Прокачка</button>
+                    <button class="shop-tab" onclick="renderShopTab('vis')">🎨 Візуальне</button>
+                    <button class="shop-tab" onclick="renderShopTab('box')">📦 Ящики</button>
+                    <button class="shop-tab" onclick="renderShopTab('market')">🏪 Ринок</button>
+                </div>
+                <div id="shop-inner"></div>
+            `;
+            renderShopTab('res');
         }
 
-        // ====== АВТОРИЗАЦІЯ ======
-        function autoLoginWithTelegram() {
-            if (!tg || !tgUserId) return false;
-            document.getElementById('authStatus').textContent = '📱 Вхід через Telegram...';
+        function renderShopTab(tab) {
+            document.querySelectorAll('.shop-tab').forEach(t => t.classList.remove('active'));
+            const btns = document.querySelectorAll('.shop-tab');
+            const tabs = ['res', 'upg', 'vis', 'box', 'market'];
+            const idx = tabs.indexOf(tab);
+            if (btns[idx]) btns[idx].classList.add('active');
+            const el = document.getElementById('shop-inner');
+            if (!el) return;
 
-            const uid = 'tg_' + tgUserId;
-            G.uid = uid;
-            G.isTelegramUser = true;
-
-            const tgUser = tg.initDataUnsafe?.user;
-            if (tgUser) {
-                let name = tgUser.first_name || 'TelegramUser';
-                if (tgUser.last_name) name += ' ' + tgUser.last_name;
-                G.name = name;
-            }
-
-            // Перевіряємо в Firebase
-            db.ref('users/' + uid).once('value').then(snap => {
-                if (snap.val()) {
-                    loadGame(snap.val());
-                    toast('✅ Дані завантажено!');
+            if (tab === 'res') {
+                el.innerHTML = `
+                    <div class="card"><div class="flex"><b>⚡ Енергія +50</b> <span style="color:var(--gold);">${getPrice('maxEnergy')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItem('maxEnergy')">Купити</button></div></div>
+                    <div class="card"><div class="flex"><b>✨ Авто XP</b> <span style="color:var(--gold);">${getPrice('autoXP')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItem('autoXP')">Купити</button></div></div>
+                    <div class="card"><div class="flex"><b>🚀 XP Бустер</b> <span style="color:var(--gold);">300💰</span> <button class="btn btn-g btn-sm" onclick="buyItem('xpBoost')">Купити</button></div></div>
+                    <div class="card"><div class="flex"><b>⚡ Авто тап</b> <span style="color:var(--gold);">${getPrice('autoTap')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItem('autoTap')">Купити</button></div></div>
+                    <div class="card"><div class="flex"><b>🔄 Регенерація +1</b> <span style="color:var(--gold);">${getPrice('energyRegen')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItem('energyRegen')">Купити</button></div></div>
+                    <div class="card"><div class="flex"><b>🟣 Купити Хоми</b> <span><button class="btn btn-g btn-sm" onclick="buyHoma(1)">1</button> <button class="btn btn-g btn-sm" onclick="buyHoma(5)">5</button> <button class="btn btn-g btn-sm" onclick="buyHoma(10)">10</button></span></div></div>
+                    <div class="card"><div class="flex"><b>🌸 Купити Івенхоми</b> <span><button class="btn btn-gold btn-sm" onclick="buyEventHoma(1)">1</button> <button class="btn btn-gold btn-sm" onclick="buyEventHoma(5)">5</button> <button class="btn btn-gold btn-sm" onclick="buyEventHoma(10)">10</button></span></div></div>
+                `;
+            } else if (tab === 'upg') {
+                el.innerHTML = `
+                    <div class="card"><div class="flex"><b>⭐ Прокачка тапу</b> <span style="color:var(--gold);">${getPrice('tapLevel')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItem('tapLevel')">Купити</button></div></div>
+                    <div class="card"><div class="flex"><b>🪙 Бустер монет</b> <span style="color:var(--gold);">${getPrice('coinBoost')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItem('coinBoost')">Купити</button></div></div>
+                    <div class="card"><div class="flex"><b>⚡ Енергія +100</b> <span style="color:var(--gold);">${getPrice('energyUp')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItem('energyUp')">Купити</button></div></div>
+                    <div class="card"><div class="flex"><b>💪 Сила тапа +50%</b> <span style="color:var(--gold);">${getPrice('tapPower')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItem('tapPower')">Купити</button></div></div>
+                    <div class="card"><div class="flex"><b>🎯 Крит +5%</b> <span style="color:var(--gold);">${getPrice('critChance')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItem('critChance')">Купити</button></div></div>
+                    <div class="card"><div class="flex"><b>🍀 Удача +0.1</b> <span style="color:var(--gold);">${getPrice('luckB')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItem('luckB')">Купити</button></div></div>
+                    <div class="card"><div class="flex"><b>👑 VIP</b> <span style="color:var(--gold);">20000💰</span> <button class="btn btn-g btn-sm" onclick="buyItem('vip')">Купити</button></div></div>
+                `;
+            } else if (tab === 'vis') {
+                let gifs = GIFS.map(g => {
+                    let owned = hasGif(g.id);
+                    let price = RARITY_PRICES[g.r] || 1000;
+                    return `<div class="gif-cell" style="width:32px;height:32px;flex-direction:column;gap:1px;padding:1px;background:${owned?'rgba(0,255,136,0.08)':'rgba(255,255,255,0.02)'}">
+                        <div style="font-size:14px;">${g.id}</div>
+                        ${!owned ? `<button class="btn btn-g btn-sm" style="padding:1px 3px;font-size:4px;" onclick="buyGif('${g.id}')">${price}💰</button>` : `<span style="font-size:4px;color:var(--primary);">x${getGifCount(g.id)}</span>`}
+                    </div>`;
+                }).join('');
+                let titles = Object.entries(TITLES).filter(([id, t]) => t.price).map(([id, t]) => {
+                    let owned = hasTitle(id);
+                    return `<div class="card"><div class="flex"><b>${t.name}</b> <span style="color:var(--gold);">${t.price}💰</span> <button class="btn btn-g btn-sm" onclick="buyTitle('${id}')" ${owned?'disabled':''}>${owned?'✅':'Купити'}</button></div></div>`;
+                }).join('');
+                el.innerHTML = `
+                    <div class="card"><div class="card-title">🎨 Гіфки</div><div class="gif-row">${gifs}</div></div>
+                    <div class="card"><div class="card-title">🏅 Титули</div>${titles}</div>
+                `;
+            } else if (tab === 'box') {
+                let boxes = BOXES.map(b => {
+                    let owned = G.chests[b.id] || 0;
+                    return `<div class="card"><div class="flex">
+                        <b>${b.emoji} ${b.name}</b>
+                        <span style="color:${b.color};font-size:6px;">${b.price}💰</span>
+                        <span><button class="btn btn-gold btn-sm" onclick="buyChest('${b.id}')">Купити</button></span>
+                    </div></div>`;
+                }).join('');
+                el.innerHTML = boxes;
+            } else if (tab === 'market') {
+                let html = `<div class="card"><div class="card-title">🏪 Ринок</div></div>`;
+                html += `<div class="card"><div class="card-title">📋 Активні лоти</div>`;
+                if (G.marketListings.length === 0) {
+                    html += `<p style="color:var(--text-secondary);font-size:7px;padding:4px;">Немає активних лотів</p>`;
                 } else {
-                    // Новий користувач - створюємо
-                    saveGame();
-                    toast('👋 Ласкаво просимо!');
-                }
-                startGame();
-            }).catch(e => {
-                console.error('Load error:', e);
-                // Навіть якщо помилка - запускаємо гру
-                startGame();
-            });
-
-            return true;
-        }
-
-        function handleTelegramGuest() {
-            if (!auth) { document.getElementById('authError').textContent = '❌ Firebase не готовий.';
-                return; }
-            if (!tg || !tgUserId) { document.getElementById('authError').textContent = '❌ Запустіть гру в Telegram';
-                return; }
-
-            const error = document.getElementById('authError');
-            const success = document.getElementById('authSuccess');
-            error.textContent = '';
-            success.textContent = '⏳ Вхід через Telegram...';
-
-            const uid = 'tg_' + tgUserId;
-            G.uid = uid;
-            G.isTelegramUser = true;
-
-            const tgUser = tg.initDataUnsafe?.user;
-            if (tgUser) {
-                let name = tgUser.first_name || 'TelegramUser';
-                if (tgUser.last_name) name += ' ' + tgUser.last_name;
-                G.name = name;
-            }
-
-            db.ref('users/' + uid).once('value').then(snap => {
-                if (snap.val()) {
-                    loadGame(snap.val());
-                    success.textContent = '✅ Вхід виконано!';
-                } else {
-                    saveGame();
-                    success.textContent = '✅ Новий акаунт створено!';
-                }
-                startGame();
-                error.textContent = '';
-            }).catch(e => {
-                console.error('Login error:', e);
-                error.textContent = '❌ ' + e.message;
-                success.textContent = '';
-            });
-        }
-
-        function handleGuest() {
-            if (!auth) { document.getElementById('authError').textContent = '❌ Firebase не готовий.';
-                return; }
-            const error = document.getElementById('authError');
-            const success = document.getElementById('authSuccess');
-            error.textContent = '';
-            success.textContent = '⏳ Вхід як гість...';
-
-            auth.signInAnonymously()
-                .then(userCredential => {
-                    const uid = userCredential.user.uid;
-                    G.uid = uid;
-                    G.isTelegramUser = false;
-                    G.name = 'Гість';
-
-                    db.ref('users/' + uid).once('value').then(snap => {
-                        if (snap.val()) {
-                            loadGame(snap.val());
-                        } else {
-                            saveGame();
-                        }
-                        success.textContent = '✅ Гостьовий вхід!';
-                        error.textContent = '';
-                        startGame();
+                    G.marketListings.forEach((item, idx) => {
+                        const upItem = UPGRADE_ITEMS.find(i => i.id === item.itemId);
+                        if (!upItem) return;
+                        html += `<div class="market-item">
+                            <div class="info"><div class="name">${upItem.image} ${upItem.name}</div><div class="desc">${item.seller}</div></div>
+                            <div class="price">₿ ${item.price.toFixed(2)}</div>
+                            <button class="btn btn-c btn-sm" onclick="buyMarketItem(${idx})">Купити</button>
+                        </div>`;
                     });
-                })
-                .catch(e => {
-                    console.error('Guest error:', e);
-                    error.textContent = '❌ ' + e.message;
-                    success.textContent = '';
-                });
-        }
-
-        function handleLogin() {
-            if (!auth) { document.getElementById('authError').textContent = '❌ Firebase не готовий.';
-                return; }
-            const nick = document.getElementById('authNick').value.trim();
-            const pass = document.getElementById('authPass').value;
-            const error = document.getElementById('authError');
-            const success = document.getElementById('authSuccess');
-            if (!nick || !pass) { error.textContent = '❌ Введіть нік та пароль';
-                return; }
-            if (nick.length < 3) { error.textContent = '❌ Нік ≥3';
-                return; }
-            if (pass.length < 4) { error.textContent = '❌ Пароль ≥4';
-                return; }
-            error.textContent = '';
-            success.textContent = '⏳ Вхід...';
-            const email = nick.toLowerCase().replace(/[^a-z0-9]/g, '') + '@hamka.ua';
-
-            auth.signInWithEmailAndPassword(email, pass)
-                .then(userCredential => {
-                    G.uid = userCredential.user.uid;
-                    G.isTelegramUser = false;
-                    G.name = nick;
-
-                    db.ref('users/' + G.uid).once('value').then(snap => {
-                        if (snap.val()) {
-                            loadGame(snap.val());
-                        } else {
-                            saveGame();
-                        }
-                        success.textContent = '✅ Вхід виконано!';
-                        error.textContent = '';
-                        startGame();
-                    });
-                })
-                .catch(e => {
-                    console.error('Login error:', e);
-                    error.textContent = '❌ ' + e.message;
-                    success.textContent = '';
-                });
-        }
-
-        function logout() {
-            if (confirm('Вийти?')) {
-                if (G.isTelegramUser) {
-                    location.reload();
-                } else {
-                    auth.signOut();
-                    location.reload();
                 }
+                html += `</div>`;
+                html += `<div class="card"><div class="card-title">📤 Продати предмет</div>
+                    <div class="flex">
+                        <select id="marketItemSelect" style="flex:1;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:3px;border-radius:var(--radius);font-size:6px;outline:none;">
+                            ${Object.entries(G.upgradeInventory).filter(([_,c]) => c > 0).map(([id,c]) => {
+                                const item = UPGRADE_ITEMS.find(i => i.id === id);
+                                return `<option value="${id}">${item?.image || '❓'} ${item?.name || id} (x${c})</option>`;
+                            }).join('')}
+                            <option value="">Немає</option>
+                        </select>
+                        <input type="number" id="marketPriceInput" placeholder="Ціна ₿" style="width:44px;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:3px;border-radius:var(--radius);font-size:6px;text-align:center;outline:none;">
+                        <button class="btn btn-g btn-sm" onclick="listMarketItem()">📤</button>
+                    </div>
+                </div>`;
+                html += `<div class="card"><div class="card-title">🤖 Крипто-трейдери</div>`;
+                G.traders.forEach(trader => {
+                    html += `<div class="trader-card">
+                        <div class="flex"><span class="name">${trader.name}</span></div>
+                        <div class="items">
+                            ${trader.items.map(itemId => {
+                                const item = UPGRADE_ITEMS.find(i => i.id === itemId);
+                                if (!item) return '';
+                                const price = Math.floor((item.price / 1000000) * trader.multiplier) + 0.1;
+                                return `<div class="trader-item">
+                                    <span class="icon">${item.image}</span>
+                                    <span class="price">${price.toFixed(2)} ₿</span>
+                                    <button class="btn btn-c btn-sm" onclick="buyFromTrader('${trader.id}','${itemId}')">Купити</button>
+                                </div>`;
+                            }).join('')}
+                        </div>
+                    </div>`;
+                });
+                html += `</div>`;
+                el.innerHTML = html;
             }
         }
 
-        // ====== СТАРТ ГРИ ======
-        function startGame() {
-            if (gameStarted) return;
-            gameStarted = true;
-            document.getElementById('authScreen').style.display = 'none';
-            document.getElementById('game').style.display = 'flex';
+        function getPrice(item) {
+            const base = { maxEnergy: 2000, autoXP: 5000, energyRegen: 15000, tapLevel: 1000, coinBoost: 5000,
+                energyUp: 5000, tapPower: 15000, critChance: 10000, luckB: 3000 };
+            const mult = { maxEnergy: 1.5, autoXP: 2, energyRegen: 2.5, tapLevel: 1.8, coinBoost: 2, energyUp: 1.8,
+                tapPower: 2.5, critChance: 2, luckB: 2 };
+            if (item === 'autoTap') return 1500 + (G.upgrades.autoTap || 0) * 2000;
+            if (item === 'tapLevel') return Math.floor(base.tapLevel * Math.pow(mult.tapLevel, G.upgrades.tapLevel || 0));
+            return Math.floor((base[item] || 1000) * Math.pow((mult[item] || 1.5), (G.upgrades[item] || 0)));
+        }
+
+        function buyItem(item) {
+            const p = getPrice(item);
+            if (G.coins < p) { toast('❌ Не вистачає монет');
+                return; }
+            G.coins -= p;
+            if (item === 'maxEnergy') { G.maxEnergy += 50;
+                G.energy += 50;
+                G.upgrades.maxEnergy++; } else if (item === 'autoXP') { G.autoXP++;
+                G.upgrades.autoXP++; } else if (item === 'xpBoost') { addXP(100); } else if (item === 'autoTap') {
+                G.autoTap++;
+                G.upgrades.autoTap++;
+            } else if (item === 'energyRegen') { G.upgrades.energyRegen++; } else if (item === 'tapLevel') { G.upgrades
+                    .tapLevel++; } else if (item === 'coinBoost') { G.upgrades.coinBoost++; } else if (item ===
+                'energyUp') { G.maxEnergy += 100;
+                G.energy += 100;
+                G.upgrades.energyUp++; } else if (item === 'tapPower') { G.upgrades.tapPower++; } else if (item ===
+                'critChance') { G.upgrades.critChance++; } else if (item === 'luckB') { G.upgrades.luckB++; } else if (
+                item === 'vip') {
+                if (G.vip) { toast('Вже є');
+                    return; }
+                G.vip = true;
+                G.inv.push('VIP');
+                G.luck = Math.min(G.luck + 0.1, 1.3);
+            }
+            toast('✅ Куплено!');
             updateUI();
-            buildPages();
+            saveGame();
+            renderShop();
+        }
 
-            if (db) {
-                db.ref('global/cryptoRate').once('value').then(snap => {
-                    if (snap.val()) {
-                        G.cryptoRate = snap.val();
-                        G.cryptoHistory.push(G.cryptoRate);
-                        if (G.cryptoHistory.length > 60) G.cryptoHistory.shift();
-                        updateUI();
-                        const chartContainer = document.getElementById('cryptoChart');
-                        if (chartContainer) drawLineChart();
-                    }
-                }).catch(e => console.warn('Load global rate error:', e));
-            }
-
-            setInterval(() => { updateCryptoRate(); }, 3000);
-            setInterval(() => { G.tapCountMinute = 0; }, 60000);
-
-            setInterval(() => {
-                let regen = G.energyRegen + G.upgrades.energyRegen;
-                G.energy = Math.min(G.maxEnergy, G.energy + regen);
-                if (G.autoTap > 0) G.coins += G.autoTap;
-                if (G.autoXP > 0) addXP(G.autoXP);
-                let now = Date.now();
-                if (now - G.lastTimeReward >= 300000) {
-                    G.lastTimeReward = now;
-                    G.coins += 500;
-                    toast('⏰ +500 монет');
-                }
+        function buyHoma(n) {
+            let cost = n * 50000;
+            if (G.coins >= cost) { G.coins -= cost;
+                G.homa += n;
+                toast('✅ +' + n + '🟣');
                 updateUI();
                 saveGame();
-            }, 1000);
-
-            setTimeout(updateTapButton, 100);
-            saveGame();
-            toast('🐹 Ласкаво просимо до Hamka!');
+                renderShop(); } else { toast('❌ Мало монет'); }
         }
 
-        function buildPages() {
-            document.getElementById('contentArea').innerHTML = `
-                <div id="tab-games" class="page show">
-                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:3px;margin-bottom:4px;">
-                        <button class="btn btn-g btn-lg" onclick="openGame('tap')">💸 Тап</button>
-                        <button class="btn btn-o btn-lg" onclick="openGame('casino')">🎰</button>
-                        <button class="btn btn-p btn-lg" onclick="openGame('upgrader')">🔧</button>
-                        <button class="btn" style="background:#f97316;font-size:9px;padding:8px;" onclick="openGame('boss')">🐉</button>
-                        <button class="btn" style="background:#ec4899;font-size:9px;padding:8px;" onclick="openGame('event')">🌸</button>
-                    </div>
-                    <div id="game-area"></div>
-                </div>
-                <div id="tab-shop" class="page"><div id="shop-content"></div></div>
-                <div id="tab-crypto" class="page"><div id="crypto-area"></div></div>
-                <div id="tab-vip" class="page"><div id="vip-area"></div></div>
-                <div id="tab-profile" class="page"><div id="profile-area"></div></div>
-                <div id="tab-inventory" class="page"><div id="inventory-area"></div></div>
-                <div id="tab-top" class="page"><div id="top-area"></div></div>
-            `;
-            openGame('tap');
+        function buyEventHoma(n) {
+            let cost = n * 100000;
+            if (G.coins >= cost) { G.coins -= cost;
+                G.eventHoma += n;
+                toast('✅ +' + n + '🌸');
+                updateUI();
+                saveGame();
+                renderShop(); } else { toast('❌ Мало монет'); }
+        }
+
+        function buyGif(id) {
+            const g = GIFS.find(x => x.id === id);
+            if (!g || hasGif(id)) return;
+            const price = RARITY_PRICES[g.r] || 1000;
+            if (G.coins >= price) { G.coins -= price;
+                addGif(id);
+                toast('🎨 +' + id);
+                updateUI();
+                saveGame();
+                renderShop(); } else { toast('❌ ' + price + '💰'); }
+        }
+
+        function buyTitle(id) {
+            if (hasTitle(id)) { toast('Вже є');
+                return; }
+            const t = TITLES[id];
+            if (!t || !t.price) return;
+            if (G.coins >= t.price) { G.coins -= t.price;
+                addTitle(id);
+                toast('🏅 ' + t.name);
+                updateUI();
+                saveGame();
+                renderShop(); } else { toast('❌ Мало монет'); }
+        }
+
+        function buyChest(type) {
+            const box = BOXES.find(b => b.id === type);
+            if (!box) return;
+            if (G.coins < box.price) { toast('❌ Не вистачає монет');
+                return; }
+            G.coins -= box.price;
+            G.chests[type] = (G.chests[type] || 0) + 1;
+            toast(`✅ ${box.emoji} ${box.name} ящик в інвентарі!`);
+            updateUI();
+            saveGame();
             renderShop();
-            renderCrypto();
-            renderVip();
-            renderProfile();
             renderInventory();
-            renderTop();
         }
 
-        // ====== ТАП ======
-        function handleTap(e) {
-            e.preventDefault();
-            if (G.isBanned) { toast('⛔ Тапи заблоковано! Зачекайте 30 секунд.');
+        // ============================================================
+        //  🏪 РИНОК
+        // ============================================================
+        function listMarketItem() {
+            const select = document.getElementById('marketItemSelect');
+            const priceInput = document.getElementById('marketPriceInput');
+            const itemId = select?.value;
+            const price = parseFloat(priceInput?.value);
+            if (!itemId) { toast('Виберіть предмет');
                 return; }
-            if (G.energy < 1) { toast('⚡ Немає енергії! Зачекай.');
+            if (!price || price <= 0) { toast('Введіть ціну >0');
                 return; }
-
-            G.tapCountMinute++;
-            if (G.tapCountMinute > 900) {
-                G.isBanned = true;
-                document.getElementById('antibotWarning').classList.add('show');
-                toast('⚠️ Перевищено 900 тапів! Блокування 30 секунд.');
-                setTimeout(() => {
-                    G.isBanned = false;
-                    document.getElementById('antibotWarning').classList.remove('show');
-                    toast('✅ Тапи розблоковано');
-                }, 30000);
-                return;
-            }
-
-            let x = e.clientX || e.touches?.[0]?.clientX || window.innerWidth / 2;
-            let y = e.clientY || e.touches?.[0]?.clientY || window.innerHeight / 2;
-            G.energy--;
-            const inc = calcTapIncome();
-            G.coins += inc;
-            G.taps++;
-            G.totalTaps++;
-            addXP(1);
-            G.seasonPoints = (G.seasonPoints || 0) + 1;
-
-            if (G.totalTaps % 30 === 0) { G.crypto += 0.5;
-                toast('₿ +0.5 крипти!'); }
-            if (G.totalTaps % 100 === 0) { G.eventHoma += 1;
-                toast('🌸 +1 івенхом!'); }
-
-            updateUI();
-            showTapAnimation(x, y, inc);
-            if (G.taps % 10 === 0) saveGame();
-        }
-
-        function showTapAnimation(x, y, amount) {
-            const num = document.createElement('div');
-            num.className = 'floating-number';
-            num.textContent = '+' + amount + '💰';
-            num.style.left = (x - 20) + 'px';
-            num.style.top = (y - 30) + 'px';
-            document.body.appendChild(num);
-            setTimeout(() => num.remove(), 800);
-
-            for (let i = 0; i < 6; i++) {
-                const coin = document.createElement('div');
-                coin.className = 'coin-particle';
-                coin.textContent = ['💰', '🪙', '✨', '💎', '🌟', '⭐'][rand(0, 5)];
-                const angle = Math.random() * Math.PI * 2;
-                const dist = 20 + Math.random() * 50;
-                coin.style.left = (x - 8) + 'px';
-                coin.style.top = (y - 8) + 'px';
-                coin.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
-                coin.style.setProperty('--dy', (Math.sin(angle) * dist - 30) + 'px');
-                document.body.appendChild(coin);
-                setTimeout(() => coin.remove(), 600);
-            }
-
-            const btn = document.getElementById('tapBtn');
-            if (btn) {
-                const ripple = document.createElement('div');
-                ripple.className = 'tap-ripple';
-                ripple.style.left = '50%';
-                ripple.style.top = '50%';
-                ripple.style.transform = 'translate(-50%, -50%)';
-                btn.appendChild(ripple);
-                setTimeout(() => ripple.remove(), 700);
-            }
-        }
-
-        // ====== ВІКНА ======
-        function openGame(g) {
-            G.currentGame = g;
-            const a = document.getElementById('game-area');
-            if (g === 'tap') {
-                a.innerHTML = `
-                    <div class="center-game">
-                        <div class="tap-balance">🪙 <span id="tapBalance">${formatNum(G.coins)}</span></div>
-                        <div class="tap-circle" id="tapBtn"></div>
-                    </div>
-                `;
-                setTimeout(updateTapButton, 50);
-                const btn = document.getElementById('tapBtn');
-                if (btn) {
-                    btn.addEventListener('click', handleTap);
-                    btn.addEventListener('touchstart', handleTap, { passive: false });
-                }
-            } else if (g === 'casino') {
-                a.innerHTML = `<div class="center-game"><h3 style="color:var(--primary);font-size:13px;">🎰 Казино</h3>
-                    <div class="slot-machine">
-                        <div class="slot" id="s1">🍒</div><div class="slot" id="s2">🍋</div><div class="slot" id="s3">🍉</div>
-                    </div>
-                    <div class="bet-row">
-                        <button class="btn btn-g btn-sm" onclick="document.getElementById('bet').value=Math.max(1,parseInt(document.getElementById('bet').value||10)-10)">−</button>
-                        <input type="number" id="bet" value="10">
-                        <button class="btn btn-g btn-sm" onclick="document.getElementById('bet').value=parseInt(document.getElementById('bet').value||10)+10">+</button>
-                    </div>
-                    <button class="btn btn-o btn-lg" onclick="spinSlot()">🎰 КРУТИТИ</button></div>`;
-            } else if (g === 'upgrader') { renderUpgrader(); } else if (g === 'boss') { renderBosses(); } else if (g ===
-                'event') { renderEvent(); }
-        }
-
-        function spinSlot() {
-            let bet = parseInt(document.getElementById('bet')?.value) || 0;
-            if (!bet || bet < 1) { toast('Введіть ставку >0');
+            if (!G.upgradeInventory[itemId] || G.upgradeInventory[itemId] <= 0) { toast('У вас немає цього предмета');
                 return; }
-            if (G.coins < bet) { toast('❌ Не вистачає монет');
-                return; }
-            G.coins -= bet;
-            const sym = ['🍒', '🍋', '🍉', '⭐', '7️⃣', '💎'];
-            let r1 = sym[rand(0, 5)],
-                r2 = sym[rand(0, 5)],
-                r3 = sym[rand(0, 5)];
-            document.querySelectorAll('.slot').forEach(el => el.classList.add('spinning'));
-            setTimeout(() => { document.querySelectorAll('.slot').forEach(el => el.classList.remove('spinning')); }, 300);
-            document.getElementById('s1').textContent = r1;
-            document.getElementById('s2').textContent = r2;
-            document.getElementById('s3').textContent = r3;
-            let win = 0;
-            if (r1 === r2 && r2 === r3) win = bet * 3;
-            else if (r1 === r2 || r2 === r3 || r1 === r3) win = Math.floor(bet * 1.5);
-            win = Math.floor(win * G.luck);
-            G.coins += win;
-            if (win > 0) { addXP(Math.floor(win / 5));
-                toast(`🎉 Виграш! +${win}💰`); } else { toast(`😢 Програш -${bet}💰`); }
-            updateUI();
+            G.upgradeInventory[itemId]--;
+            if (G.upgradeInventory[itemId] === 0) delete G.upgradeInventory[itemId];
+            G.marketListings.push({ itemId: itemId, price: price, seller: G.name, time: Date.now() });
+            toast('✅ Лот виставлено на ринок');
             saveGame();
+            renderShop();
+            updateUI();
         }
 
-        // ====== АПГРЕЙДЕР ======
+        function buyMarketItem(idx) {
+            const item = G.marketListings[idx];
+            if (!item) { toast('Лот вже продано');
+                return; }
+            if (G.crypto < item.price) { toast(`❌ Потрібно ₿ ${item.price.toFixed(2)}`);
+                return; }
+            G.crypto -= item.price;
+            G.upgradeInventory[item.itemId] = (G.upgradeInventory[item.itemId] || 0) + 1;
+            G.marketListings.splice(idx, 1);
+            toast(`✅ Куплено`);
+            saveGame();
+            renderShop();
+            updateUI();
+        }
+
+        function buyFromTrader(traderId, itemId) {
+            const trader = G.traders.find(t => t.id === traderId);
+            if (!trader) return;
+            const item = UPGRADE_ITEMS.find(i => i.id === itemId);
+            if (!item) return;
+            const price = Math.floor((item.price / 1000000) * trader.multiplier) + 0.1;
+            if (G.crypto < price) { toast(`❌ Потрібно ${price.toFixed(2)} крипти`);
+                return; }
+            G.crypto -= price;
+            G.upgradeInventory[itemId] = (G.upgradeInventory[itemId] || 0) + 1;
+            toast(`✅ Куплено ${item.name}`);
+            saveGame();
+            renderShop();
+            updateUI();
+        }
+
+        // ============================================================
+        //  🧰 АПГРЕЙДЕР
+        // ============================================================
         function renderUpgrader() {
             const inItem = G.selectedItemIn ? UPGRADE_ITEMS.find(i => i.id === G.selectedItemIn) : null;
             const outItem = G.selectedItemOut ? UPGRADE_ITEMS.find(i => i.id === G.selectedItemOut) : null;
             let chance = 0;
             if (inItem && outItem) { chance = Math.min(75, (inItem.price / outItem.price) * 100); }
 
-            // Показуємо який скін активний в апгрейдері
             const activeSkin = getActiveSkinName();
             const gifKeys = Object.keys(G.ownedGifs);
             const gifDisplay = gifKeys.slice(0, 8).map(id => {
@@ -2176,7 +2326,9 @@
             }, 500);
         }
 
-        // ====== БОСИ ======
+        // ============================================================
+        //  🐉 БОСИ
+        // ============================================================
         function fightBoss(idx) {
             const b = BOSSES[idx];
             if (b.cost > 0 && G.homa < b.cost) { toast(`❌ Потрібно ${b.cost}🟣`);
@@ -2223,7 +2375,7 @@
                         } else {
                             let ct = ['common', 'rare', 'epic', 'mythic'][rand(0, 3)];
                             G.chests[ct] = (G.chests[ct] || 0) + 1;
-                            toast('🎁 Ящик');
+                            toast('🎁 Ящик в інвентарі!');
                         }
                     }
                 } else { toast('💀 Поразка...'); }
@@ -2248,7 +2400,9 @@
             document.getElementById('game-area').innerHTML = html;
         }
 
-        // ====== ІВЕНТ ======
+        // ============================================================
+        //  🌸 ІВЕНТ
+        // ============================================================
         function renderEvent() {
             document.getElementById('game-area').innerHTML = `
                 <div class="center-game"><h3 style="color:#ec4899;font-size:13px;">🌸 Літній бум</h3>
@@ -2304,284 +2458,39 @@
             renderEvent();
         }
 
-        // ====== МАГАЗИН ======
-        function renderShop() {
-            const el = document.getElementById('shop-content');
-            if (!el) return;
-            el.innerHTML = `
-                <div class="shop-tabs">
-                    <button class="shop-tab active" onclick="renderShopTab('res')">⚡ Ресурси</button>
-                    <button class="shop-tab" onclick="renderShopTab('upg')">⭐ Прокачка</button>
-                    <button class="shop-tab" onclick="renderShopTab('vis')">🎨 Візуальне</button>
-                    <button class="shop-tab" onclick="renderShopTab('box')">📦 Ящики</button>
-                    <button class="shop-tab" onclick="renderShopTab('market')">🏪 Ринок</button>
-                </div>
-                <div id="shop-inner"></div>
-            `;
-            renderShopTab('res');
-        }
-
-        function renderShopTab(tab) {
-            document.querySelectorAll('.shop-tab').forEach(t => t.classList.remove('active'));
-            const btns = document.querySelectorAll('.shop-tab');
-            const tabs = ['res', 'upg', 'vis', 'box', 'market'];
-            const idx = tabs.indexOf(tab);
-            if (btns[idx]) btns[idx].classList.add('active');
-            const el = document.getElementById('shop-inner');
-            if (!el) return;
-
-            // --- решта функцій магазину (скорочено для економії місця) ---
-            // Вони залишаються незмінними з попередньої версії
-            if (tab === 'res') {
-                el.innerHTML = `
-                    <div class="card"><div class="flex"><b>⚡ Енергія +50</b> <span style="color:var(--gold);">${getPrice('maxEnergy')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItem('maxEnergy')">Купити</button></div></div>
-                    <div class="card"><div class="flex"><b>✨ Авто XP</b> <span style="color:var(--gold);">${getPrice('autoXP')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItem('autoXP')">Купити</button></div></div>
-                    <div class="card"><div class="flex"><b>🚀 XP Бустер</b> <span style="color:var(--gold);">300💰</span> <button class="btn btn-g btn-sm" onclick="buyItem('xpBoost')">Купити</button></div></div>
-                    <div class="card"><div class="flex"><b>⚡ Авто тап</b> <span style="color:var(--gold);">${getPrice('autoTap')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItem('autoTap')">Купити</button></div></div>
-                    <div class="card"><div class="flex"><b>🔄 Регенерація +1</b> <span style="color:var(--gold);">${getPrice('energyRegen')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItem('energyRegen')">Купити</button></div></div>
-                    <div class="card"><div class="flex"><b>🟣 Купити Хоми</b> <span><button class="btn btn-g btn-sm" onclick="buyHoma(1)">1</button> <button class="btn btn-g btn-sm" onclick="buyHoma(5)">5</button> <button class="btn btn-g btn-sm" onclick="buyHoma(10)">10</button></span></div></div>
-                `;
-            } else if (tab === 'upg') {
-                el.innerHTML = `
-                    <div class="card"><div class="flex"><b>⭐ Прокачка тапу</b> <span style="color:var(--gold);">${getPrice('tapLevel')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItem('tapLevel')">Купити</button></div></div>
-                    <div class="card"><div class="flex"><b>🪙 Бустер монет</b> <span style="color:var(--gold);">${getPrice('coinBoost')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItem('coinBoost')">Купити</button></div></div>
-                    <div class="card"><div class="flex"><b>⚡ Енергія +100</b> <span style="color:var(--gold);">${getPrice('energyUp')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItem('energyUp')">Купити</button></div></div>
-                    <div class="card"><div class="flex"><b>💪 Сила тапа +50%</b> <span style="color:var(--gold);">${getPrice('tapPower')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItem('tapPower')">Купити</button></div></div>
-                    <div class="card"><div class="flex"><b>🎯 Крит +5%</b> <span style="color:var(--gold);">${getPrice('critChance')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItem('critChance')">Купити</button></div></div>
-                    <div class="card"><div class="flex"><b>🍀 Удача +0.1</b> <span style="color:var(--gold);">${getPrice('luckB')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItem('luckB')">Купити</button></div></div>
-                    <div class="card"><div class="flex"><b>👑 VIP</b> <span style="color:var(--gold);">20000💰</span> <button class="btn btn-g btn-sm" onclick="buyItem('vip')">Купити</button></div></div>
-                `;
-            } else if (tab === 'vis') {
-                let gifs = GIFS.map(g => {
-                    let owned = hasGif(g.id);
-                    let price = RARITY_PRICES[g.r] || 1000;
-                    return `<div class="gif-cell" style="width:32px;height:32px;flex-direction:column;gap:1px;padding:1px;background:${owned?'rgba(0,255,136,0.08)':'rgba(255,255,255,0.02)'}">
-                        <div style="font-size:14px;">${g.id}</div>
-                        ${!owned ? `<button class="btn btn-g btn-sm" style="padding:1px 3px;font-size:4px;" onclick="buyGif('${g.id}')">${price}💰</button>` : `<span style="font-size:4px;color:var(--primary);">x${getGifCount(g.id)}</span>`}
-                    </div>`;
-                }).join('');
-                let titles = Object.entries(TITLES).filter(([id, t]) => t.price).map(([id, t]) => {
-                    let owned = hasTitle(id);
-                    return `<div class="card"><div class="flex"><b>${t.name}</b> <span style="color:var(--gold);">${t.price}💰</span> <button class="btn btn-g btn-sm" onclick="buyTitle('${id}')" ${owned?'disabled':''}>${owned?'✅':'Купити'}</button></div></div>`;
-                }).join('');
-                el.innerHTML = `
-                    <div class="card"><div class="card-title">🎨 Гіфки</div><div class="gif-row">${gifs}</div></div>
-                    <div class="card"><div class="card-title">🏅 Титули</div>${titles}</div>
-                `;
-            } else if (tab === 'box') {
-                let boxes = BOXES.map(b => {
-                    let owned = G.chests[b.id] || 0;
-                    return `<div class="card"><div class="flex"><b>${b.emoji} ${b.name}</b> <span style="color:var(--gold);">${b.price}💰</span> <span><button class="btn btn-g btn-sm" onclick="buyChest('${b.id}')">Купити</button>${owned>0 ? `<button class="btn btn-o btn-sm" onclick="openChest('${b.id}')">Відкрити (${owned})</button>` : ''}</span></div></div>`;
-                }).join('');
-                el.innerHTML = boxes;
-            } else if (tab === 'market') {
-                let html = `<div class="card"><div class="card-title">🏪 Ринок</div></div>`;
-                html += `<div class="card"><div class="card-title">📋 Активні лоти</div>`;
-                if (G.marketListings.length === 0) {
-                    html += `<p style="color:var(--text-secondary);font-size:7px;padding:4px;">Немає активних лотів</p>`;
-                } else {
-                    G.marketListings.forEach((item, idx) => {
-                        const upItem = UPGRADE_ITEMS.find(i => i.id === item.itemId);
-                        if (!upItem) return;
-                        html += `<div class="market-item">
-                            <div class="info"><div class="name">${upItem.image} ${upItem.name}</div><div class="desc">${item.seller}</div></div>
-                            <div class="price">₿ ${item.price.toFixed(2)}</div>
-                            <button class="btn btn-c btn-sm" onclick="buyMarketItem(${idx})">Купити</button>
-                        </div>`;
-                    });
-                }
-                html += `</div>`;
-                html += `<div class="card"><div class="card-title">📤 Продати предмет</div>
-                    <div class="flex">
-                        <select id="marketItemSelect" style="flex:1;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:3px;border-radius:var(--radius);font-size:6px;outline:none;">
-                            ${Object.entries(G.upgradeInventory).filter(([_,c]) => c > 0).map(([id,c]) => {
-                                const item = UPGRADE_ITEMS.find(i => i.id === id);
-                                return `<option value="${id}">${item?.image || '❓'} ${item?.name || id} (x${c})</option>`;
-                            }).join('')}
-                            <option value="">Немає</option>
-                        </select>
-                        <input type="number" id="marketPriceInput" placeholder="Ціна ₿" style="width:44px;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:3px;border-radius:var(--radius);font-size:6px;text-align:center;outline:none;">
-                        <button class="btn btn-g btn-sm" onclick="listMarketItem()">📤</button>
-                    </div>
-                </div>`;
-                html += `<div class="card"><div class="card-title">🤖 Крипто-трейдери</div>`;
-                G.traders.forEach(trader => {
-                    html += `<div class="trader-card">
-                        <div class="flex"><span class="name">${trader.name}</span></div>
-                        <div class="items">
-                            ${trader.items.map(itemId => {
-                                const item = UPGRADE_ITEMS.find(i => i.id === itemId);
-                                if (!item) return '';
-                                const price = Math.floor((item.price / 1000000) * trader.multiplier) + 0.1;
-                                return `<div class="trader-item">
-                                    <span class="icon">${item.image}</span>
-                                    <span class="price">${price.toFixed(2)} ₿</span>
-                                    <button class="btn btn-c btn-sm" onclick="buyFromTrader('${trader.id}','${itemId}')">Купити</button>
-                                </div>`;
-                            }).join('')}
-                        </div>
-                    </div>`;
-                });
-                html += `</div>`;
-                el.innerHTML = html;
-            }
-        }
-
-        function getPrice(item) {
-            const base = { maxEnergy: 2000, autoXP: 5000, energyRegen: 15000, tapLevel: 1000, coinBoost: 5000,
-                energyUp: 5000, tapPower: 15000, critChance: 10000, luckB: 3000 };
-            const mult = { maxEnergy: 1.5, autoXP: 2, energyRegen: 2.5, tapLevel: 1.8, coinBoost: 2, energyUp: 1.8,
-                tapPower: 2.5, critChance: 2, luckB: 2 };
-            if (item === 'autoTap') return 1500 + (G.upgrades.autoTap || 0) * 800;
-            if (item === 'tapLevel') return Math.floor(base.tapLevel * Math.pow(mult.tapLevel, G.upgrades.tapLevel || 0));
-            return Math.floor((base[item] || 1000) * Math.pow((mult[item] || 1.5), (G.upgrades[item] || 0)));
-        }
-
-        function buyItem(item) {
-            const p = getPrice(item);
-            if (G.coins < p) { toast('❌ Не вистачає монет');
+        // ============================================================
+        //  🎰 КАЗИНО
+        // ============================================================
+        function spinSlot() {
+            let bet = parseInt(document.getElementById('bet')?.value) || 0;
+            if (!bet || bet < 1) { toast('Введіть ставку >0');
                 return; }
-            G.coins -= p;
-            if (item === 'maxEnergy') { G.maxEnergy += 50;
-                G.energy += 50;
-                G.upgrades.maxEnergy++; } else if (item === 'autoXP') { G.autoXP++;
-                G.upgrades.autoXP++; } else if (item === 'xpBoost') { addXP(100); } else if (item === 'autoTap') {
-                if (G.autoTap >= 10) { toast('Макс 10');
-                    return; }
-                G.autoTap++;
-                G.upgrades.autoTap++;
-            } else if (item === 'energyRegen') { G.upgrades.energyRegen++; } else if (item === 'tapLevel') { G.upgrades
-                    .tapLevel++; } else if (item === 'coinBoost') { G.upgrades.coinBoost++; } else if (item ===
-                'energyUp') { G.maxEnergy += 100;
-                G.energy += 100;
-                G.upgrades.energyUp++; } else if (item === 'tapPower') { G.upgrades.tapPower++; } else if (item ===
-                'critChance') { G.upgrades.critChance++; } else if (item === 'luckB') { G.upgrades.luckB++; } else if (
-                item === 'vip') {
-                if (G.vip) { toast('Вже є');
-                    return; }
-                G.vip = true;
-                G.inv.push('VIP');
-                G.luck = Math.min(G.luck + 0.1, 1.3);
-            }
-            toast('✅ Куплено!');
+            if (G.coins < bet) { toast('❌ Не вистачає монет');
+                return; }
+            G.coins -= bet;
+            const sym = ['🍒', '🍋', '🍉', '⭐', '7️⃣', '💎'];
+            let r1 = sym[rand(0, 5)],
+                r2 = sym[rand(0, 5)],
+                r3 = sym[rand(0, 5)];
+            document.querySelectorAll('.slot').forEach(el => el.classList.add('spinning'));
+            setTimeout(() => { document.querySelectorAll('.slot').forEach(el => el.classList.remove('spinning')); }, 300);
+            document.getElementById('s1').textContent = r1;
+            document.getElementById('s2').textContent = r2;
+            document.getElementById('s3').textContent = r3;
+            let win = 0;
+            if (r1 === r2 && r2 === r3) win = bet * 3;
+            else if (r1 === r2 || r2 === r3 || r1 === r3) win = Math.floor(bet * 1.5);
+            win = Math.floor(win * G.luck);
+            G.coins += win;
+            if (win > 0) { addXP(Math.floor(win / 5));
+                toast(`🎉 Виграш! +${win}💰`); } else { toast(`😢 Програш -${bet}💰`); }
             updateUI();
             saveGame();
-            renderShop();
         }
 
-        function buyHoma(n) {
-            let cost = n * 50000;
-            if (G.coins >= cost) { G.coins -= cost;
-                G.homa += n;
-                toast('✅ +' + n + '🟣');
-                updateUI();
-                saveGame();
-                renderShop(); } else { toast('❌ Мало монет'); }
-        }
-
-        function buyGif(id) {
-            const g = GIFS.find(x => x.id === id);
-            if (!g || hasGif(id)) return;
-            const price = RARITY_PRICES[g.r] || 1000;
-            if (G.coins >= price) { G.coins -= price;
-                addGif(id);
-                toast('🎨 +' + id);
-                updateUI();
-                saveGame();
-                renderShop(); } else { toast('❌ ' + price + '💰'); }
-        }
-
-        function buyTitle(id) {
-            if (hasTitle(id)) { toast('Вже є');
-                return; }
-            const t = TITLES[id];
-            if (!t || !t.price) return;
-            if (G.coins >= t.price) { G.coins -= t.price;
-                addTitle(id);
-                toast('🏅 ' + t.name);
-                updateUI();
-                saveGame();
-                renderShop(); } else { toast('❌ Мало монет'); }
-        }
-
-        function buyChest(type) {
-            const box = BOXES.find(b => b.id === type);
-            if (!box) return;
-            if (G.coins < box.price) { toast('❌ Не вистачає монет');
-                return; }
-            G.coins -= box.price;
-            G.chests[type] = (G.chests[type] || 0) + 1;
-            toast('✅ Ящик в інвентарі');
-            updateUI();
-            saveGame();
-            renderShop();
-        }
-
-        function openChest(type) {
-            const box = BOXES.find(b => b.id === type);
-            if (!box || !G.chests[type]) { toast('Немає ящиків');
-                return; }
-            G.chests[type]--;
-            const reward = rand(box.homyMin, box.homyMax);
-            G.homa += reward;
-            toast('📦 +' + reward + '🟣');
-            updateUI();
-            saveGame();
-            renderShop();
-        }
-
-        function listMarketItem() {
-            const select = document.getElementById('marketItemSelect');
-            const priceInput = document.getElementById('marketPriceInput');
-            const itemId = select?.value;
-            const price = parseFloat(priceInput?.value);
-            if (!itemId) { toast('Виберіть предмет');
-                return; }
-            if (!price || price <= 0) { toast('Введіть ціну >0');
-                return; }
-            if (!G.upgradeInventory[itemId] || G.upgradeInventory[itemId] <= 0) { toast('У вас немає цього предмета');
-                return; }
-            G.upgradeInventory[itemId]--;
-            if (G.upgradeInventory[itemId] === 0) delete G.upgradeInventory[itemId];
-            G.marketListings.push({ itemId: itemId, price: price, seller: G.name, time: Date.now() });
-            toast('✅ Лот виставлено на ринок');
-            saveGame();
-            renderShop();
-            updateUI();
-        }
-
-        function buyMarketItem(idx) {
-            const item = G.marketListings[idx];
-            if (!item) { toast('Лот вже продано');
-                return; }
-            if (G.crypto < item.price) { toast(`❌ Потрібно ₿ ${item.price.toFixed(2)}`);
-                return; }
-            G.crypto -= item.price;
-            G.upgradeInventory[item.itemId] = (G.upgradeInventory[item.itemId] || 0) + 1;
-            G.marketListings.splice(idx, 1);
-            toast(`✅ Куплено`);
-            saveGame();
-            renderShop();
-            updateUI();
-        }
-
-        function buyFromTrader(traderId, itemId) {
-            const trader = G.traders.find(t => t.id === traderId);
-            if (!trader) return;
-            const item = UPGRADE_ITEMS.find(i => i.id === itemId);
-            if (!item) return;
-            const price = Math.floor((item.price / 1000000) * trader.multiplier) + 0.1;
-            if (G.crypto < price) { toast(`❌ Потрібно ${price.toFixed(2)} крипти`);
-                return; }
-            G.crypto -= price;
-            G.upgradeInventory[itemId] = (G.upgradeInventory[itemId] || 0) + 1;
-            toast(`✅ Куплено ${item.name}`);
-            saveGame();
-            renderShop();
-            updateUI();
-        }
-
-        // ====== ПРОФІЛЬ ======
+        // ============================================================
+        //  👤 ПРОФІЛЬ
+        // ============================================================
         function renderProfile() {
             document.getElementById('profile-area').innerHTML = `
                 <div class="profile-header">
@@ -2603,7 +2512,70 @@
             `;
         }
 
-        // ====== ТОП ======
+        // ============================================================
+        //  🎒 ІНВЕНТАР
+        // ============================================================
+        function renderInventory() {
+            let gifs = Object.entries(G.ownedGifs).map(([id, c]) =>
+                `<div class="inv-item"><span class="icon">${id}</span><span class="count">x${c}</span></div>`
+            ).join('');
+            let titles = Object.entries(G.ownedTitles).map(([id, c]) =>
+                `<div class="inv-item"><span style="font-size:7px;">${TITLES[id]?.name || id}</span><span class="count">x${c}</span></div>`
+            ).join('');
+            let chests = Object.entries(G.chests).filter(([_, c]) => c > 0).map(([id, c]) => {
+                const box = BOXES.find(b => b.id === id);
+                return `<div class="inv-item chest" onclick="openChestModal('${id}')" style="border-color:${box?.color || 'var(--gold)'};">
+                    <span class="icon">${box?.emoji || '📦'}</span>
+                    <span class="count">x${c}</span>
+                    <span class="name">${box?.name || id}</span>
+                </div>`;
+            }).join('');
+            let upItems = Object.entries(G.upgradeInventory).filter(([_, c]) => c > 0).map(([id, c]) =>
+                `<div class="inv-item"><span class="icon">${UPGRADE_ITEMS[id]?.image || '❓'}</span><span class="count">x${c}</span></div>`
+            ).join('');
+
+            // Скіни в інвентарі
+            let skinsHtml = '';
+            if (G.skins.plow.has) {
+                skinsHtml += `
+                    <div class="card" style="border-color:${G.skins.plow.use ? 'var(--gold)' : 'var(--border)'};">
+                        <div class="flex">
+                            <span>🚜 PLOW</span>
+                            <span style="font-size:6px;color:var(--text-secondary);">Plow.jpg</span>
+                            <button class="btn ${G.skins.plow.use ? 'btn-g' : 'btn-sm'}" onclick="toggleSkin('plow')">
+                                ${G.skins.plow.use ? '✅' : '🔘'}
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+            if (G.skins.ronaldo.has) {
+                skinsHtml += `
+                    <div class="card" style="border-color:${G.skins.ronaldo.use ? 'var(--gold)' : 'var(--border)'};">
+                        <div class="flex">
+                            <span>⚽ RONALDO</span>
+                            <span style="font-size:6px;color:var(--text-secondary);">Ronaldo.jpg</span>
+                            <button class="btn ${G.skins.ronaldo.use ? 'btn-g' : 'btn-sm'}" onclick="toggleSkin('ronaldo')">
+                                ${G.skins.ronaldo.use ? '✅' : '🔘'}
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            document.getElementById('inventory-area').innerHTML = `
+                ${skinsHtml}
+                ${chests ? `<div class="card"><div class="card-title">📦 Ящики (натисніть щоб відкрити)</div><div class="inventory-grid">${chests}</div></div>` : ''}
+                ${gifs ? `<div class="card"><div class="card-title">🎨 Гіфки</div><div class="inventory-grid">${gifs}</div></div>` : ''}
+                ${titles ? `<div class="card"><div class="card-title">🏅 Титули</div><div class="inventory-grid">${titles}</div></div>` : ''}
+                ${upItems ? `<div class="card"><div class="card-title">🔧 Предмети</div><div class="inventory-grid">${upItems}</div></div>` : ''}
+                <div class="card" style="text-align:center;color:var(--text-muted);font-size:7px;">Всього: ${Object.values(G.ownedGifs).reduce((a,b)=>a+b,0) + Object.values(G.ownedTitles).reduce((a,b)=>a+b,0)}</div>
+            `;
+        }
+
+        // ============================================================
+        //  🏆 ТОП
+        // ============================================================
         function renderTop() {
             const el = document.getElementById('top-area');
             if (!el) return;
@@ -2640,6 +2612,10 @@
                 });
                 users.sort((a, b) => (b.xp || 0) - (a.xp || 0));
                 const topUsers = users.slice(0, 50);
+
+                // Перевіряємо чи є поточний гравець в топі
+                const isInTop = topUsers.some(u => u.uid === G.uid);
+
                 if (topUsers.length === 0) {
                     el.innerHTML = `
                         <div class="season-card">
@@ -2655,6 +2631,7 @@
                     `;
                     return;
                 }
+
                 let html = `
                     <div class="season-card">
                         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:4px;">
@@ -2665,7 +2642,9 @@
                         ${G.seasonRewardClaimed ? '<div style="color:var(--gold);font-size:7px;margin-top:3px;">✅ Отримано!</div>' : ''}
                     </div>
                     <div class="card"><div class="flex"><b style="color:var(--gold);">🏆 Топ</b><button class="btn btn-g btn-sm" onclick="renderTop()">🔄</button></div></div>
+                    ${!isInTop ? `<div class="card" style="border-color:var(--gold);background:rgba(251,191,36,0.05);"><div style="text-align:center;font-size:7px;color:var(--gold);">👑 Ви поки що не в топі. Набирайте XP!</div></div>` : ''}
                 `;
+
                 topUsers.forEach((user, index) => {
                     const isCurrent = user.uid === G.uid;
                     let medal = '';
@@ -2686,6 +2665,7 @@
                         </div>
                     `;
                 });
+
                 el.innerHTML = html;
             }).catch(err => {
                 console.error('Top error:', err);
@@ -2719,7 +2699,9 @@
             renderTop();
         }
 
-        // ====== КРИПТА ВКЛАДКА ======
+        // ============================================================
+        //  ₿ КРИПТА ВКЛАДКА
+        // ============================================================
         function renderCrypto() {
             const el = document.getElementById('crypto-area');
             if (!el) return;
@@ -2773,7 +2755,9 @@
             drawLineChart();
         }
 
-        // ====== XP & РІВЕНЬ ======
+        // ============================================================
+        //  ⭐ XP ТА РІВЕНЬ
+        // ============================================================
         function addXP(amount) {
             G.xp += amount;
             checkLevelUp();
@@ -2794,7 +2778,9 @@
             } else { G.level = lvl; }
         }
 
-        // ====== UI ОНОВЛЕННЯ ======
+        // ============================================================
+        //  🖥️ ОНОВЛЕННЯ UI
+        // ============================================================
         function updateUI() {
             document.getElementById('balance').textContent = '💰 ' + formatNum(G.coins);
             document.getElementById('moneyDisp').textContent = formatNum(G.coins);
@@ -2820,7 +2806,9 @@
             document.getElementById('seasonBadge').textContent = `🏆 Сезон ${G.season || 1}`;
         }
 
-        // ====== ЗБЕРЕЖЕННЯ ======
+        // ============================================================
+        //  💾 ЗБЕРЕЖЕННЯ
+        // ============================================================
         function saveGame() {
             if (!G.uid) {
                 try {
@@ -2852,11 +2840,12 @@
                         if (data.skins.plow) Object.assign(G.skins.plow, data.skins.plow);
                         if (data.skins.ronaldo) Object.assign(G.skins.ronaldo, data.skins.ronaldo);
                     }
-                } else { G[key] = data[key]; }
+                } else if (key === 'season') { G.season = data.season || 2; } else { G[key] = data[key]; }
             });
             G.maxEnergy = calcMaxEnergy();
             G.energy = Math.min(G.energy, G.maxEnergy);
             G.name = G.name || 'Гравець';
+            if (!G.season) G.season = 2;
             checkLevelUp();
             updateUI();
             setTimeout(updateTapButton, 100);
@@ -2886,11 +2875,406 @@
             location.reload();
         }
 
-        // ====== ЗАПУСК ======
+        // ============================================================
+        //  📱 ВКЛАДКИ
+        // ============================================================
+        function switchTab(t) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('show'));
+            const tabs = { games: 'tab-games', shop: 'tab-shop', crypto: 'tab-crypto', vip: 'tab-vip',
+                profile: 'tab-profile', inventory: 'tab-inventory', top: 'tab-top' };
+            const page = document.getElementById(tabs[t]);
+            if (page) page.classList.add('show');
+            document.querySelectorAll('.tab-nav button').forEach((b, i) => {
+                const names = ['games', 'shop', 'crypto', 'vip', 'profile', 'inventory', 'top'];
+                b.classList.toggle('active', names[i] === t);
+            });
+            if (t === 'games') openGame(G.currentGame || 'tap');
+            if (t === 'shop') renderShop();
+            if (t === 'crypto') renderCrypto();
+            if (t === 'vip') renderVip();
+            if (t === 'profile') renderProfile();
+            if (t === 'inventory') renderInventory();
+            if (t === 'top') renderTop();
+        }
+
+        // ============================================================
+        //  🎮 ВІКНА ГРИ
+        // ============================================================
+        function openGame(g) {
+            G.currentGame = g;
+            const a = document.getElementById('game-area');
+            if (g === 'tap') {
+                a.innerHTML = `
+                    <div class="center-game">
+                        <div class="tap-balance">🪙 <span id="tapBalance">${formatNum(G.coins)}</span></div>
+                        <div class="tap-circle" id="tapBtn"></div>
+                    </div>
+                `;
+                setTimeout(updateTapButton, 50);
+                const btn = document.getElementById('tapBtn');
+                if (btn) {
+                    btn.addEventListener('click', handleTap);
+                    btn.addEventListener('touchstart', handleTap, { passive: false });
+                }
+            } else if (g === 'casino') {
+                a.innerHTML = `<div class="center-game"><h3 style="color:var(--primary);font-size:13px;">🎰 Казино</h3>
+                    <div class="slot-machine">
+                        <div class="slot" id="s1">🍒</div><div class="slot" id="s2">🍋</div><div class="slot" id="s3">🍉</div>
+                    </div>
+                    <div class="bet-row">
+                        <button class="btn btn-g btn-sm" onclick="document.getElementById('bet').value=Math.max(1,parseInt(document.getElementById('bet').value||10)-10)">−</button>
+                        <input type="number" id="bet" value="10">
+                        <button class="btn btn-g btn-sm" onclick="document.getElementById('bet').value=parseInt(document.getElementById('bet').value||10)+10">+</button>
+                    </div>
+                    <button class="btn btn-o btn-lg" onclick="spinSlot()">🎰 КРУТИТИ</button></div>`;
+            } else if (g === 'upgrader') { renderUpgrader(); } else if (g === 'boss') { renderBosses(); } else if (g ===
+                'event') { renderEvent(); }
+        }
+
+        // ============================================================
+        //  🐹 ТАП
+        // ============================================================
+        function handleTap(e) {
+            e.preventDefault();
+            if (G.isBanned) { toast('⛔ Тапи заблоковано! Зачекайте 30 секунд.');
+                return; }
+            if (G.energy < 1) { toast('⚡ Немає енергії! Зачекай.');
+                return; }
+
+            G.tapCountMinute++;
+            if (G.tapCountMinute > 1500) {
+                G.isBanned = true;
+                document.getElementById('antibotWarning').classList.add('show');
+                toast('⚠️ Перевищено 1500 тапів! Блокування 30 секунд.');
+                setTimeout(() => {
+                    G.isBanned = false;
+                    document.getElementById('antibotWarning').classList.remove('show');
+                    toast('✅ Тапи розблоковано');
+                }, 30000);
+                return;
+            }
+
+            let x = e.clientX || e.touches?.[0]?.clientX || window.innerWidth / 2;
+            let y = e.clientY || e.touches?.[0]?.clientY || window.innerHeight / 2;
+            G.energy--;
+            const inc = calcTapIncome();
+            G.coins += inc;
+            G.taps++;
+            G.totalTaps++;
+            addXP(1);
+            G.seasonPoints = (G.seasonPoints || 0) + 1;
+
+            if (G.totalTaps % 30 === 0) { G.crypto += 0.5;
+                toast('₿ +0.5 крипти!'); }
+            if (G.totalTaps % 100 === 0) { G.eventHoma += 1;
+                toast('🌸 +1 івенхом!'); }
+
+            updateUI();
+            showTapAnimation(x, y, inc);
+            if (G.taps % 10 === 0) saveGame();
+        }
+
+        function showTapAnimation(x, y, amount) {
+            const num = document.createElement('div');
+            num.className = 'floating-number';
+            num.textContent = '+' + amount + '💰';
+            num.style.left = (x - 25) + 'px';
+            num.style.top = (y - 35) + 'px';
+            document.body.appendChild(num);
+            setTimeout(() => num.remove(), 900);
+
+            for (let i = 0; i < 8; i++) {
+                const coin = document.createElement('div');
+                coin.className = 'coin-particle';
+                coin.textContent = ['💰', '🪙', '✨', '💎', '🌟', '⭐', '💫', '🎯'][rand(0, 7)];
+                const angle = Math.random() * Math.PI * 2;
+                const dist = 25 + Math.random() * 60;
+                coin.style.left = (x - 10) + 'px';
+                coin.style.top = (y - 10) + 'px';
+                coin.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
+                coin.style.setProperty('--dy', (Math.sin(angle) * dist - 40) + 'px');
+                document.body.appendChild(coin);
+                setTimeout(() => coin.remove(), 700);
+            }
+
+            const btn = document.getElementById('tapBtn');
+            if (btn) {
+                const ripple = document.createElement('div');
+                ripple.className = 'tap-ripple';
+                ripple.style.left = '50%';
+                ripple.style.top = '50%';
+                ripple.style.transform = 'translate(-50%, -50%)';
+                btn.appendChild(ripple);
+                setTimeout(() => ripple.remove(), 800);
+            }
+        }
+
+        // ============================================================
+        //  🔐 АВТОРИЗАЦІЯ
+        // ============================================================
+        function switchAuthTab(mode) {
+            authMode = mode;
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            if (mode === 'login') {
+                document.querySelector('.auth-tab:first-child').classList.add('active');
+                document.getElementById('authMainBtn').textContent = '🔐 Увійти';
+                document.getElementById('authMainBtn').onclick = handleLogin;
+                document.getElementById('authStatus').textContent = '🔐 Введіть дані для входу';
+            } else {
+                document.querySelector('.auth-tab:last-child').classList.add('active');
+                document.getElementById('authMainBtn').textContent = '📝 Зареєструватися';
+                document.getElementById('authMainBtn').onclick = handleRegister;
+                document.getElementById('authStatus').textContent = '📝 Створіть новий акаунт';
+            }
+        }
+
+        function handleRegister() {
+            if (!auth) { document.getElementById('authError').textContent = '❌ Firebase не готовий.';
+                return; }
+            const nick = document.getElementById('authNick').value.trim();
+            const pass = document.getElementById('authPass').value;
+            const error = document.getElementById('authError');
+            const success = document.getElementById('authSuccess');
+            if (!nick || !pass) { error.textContent = '❌ Введіть нік та пароль';
+                return; }
+            if (nick.length < 3) { error.textContent = '❌ Нік ≥3';
+                return; }
+            if (pass.length < 4) { error.textContent = '❌ Пароль ≥4';
+                return; }
+            error.textContent = '';
+            success.textContent = '⏳ Реєстрація...';
+            const email = nick.toLowerCase().replace(/[^a-z0-9]/g, '') + '@hamka.ua';
+
+            auth.createUserWithEmailAndPassword(email, pass)
+                .then(userCredential => {
+                    const uid = userCredential.user.uid;
+                    G.uid = uid;
+                    G.isTelegramUser = false;
+                    G.name = nick;
+                    G.season = 2;
+                    saveGame();
+                    success.textContent = '✅ Реєстрація виконана!';
+                    error.textContent = '';
+                    startGame();
+                })
+                .catch(e => {
+                    console.error('Register error:', e);
+                    if (e.code === 'auth/email-already-in-use') {
+                        error.textContent = '❌ Користувач вже існує';
+                    } else {
+                        error.textContent = '❌ ' + e.message;
+                    }
+                    success.textContent = '';
+                });
+        }
+
+        function handleLogin() {
+            if (!auth) { document.getElementById('authError').textContent = '❌ Firebase не готовий.';
+                return; }
+            const nick = document.getElementById('authNick').value.trim();
+            const pass = document.getElementById('authPass').value;
+            const error = document.getElementById('authError');
+            const success = document.getElementById('authSuccess');
+            if (!nick || !pass) { error.textContent = '❌ Введіть нік та пароль';
+                return; }
+            if (nick.length < 3) { error.textContent = '❌ Нік ≥3';
+                return; }
+            if (pass.length < 4) { error.textContent = '❌ Пароль ≥4';
+                return; }
+            error.textContent = '';
+            success.textContent = '⏳ Вхід...';
+            const email = nick.toLowerCase().replace(/[^a-z0-9]/g, '') + '@hamka.ua';
+
+            auth.signInWithEmailAndPassword(email, pass)
+                .then(userCredential => {
+                    G.uid = userCredential.user.uid;
+                    G.isTelegramUser = false;
+                    G.name = nick;
+                    db.ref('users/' + G.uid).once('value').then(snap => {
+                        if (snap.val()) { loadGame(snap.val()); } else { saveGame(); }
+                        success.textContent = '✅ Вхід виконано!';
+                        error.textContent = '';
+                        startGame();
+                    });
+                })
+                .catch(e => {
+                    console.error('Login error:', e);
+                    if (e.code === 'auth/user-not-found') {
+                        error.textContent = '❌ Користувача не знайдено';
+                    } else if (e.code === 'auth/wrong-password') {
+                        error.textContent = '❌ Невірний пароль';
+                    } else {
+                        error.textContent = '❌ ' + e.message;
+                    }
+                    success.textContent = '';
+                });
+        }
+
+        function handleTelegramGuest() {
+            if (!auth) { document.getElementById('authError').textContent = '❌ Firebase не готовий.';
+                return; }
+            if (!tg || !tgUserId) { document.getElementById('authError').textContent = '❌ Запустіть гру в Telegram';
+                return; }
+            const error = document.getElementById('authError');
+            const success = document.getElementById('authSuccess');
+            error.textContent = '';
+            success.textContent = '⏳ Вхід через Telegram...';
+
+            const uid = 'tg_' + tgUserId;
+            G.uid = uid;
+            G.isTelegramUser = true;
+
+            const tgUser = tg.initDataUnsafe?.user;
+            if (tgUser) {
+                let name = tgUser.first_name || 'TelegramUser';
+                if (tgUser.last_name) name += ' ' + tgUser.last_name;
+                G.name = name;
+            }
+            G.season = 2;
+
+            db.ref('users/' + uid).once('value').then(snap => {
+                if (snap.val()) { loadGame(snap.val());
+                    success.textContent = '✅ Вхід виконано!'; } else { saveGame();
+                    success.textContent = '✅ Новий акаунт створено!'; }
+                startGame();
+                error.textContent = '';
+            }).catch(e => { console.error('Login error:', e);
+                error.textContent = '❌ ' + e.message;
+                success.textContent = ''; });
+        }
+
+        function handleGuest() {
+            if (!auth) { document.getElementById('authError').textContent = '❌ Firebase не готовий.';
+                return; }
+            const error = document.getElementById('authError');
+            const success = document.getElementById('authSuccess');
+            error.textContent = '';
+            success.textContent = '⏳ Вхід як гість...';
+
+            auth.signInAnonymously()
+                .then(userCredential => {
+                    const uid = userCredential.user.uid;
+                    G.uid = uid;
+                    G.isTelegramUser = false;
+                    G.name = 'Гість';
+                    G.season = 2;
+                    db.ref('users/' + uid).once('value').then(snap => {
+                        if (snap.val()) { loadGame(snap.val()); } else { saveGame(); }
+                        success.textContent = '✅ Гостьовий вхід!';
+                        error.textContent = '';
+                        startGame();
+                    });
+                })
+                .catch(e => { console.error('Guest error:', e);
+                    error.textContent = '❌ ' + e.message;
+                    success.textContent = ''; });
+        }
+
+        function logout() {
+            if (confirm('Вийти?')) {
+                if (G.isTelegramUser) { location.reload(); } else { auth.signOut();
+                    location.reload(); }
+            }
+        }
+
+        // ============================================================
+        //  🚀 СТАРТ ГРИ
+        // ============================================================
+        function startGame() {
+            if (gameStarted) return;
+            gameStarted = true;
+            document.getElementById('authScreen').style.display = 'none';
+            document.getElementById('game').style.display = 'flex';
+            updateUI();
+            buildPages();
+
+            if (db) {
+                db.ref('global/cryptoRate').once('value').then(snap => {
+                    if (snap.val()) {
+                        G.cryptoRate = snap.val();
+                        G.cryptoHistory.push(G.cryptoRate);
+                        if (G.cryptoHistory.length > 60) G.cryptoHistory.shift();
+                        updateUI();
+                        const chartContainer = document.getElementById('cryptoChart');
+                        if (chartContainer) drawLineChart();
+                    }
+                }).catch(e => console.warn('Load global rate error:', e));
+            }
+
+            setInterval(() => { updateCryptoRate(); }, 3000);
+            setInterval(() => { G.tapCountMinute = 0; }, 60000);
+
+            setInterval(() => {
+                let regen = G.energyRegen + G.upgrades.energyRegen;
+                G.energy = Math.min(G.maxEnergy, G.energy + regen);
+                if (G.autoTap > 0) G.coins += G.autoTap;
+                if (G.autoXP > 0) addXP(G.autoXP);
+                let now = Date.now();
+                if (now - G.lastTimeReward >= 300000) {
+                    G.lastTimeReward = now;
+                    G.coins += 500;
+                    toast('⏰ +500 монет');
+                }
+                updateUI();
+                saveGame();
+            }, 1000);
+
+            setTimeout(updateTapButton, 100);
+            saveGame();
+            toast('🐹 Ласкаво просимо до Hamka! Сезон 2');
+        }
+
+        function buildPages() {
+            document.getElementById('contentArea').innerHTML = `
+                <div id="tab-games" class="page show">
+                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:3px;margin-bottom:4px;">
+                        <button class="btn btn-g btn-lg" onclick="openGame('tap')">💸 Тап</button>
+                        <button class="btn btn-o btn-lg" onclick="openGame('casino')">🎰</button>
+                        <button class="btn btn-p btn-lg" onclick="openGame('upgrader')">🔧</button>
+                        <button class="btn" style="background:#f97316;font-size:9px;padding:8px;" onclick="openGame('boss')">🐉</button>
+                        <button class="btn" style="background:#ec4899;font-size:9px;padding:8px;" onclick="openGame('event')">🌸</button>
+                    </div>
+                    <div id="game-area"></div>
+                </div>
+                <div id="tab-shop" class="page"><div id="shop-content"></div></div>
+                <div id="tab-crypto" class="page"><div id="crypto-area"></div></div>
+                <div id="tab-vip" class="page"><div id="vip-area"></div></div>
+                <div id="tab-profile" class="page"><div id="profile-area"></div></div>
+                <div id="tab-inventory" class="page"><div id="inventory-area"></div></div>
+                <div id="tab-top" class="page"><div id="top-area"></div></div>
+            `;
+            openGame('tap');
+            renderShop();
+            renderCrypto();
+            renderVip();
+            renderProfile();
+            renderInventory();
+            renderTop();
+        }
+
+        // ============================================================
+        //  🔄 АВТОВХІД
+        // ============================================================
         if (tg && tgUserId) {
             setTimeout(() => {
                 if (db) {
-                    autoLoginWithTelegram();
+                    const uid = 'tg_' + tgUserId;
+                    G.uid = uid;
+                    G.isTelegramUser = true;
+                    const tgUser = tg.initDataUnsafe?.user;
+                    if (tgUser) {
+                        let name = tgUser.first_name || 'TelegramUser';
+                        if (tgUser.last_name) name += ' ' + tgUser.last_name;
+                        G.name = name;
+                    }
+                    G.season = 2;
+                    db.ref('users/' + uid).once('value').then(snap => {
+                        if (snap.val()) { loadGame(snap.val());
+                            toast('✅ Дані завантажено!'); } else { saveGame();
+                            toast('👋 Ласкаво просимо!'); }
+                        startGame();
+                    }).catch(e => { console.error('Load error:', e);
+                        startGame(); });
                 } else {
                     document.getElementById('authStatus').textContent = '❌ Помилка підключення до сервера';
                 }
@@ -2902,17 +3286,14 @@
                     G.uid = user.uid;
                     G.isTelegramUser = false;
                     db.ref('users/' + user.uid).once('value').then(snap => {
-                        if (snap.val()) {
-                            loadGame(snap.val());
-                        } else {
+                        if (snap.val()) { loadGame(snap.val()); } else {
                             G.name = user.isAnonymous ? 'Гість' : 'Гравець';
+                            G.season = 2;
                             saveGame();
                         }
                         startGame();
-                    }).catch(e => {
-                        console.error('Load error:', e);
-                        startGame();
-                    });
+                    }).catch(e => { console.error('Load error:', e);
+                        startGame(); });
                 } else {
                     document.getElementById('authScreen').style.display = 'flex';
                     document.getElementById('game').style.display = 'none';
@@ -2920,10 +3301,14 @@
                 }
             });
         }
-        console.log('🐹 Hamka — Повністю робоча версія');
-        console.log('✅ Промокоди: PLOW, RONALDO');
-        console.log('✅ Прогрес синхронізується між пристроями');
-        console.log('✅ Вхід через Telegram працює');
+
+        console.log('🐹 Hamka — Сезон 2');
+        console.log('✅ Кнопка тапа збільшена в 3 рази');
+        console.log('✅ Ящики відкриваються в інвентарі (як Standoff 2)');
+        console.log('✅ Промокоди приховані');
+        console.log('✅ Авто тап без ліміту');
+        console.log('✅ Виправлено топ');
+        console.log('✅ Додано ящики за хоми та івенхоми');
     </script>
 </body>
-</html>
+    </html>
