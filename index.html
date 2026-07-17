@@ -1374,7 +1374,7 @@
             'mythic': { name: '✨ Міфічний', color: '#ec4899', price: 10000000 },
             'god': { name: '👑 Бог', color: '#00ff88', price: 25000000 },
             'hamka': { name: '🐹 Хамка', color: '#00ff88', price: 25000 }
-        };
+        ];
 
         const UPGRADE_ITEMS = [
             { id: 'figurine_durov', name: "Durov's Figurine", price: 160256075, image: "🎭", rarity: 'legendary' },
@@ -1625,7 +1625,7 @@
         }
 
         // ============================================================
-        //  🛒 ПОКУПКА СКІНІВ
+        //  🛒 ПОКУПКА СКІНІВ (за Хоми 🟣)
         // ============================================================
         function buyShopSkin(skinId) {
             const skin = SHOP_SKINS.find(s => s.id === skinId);
@@ -1642,11 +1642,11 @@
                 renderInventory();
                 return;
             }
-            if (G.coins < skin.price) {
-                toast(`❌ Потрібно ${skin.price}💰`);
+            if (G.homa < skin.price) {
+                toast(`❌ Потрібно ${skin.price}🟣`);
                 return;
             }
-            G.coins -= skin.price;
+            G.homa -= skin.price;
             G.ownedShopSkins.push(skinId);
             G.activeShopSkin = skinId;
             G.skins.plow.use = false;
@@ -1706,7 +1706,7 @@
                 toast('₿ +1');
                 updateUI();
                 saveGame(); } else if (code === 'CRYPTO2') { G.crypto2 += 1;
-                toast('🪙 +1 T-HAM');
+                toast('🪙 +1 HAM2');
                 updateUI();
                 saveGame(); } else if (code === 'VIP') {
                 if (!G.vip) { G.vip = true;
@@ -1793,7 +1793,7 @@
                     <div class="card" style="border-color:${active ? 'var(--gold)' : 'var(--border)'};">
                         <div class="flex">
                             <b>${skin.emoji} ${skin.name}</b>
-                            <span style="color:var(--gold);font-size:6px;">${owned ? '✅' : skin.price + '💰'}</span>
+                            <span style="color:var(--gold);font-size:6px;">${owned ? '✅' : skin.price + '🟣'}</span>
                             <button class="btn ${active ? 'btn-g' : 'btn-sm'}" onclick="buyShopSkin('${skin.id}')">
                                 ${active ? '✅' : (owned ? '🔘' : 'Купити')}
                             </button>
@@ -1911,9 +1911,8 @@
         }
 
         // ============================================================
-        //  📊 КРИПТА
+        //  📊 КРИПТА (ЛАЙФ ГРАФІК)
         // ============================================================
-        // HAM (коливається 1000-5000)
         function updateCryptoRate() {
             let change = (Math.random() - 0.48) * 50;
             let newRate = G.cryptoRate + change;
@@ -1929,10 +1928,14 @@
             const rateDisp = document.getElementById('cryptoRateDisp');
             if (rateDisp) rateDisp.textContent = G.cryptoRate;
 
+            const chartContainer = document.getElementById('cryptoChart');
+            if (chartContainer && document.getElementById('tab-crypto').classList.contains('show')) {
+                drawLineChart('cryptoChart', G.cryptoHistory, '#f472b6');
+            }
+
             saveGame();
         }
 
-        // T-HAM (постійно зростає 1000 -> 1,000,000)
         function updateCrypto2Rate() {
             let growth = rand(5, 20);
             let newRate = G.crypto2Rate + growth;
@@ -1948,10 +1951,15 @@
             const rateDisp = document.getElementById('crypto2RateDisp');
             if (rateDisp) rateDisp.textContent = G.crypto2Rate;
 
+            const chartContainer = document.getElementById('crypto2Chart');
+            if (chartContainer && document.getElementById('tab-crypto').classList.contains('show')) {
+                drawLineChart('crypto2Chart', G.crypto2History, '#fbbf24');
+            }
+
             saveGame();
         }
 
-        function drawLineChart(containerId, data, color, label) {
+        function drawLineChart(containerId, data, color) {
             const container = document.getElementById(containerId);
             if (!container) return;
             if (data.length < 2) {
@@ -2005,68 +2013,173 @@
             `;
         }
 
-        function buyCrypto() {
-            let amount = parseFloat(document.getElementById('cryptoBuyAmount')?.value) || 0;
-            if (amount <= 0) { toast('Введіть суму');
-                return; }
-            let cost = Math.floor(amount * G.cryptoRate);
-            if (G.coins < cost) { toast('❌ Не вистачає монет');
-                return; }
-            G.coins -= cost;
-            G.crypto += amount;
-            toast(`✅ Куплено ${amount.toFixed(2)} ₿ за ${cost}💰`);
-            updateUI();
-            saveGame();
-            renderCrypto();
+        // ============================================================
+        //  🏪 МАГАЗИН
+        // ============================================================
+        // Функції цін для монет (💰)
+        function getPriceCoin(item) {
+            const base = { maxEnergy: 2000, autoXP: 5000, energyRegen: 15000, tapLevel: 1000, coinBoost: 5000,
+                energyUp: 5000, tapPower: 15000, critChance: 10000, luckB: 3000 };
+            const mult = { maxEnergy: 1.5, autoXP: 2, energyRegen: 2.5, tapLevel: 1.8, coinBoost: 2, energyUp: 1.8,
+                tapPower: 2.5, critChance: 2, luckB: 2 };
+            if (item === 'autoTap') return 1500 + (G.upgrades.autoTap || 0) * 2000;
+            if (item === 'tapLevel') return Math.floor(base.tapLevel * Math.pow(mult.tapLevel, G.upgrades.tapLevel || 0));
+            return Math.floor((base[item] || 1000) * Math.pow((mult[item] || 1.5), (G.upgrades[item] || 0)));
         }
 
-        function sellCrypto() {
-            let amount = parseFloat(document.getElementById('cryptoSellAmount')?.value) || 0;
-            if (amount <= 0) { toast('Введіть суму');
+        function buyItemCoin(item) {
+            const p = getPriceCoin(item);
+            if (G.coins < p) { toast(`❌ Потрібно ${p}💰`);
                 return; }
-            if (G.crypto < amount) { toast('❌ Не вистачає крипти');
-                return; }
-            let profit = Math.floor(amount * G.cryptoRate);
-            G.crypto -= amount;
-            G.coins += profit;
-            toast(`✅ Продано ${amount.toFixed(2)} ₿ за ${profit}💰`);
+            G.coins -= p;
+            if (item === 'maxEnergy') { G.maxEnergy += 50;
+                G.energy += 50;
+                G.upgrades.maxEnergy++; } else if (item === 'autoXP') { G.autoXP++;
+                G.upgrades.autoXP++; } else if (item === 'xpBoost') { addXP(100); } else if (item === 'autoTap') {
+                G.autoTap++;
+                G.upgrades.autoTap++;
+            } else if (item === 'energyRegen') { G.upgrades.energyRegen++; } else if (item === 'tapLevel') { G.upgrades
+                    .tapLevel++; } else if (item === 'coinBoost') { G.upgrades.coinBoost++; } else if (item ===
+                'energyUp') { G.maxEnergy += 100;
+                G.energy += 100;
+                G.upgrades.energyUp++; } else if (item === 'tapPower') { G.upgrades.tapPower++; } else if (item ===
+                'critChance') { G.upgrades.critChance++; } else if (item === 'luckB') { G.upgrades.luckB++; }
+            toast('✅ Куплено!');
             updateUI();
             saveGame();
-            renderCrypto();
+            renderShop();
         }
 
-        function buyCrypto2() {
-            let amount = parseFloat(document.getElementById('crypto2BuyAmount')?.value) || 0;
-            if (amount <= 0) { toast('Введіть суму');
-                return; }
-            let cost = Math.floor(amount * G.crypto2Rate);
-            if (G.coins < cost) { toast('❌ Не вистачає монет');
-                return; }
-            G.coins -= cost;
-            G.crypto2 += amount;
-            toast(`✅ Куплено ${amount.toFixed(2)} 🪙 T-HAM за ${cost}💰`);
-            updateUI();
-            saveGame();
-            renderCrypto();
+        // Покупка за Хоми (🟣)
+        function buyHoma(n) {
+            let cost = n * 50000;
+            if (G.coins >= cost) { G.coins -= cost;
+                G.homa += n;
+                toast('✅ +' + n + '🟣');
+                updateUI();
+                saveGame();
+                renderShop(); } else { toast('❌ Мало монет'); }
         }
 
-        function sellCrypto2() {
-            let amount = parseFloat(document.getElementById('crypto2SellAmount')?.value) || 0;
-            if (amount <= 0) { toast('Введіть суму');
+        function buyEventHoma(n) {
+            let cost = n * 100000;
+            if (G.coins >= cost) { G.coins -= cost;
+                G.eventHoma += n;
+                toast('✅ +' + n + '🌸');
+                updateUI();
+                saveGame();
+                renderShop(); } else { toast('❌ Мало монет'); }
+        }
+
+        function buyGifHoma(id) {
+            const g = GIFS.find(x => x.id === id);
+            if (!g || hasGif(id)) return;
+            const price = RARITY_PRICES[g.r] || 1000;
+            if (G.homa >= price) { G.homa -= price;
+                addGif(id);
+                toast('🎨 +' + id);
+                updateUI();
+                saveGame();
+                renderShop(); } else { toast('❌ ' + price + '🟣'); }
+        }
+
+        function buyTitleHoma(id) {
+            if (hasTitle(id)) { toast('Вже є');
                 return; }
-            if (G.crypto2 < amount) { toast('❌ Не вистачає T-HAM');
+            const t = TITLES[id];
+            if (!t || !t.price) return;
+            if (G.homa >= t.price) { G.homa -= t.price;
+                addTitle(id);
+                toast('🏅 ' + t.name);
+                updateUI();
+                saveGame();
+                renderShop(); } else { toast('❌ Мало Хом'); }
+        }
+
+        function buyChestHoma(type) {
+            const box = BOXES.find(b => b.id === type);
+            if (!box) return;
+            if (G.homa < box.price) { toast(`❌ Потрібно ${box.price}🟣`);
                 return; }
-            let profit = Math.floor(amount * G.crypto2Rate);
-            G.crypto2 -= amount;
-            G.coins += profit;
-            toast(`✅ Продано ${amount.toFixed(2)} 🪙 T-HAM за ${profit}💰`);
+            G.homa -= box.price;
+            G.chests[type] = (G.chests[type] || 0) + 1;
+            toast(`✅ ${box.emoji} ${box.name} ящик в інвентарі!`);
             updateUI();
             saveGame();
-            renderCrypto();
+            renderShop();
+            renderInventory();
+        }
+
+        // VIP за монети
+        function buyVip() {
+            if (G.vip) { toast('Вже є');
+                return; }
+            if (G.coins < 20000) { toast('❌ Потрібно 20000💰');
+                return; }
+            G.coins -= 20000;
+            G.vip = true;
+            G.inv.push('VIP');
+            G.luck = Math.min(G.luck + 0.1, 1.3);
+            toast('👑 VIP!');
+            updateUI();
+            saveGame();
+            renderShop();
+        }
+
+        // Ринок за Хоми (🟣)
+        function listMarketItemHoma() {
+            const select = document.getElementById('marketItemSelect');
+            const priceInput = document.getElementById('marketPriceInputHoma');
+            const itemId = select?.value;
+            const price = parseFloat(priceInput?.value);
+            if (!itemId) { toast('Виберіть предмет');
+                return; }
+            if (!price || price <= 0) { toast('Введіть ціну >0');
+                return; }
+            if (!G.upgradeInventory[itemId] || G.upgradeInventory[itemId] <= 0) { toast('У вас немає цього предмета');
+                return; }
+            G.upgradeInventory[itemId]--;
+            if (G.upgradeInventory[itemId] === 0) delete G.upgradeInventory[itemId];
+            G.marketListings.push({ itemId: itemId, price: price, seller: G.name, time: Date.now() });
+            toast('✅ Лот виставлено на ринок');
+            saveGame();
+            renderShop();
+            updateUI();
+        }
+
+        function buyMarketItemHoma(idx) {
+            const item = G.marketListings[idx];
+            if (!item) { toast('Лот вже продано');
+                return; }
+            if (G.homa < item.price) { toast(`❌ Потрібно 🟣 ${item.price}`);
+                return; }
+            G.homa -= item.price;
+            G.upgradeInventory[item.itemId] = (G.upgradeInventory[item.itemId] || 0) + 1;
+            G.marketListings.splice(idx, 1);
+            toast(`✅ Куплено`);
+            saveGame();
+            renderShop();
+            updateUI();
+        }
+
+        function buyFromTraderHoma(traderId, itemId) {
+            const trader = G.traders.find(t => t.id === traderId);
+            if (!trader) return;
+            const item = UPGRADE_ITEMS.find(i => i.id === itemId);
+            if (!item) return;
+            const price = Math.floor((item.price / 1000000) * trader.multiplier) + 0.1;
+            if (G.homa < price) { toast(`❌ Потрібно ${price}🟣`);
+                return; }
+            G.homa -= price;
+            G.upgradeInventory[itemId] = (G.upgradeInventory[itemId] || 0) + 1;
+            toast(`✅ Куплено ${item.name}`);
+            saveGame();
+            renderShop();
+            updateUI();
         }
 
         // ============================================================
-        //  🏪 МАГАЗИН
+        //  🏪 МАГАЗИН (відображення)
         // ============================================================
         function renderShop() {
             const el = document.getElementById('shop-content');
@@ -2096,23 +2209,23 @@
 
             if (tab === 'res') {
                 el.innerHTML = `
-                    <div class="card"><div class="flex"><b>⚡ Енергія +50</b> <span style="color:var(--gold);">${getPrice('maxEnergy')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItem('maxEnergy')">Купити</button></div></div>
-                    <div class="card"><div class="flex"><b>✨ Авто XP</b> <span style="color:var(--gold);">${getPrice('autoXP')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItem('autoXP')">Купити</button></div></div>
-                    <div class="card"><div class="flex"><b>🚀 XP Бустер</b> <span style="color:var(--gold);">300💰</span> <button class="btn btn-g btn-sm" onclick="buyItem('xpBoost')">Купити</button></div></div>
-                    <div class="card"><div class="flex"><b>⚡ Авто тап</b> <span style="color:var(--gold);">${getPrice('autoTap')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItem('autoTap')">Купити</button></div></div>
-                    <div class="card"><div class="flex"><b>🔄 Регенерація +1</b> <span style="color:var(--gold);">${getPrice('energyRegen')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItem('energyRegen')">Купити</button></div></div>
+                    <div class="card"><div class="flex"><b>⚡ Енергія +50</b> <span style="color:var(--gold);">${getPriceCoin('maxEnergy')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItemCoin('maxEnergy')">Купити</button></div></div>
+                    <div class="card"><div class="flex"><b>✨ Авто XP</b> <span style="color:var(--gold);">${getPriceCoin('autoXP')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItemCoin('autoXP')">Купити</button></div></div>
+                    <div class="card"><div class="flex"><b>🚀 XP Бустер</b> <span style="color:var(--gold);">300💰</span> <button class="btn btn-g btn-sm" onclick="buyItemCoin('xpBoost')">Купити</button></div></div>
+                    <div class="card"><div class="flex"><b>⚡ Авто тап</b> <span style="color:var(--gold);">${getPriceCoin('autoTap')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItemCoin('autoTap')">Купити</button></div></div>
+                    <div class="card"><div class="flex"><b>🔄 Регенерація +1</b> <span style="color:var(--gold);">${getPriceCoin('energyRegen')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItemCoin('energyRegen')">Купити</button></div></div>
                     <div class="card"><div class="flex"><b>🟣 Купити Хоми</b> <span><button class="btn btn-g btn-sm" onclick="buyHoma(1)">1</button> <button class="btn btn-g btn-sm" onclick="buyHoma(5)">5</button> <button class="btn btn-g btn-sm" onclick="buyHoma(10)">10</button></span></div></div>
                     <div class="card"><div class="flex"><b>🌸 Купити Івенхоми</b> <span><button class="btn btn-gold btn-sm" onclick="buyEventHoma(1)">1</button> <button class="btn btn-gold btn-sm" onclick="buyEventHoma(5)">5</button> <button class="btn btn-gold btn-sm" onclick="buyEventHoma(10)">10</button></span></div></div>
                 `;
             } else if (tab === 'upg') {
                 el.innerHTML = `
-                    <div class="card"><div class="flex"><b>⭐ Прокачка тапу</b> <span style="color:var(--gold);">${getPrice('tapLevel')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItem('tapLevel')">Купити</button></div></div>
-                    <div class="card"><div class="flex"><b>🪙 Бустер монет</b> <span style="color:var(--gold);">${getPrice('coinBoost')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItem('coinBoost')">Купити</button></div></div>
-                    <div class="card"><div class="flex"><b>⚡ Енергія +100</b> <span style="color:var(--gold);">${getPrice('energyUp')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItem('energyUp')">Купити</button></div></div>
-                    <div class="card"><div class="flex"><b>💪 Сила тапа +50%</b> <span style="color:var(--gold);">${getPrice('tapPower')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItem('tapPower')">Купити</button></div></div>
-                    <div class="card"><div class="flex"><b>🎯 Крит +5%</b> <span style="color:var(--gold);">${getPrice('critChance')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItem('critChance')">Купити</button></div></div>
-                    <div class="card"><div class="flex"><b>🍀 Удача +0.1</b> <span style="color:var(--gold);">${getPrice('luckB')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItem('luckB')">Купити</button></div></div>
-                    <div class="card"><div class="flex"><b>👑 VIP</b> <span style="color:var(--gold);">20000💰</span> <button class="btn btn-g btn-sm" onclick="buyItem('vip')">Купити</button></div></div>
+                    <div class="card"><div class="flex"><b>⭐ Прокачка тапу</b> <span style="color:var(--gold);">${getPriceCoin('tapLevel')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItemCoin('tapLevel')">Купити</button></div></div>
+                    <div class="card"><div class="flex"><b>🪙 Бустер монет</b> <span style="color:var(--gold);">${getPriceCoin('coinBoost')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItemCoin('coinBoost')">Купити</button></div></div>
+                    <div class="card"><div class="flex"><b>⚡ Енергія +100</b> <span style="color:var(--gold);">${getPriceCoin('energyUp')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItemCoin('energyUp')">Купити</button></div></div>
+                    <div class="card"><div class="flex"><b>💪 Сила тапа +50%</b> <span style="color:var(--gold);">${getPriceCoin('tapPower')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItemCoin('tapPower')">Купити</button></div></div>
+                    <div class="card"><div class="flex"><b>🎯 Крит +5%</b> <span style="color:var(--gold);">${getPriceCoin('critChance')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItemCoin('critChance')">Купити</button></div></div>
+                    <div class="card"><div class="flex"><b>🍀 Удача +0.1</b> <span style="color:var(--gold);">${getPriceCoin('luckB')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItemCoin('luckB')">Купити</button></div></div>
+                    <div class="card"><div class="flex"><b>👑 VIP</b> <span style="color:var(--gold);">20000💰</span> <button class="btn btn-g btn-sm" onclick="buyVip()">Купити</button></div></div>
                 `;
             } else if (tab === 'skins') {
                 let skinsHtml = SHOP_SKINS.map(skin => {
@@ -2122,7 +2235,7 @@
                         <div class="card" style="border-color:${active ? 'var(--gold)' : 'var(--border)'};">
                             <div class="flex">
                                 <b>${skin.emoji} ${skin.name}</b>
-                                <span style="color:${owned ? 'var(--primary)' : 'var(--gold)'};font-size:6px;">${owned ? '✅ Куплено' : skin.price + '💰'}</span>
+                                <span style="color:${owned ? 'var(--primary)' : 'var(--gold)'};font-size:6px;">${owned ? '✅ Куплено' : skin.price + '🟣'}</span>
                                 <button class="btn ${active ? 'btn-g' : 'btn-sm'}" onclick="buyShopSkin('${skin.id}')">
                                     ${active ? '✅' : (owned ? '🔘' : 'Купити')}
                                 </button>
@@ -2133,9 +2246,9 @@
                     `;
                 }).join('');
                 el.innerHTML = `
-                    <div class="card"><div class="card-title">🎨 Скіни для тапалки</div>
+                    <div class="card"><div class="card-title">🎨 Скіни для тапалки (🟣)</div>
                     ${skinsHtml}
-                    <div style="font-size:6px;color:var(--text-secondary);margin-top:6px;text-align:center;">💡 Купіть скін і він з'явиться на кнопці тапа!</div>
+                    <div style="font-size:6px;color:var(--text-secondary);margin-top:6px;text-align:center;">💡 Купіть скін за Хоми (🟣)</div>
                     </div>
                 `;
             } else if (tab === 'vis') {
@@ -2144,29 +2257,29 @@
                     let price = RARITY_PRICES[g.r] || 1000;
                     return `<div class="gif-cell" style="width:32px;height:32px;flex-direction:column;gap:1px;padding:1px;background:${owned?'rgba(0,255,136,0.08)':'rgba(255,255,255,0.02)'}">
                         <div style="font-size:14px;">${g.id}</div>
-                        ${!owned ? `<button class="btn btn-g btn-sm" style="padding:1px 3px;font-size:4px;" onclick="buyGif('${g.id}')">${price}💰</button>` : `<span style="font-size:4px;color:var(--primary);">x${getGifCount(g.id)}</span>`}
+                        ${!owned ? `<button class="btn btn-g btn-sm" style="padding:1px 3px;font-size:4px;" onclick="buyGifHoma('${g.id}')">${price}🟣</button>` : `<span style="font-size:4px;color:var(--primary);">x${getGifCount(g.id)}</span>`}
                     </div>`;
                 }).join('');
                 let titles = Object.entries(TITLES).filter(([id, t]) => t.price).map(([id, t]) => {
                     let owned = hasTitle(id);
-                    return `<div class="card"><div class="flex"><b>${t.name}</b> <span style="color:var(--gold);">${t.price}💰</span> <button class="btn btn-g btn-sm" onclick="buyTitle('${id}')" ${owned?'disabled':''}>${owned?'✅':'Купити'}</button></div></div>`;
+                    return `<div class="card"><div class="flex"><b>${t.name}</b> <span style="color:var(--gold);">${t.price}🟣</span> <button class="btn btn-g btn-sm" onclick="buyTitleHoma('${id}')" ${owned?'disabled':''}>${owned?'✅':'Купити'}</button></div></div>`;
                 }).join('');
                 el.innerHTML = `
-                    <div class="card"><div class="card-title">🎨 Гіфки</div><div class="gif-row">${gifs}</div></div>
-                    <div class="card"><div class="card-title">🏅 Титули</div>${titles}</div>
+                    <div class="card"><div class="card-title">🎨 Гіфки (🟣)</div><div class="gif-row">${gifs}</div></div>
+                    <div class="card"><div class="card-title">🏅 Титули (🟣)</div>${titles}</div>
                 `;
             } else if (tab === 'box') {
                 let boxes = BOXES.map(b => {
                     let owned = G.chests[b.id] || 0;
                     return `<div class="card"><div class="flex">
                         <b>${b.emoji} ${b.name}</b>
-                        <span style="color:${b.color};font-size:6px;">${b.price}💰</span>
-                        <span><button class="btn btn-gold btn-sm" onclick="buyChest('${b.id}')">Купити</button></span>
+                        <span style="color:${b.color};font-size:6px;">${b.price}🟣</span>
+                        <span><button class="btn btn-gold btn-sm" onclick="buyChestHoma('${b.id}')">Купити</button></span>
                     </div></div>`;
                 }).join('');
                 el.innerHTML = boxes;
             } else if (tab === 'market') {
-                let html = `<div class="card"><div class="card-title">🏪 Ринок</div></div>`;
+                let html = `<div class="card"><div class="card-title">🏪 Ринок (🟣)</div></div>`;
                 html += `<div class="card"><div class="card-title">📋 Активні лоти</div>`;
                 if (G.marketListings.length === 0) {
                     html += `<p style="color:var(--text-secondary);font-size:7px;padding:4px;">Немає активних лотів</p>`;
@@ -2176,8 +2289,8 @@
                         if (!upItem) return;
                         html += `<div class="market-item">
                             <div class="info"><div class="name">${upItem.image} ${upItem.name}</div><div class="desc">${item.seller}</div></div>
-                            <div class="price">₿ ${item.price.toFixed(2)}</div>
-                            <button class="btn btn-c btn-sm" onclick="buyMarketItem(${idx})">Купити</button>
+                            <div class="price">🟣 ${item.price}</div>
+                            <button class="btn btn-gold btn-sm" onclick="buyMarketItemHoma(${idx})">Купити</button>
                         </div>`;
                     });
                 }
@@ -2191,11 +2304,11 @@
                             }).join('')}
                             <option value="">Немає</option>
                         </select>
-                        <input type="number" id="marketPriceInput" placeholder="Ціна ₿" style="width:44px;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:3px;border-radius:var(--radius);font-size:6px;text-align:center;outline:none;">
-                        <button class="btn btn-g btn-sm" onclick="listMarketItem()">📤</button>
+                        <input type="number" id="marketPriceInputHoma" placeholder="Ціна 🟣" style="width:44px;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:3px;border-radius:var(--radius);font-size:6px;text-align:center;outline:none;">
+                        <button class="btn btn-g btn-sm" onclick="listMarketItemHoma()">📤</button>
                     </div>
                 </div>`;
-                html += `<div class="card"><div class="card-title">🤖 Крипто-трейдери</div>`;
+                html += `<div class="card"><div class="card-title">🤖 Крипто-трейдери (🟣)</div>`;
                 G.traders.forEach(trader => {
                     html += `<div class="trader-card">
                         <div class="flex"><span class="name">${trader.name}</span></div>
@@ -2206,8 +2319,8 @@
                                 const price = Math.floor((item.price / 1000000) * trader.multiplier) + 0.1;
                                 return `<div class="trader-item">
                                     <span class="icon">${item.image}</span>
-                                    <span class="price">${price.toFixed(2)} ₿</span>
-                                    <button class="btn btn-c btn-sm" onclick="buyFromTrader('${trader.id}','${itemId}')">Купити</button>
+                                    <span class="price">${price}🟣</span>
+                                    <button class="btn btn-gold btn-sm" onclick="buyFromTraderHoma('${trader.id}','${itemId}')">Купити</button>
                                 </div>`;
                             }).join('')}
                         </div>
@@ -2216,159 +2329,6 @@
                 html += `</div>`;
                 el.innerHTML = html;
             }
-        }
-
-        function getPrice(item) {
-            const base = { maxEnergy: 2000, autoXP: 5000, energyRegen: 15000, tapLevel: 1000, coinBoost: 5000,
-                energyUp: 5000, tapPower: 15000, critChance: 10000, luckB: 3000 };
-            const mult = { maxEnergy: 1.5, autoXP: 2, energyRegen: 2.5, tapLevel: 1.8, coinBoost: 2, energyUp: 1.8,
-                tapPower: 2.5, critChance: 2, luckB: 2 };
-            if (item === 'autoTap') return 1500 + (G.upgrades.autoTap || 0) * 2000;
-            if (item === 'tapLevel') return Math.floor(base.tapLevel * Math.pow(mult.tapLevel, G.upgrades.tapLevel || 0));
-            return Math.floor((base[item] || 1000) * Math.pow((mult[item] || 1.5), (G.upgrades[item] || 0)));
-        }
-
-        function buyItem(item) {
-            const p = getPrice(item);
-            if (G.coins < p) { toast('❌ Не вистачає монет');
-                return; }
-            G.coins -= p;
-            if (item === 'maxEnergy') { G.maxEnergy += 50;
-                G.energy += 50;
-                G.upgrades.maxEnergy++; } else if (item === 'autoXP') { G.autoXP++;
-                G.upgrades.autoXP++; } else if (item === 'xpBoost') { addXP(100); } else if (item === 'autoTap') {
-                G.autoTap++;
-                G.upgrades.autoTap++;
-            } else if (item === 'energyRegen') { G.upgrades.energyRegen++; } else if (item === 'tapLevel') { G.upgrades
-                    .tapLevel++; } else if (item === 'coinBoost') { G.upgrades.coinBoost++; } else if (item ===
-                'energyUp') { G.maxEnergy += 100;
-                G.energy += 100;
-                G.upgrades.energyUp++; } else if (item === 'tapPower') { G.upgrades.tapPower++; } else if (item ===
-                'critChance') { G.upgrades.critChance++; } else if (item === 'luckB') { G.upgrades.luckB++; } else if (
-                item === 'vip') {
-                if (G.vip) { toast('Вже є');
-                    return; }
-                G.vip = true;
-                G.inv.push('VIP');
-                G.luck = Math.min(G.luck + 0.1, 1.3);
-            }
-            toast('✅ Куплено!');
-            updateUI();
-            saveGame();
-            renderShop();
-        }
-
-        function buyHoma(n) {
-            let cost = n * 50000;
-            if (G.coins >= cost) { G.coins -= cost;
-                G.homa += n;
-                toast('✅ +' + n + '🟣');
-                updateUI();
-                saveGame();
-                renderShop(); } else { toast('❌ Мало монет'); }
-        }
-
-        function buyEventHoma(n) {
-            let cost = n * 100000;
-            if (G.coins >= cost) { G.coins -= cost;
-                G.eventHoma += n;
-                toast('✅ +' + n + '🌸');
-                updateUI();
-                saveGame();
-                renderShop(); } else { toast('❌ Мало монет'); }
-        }
-
-        function buyGif(id) {
-            const g = GIFS.find(x => x.id === id);
-            if (!g || hasGif(id)) return;
-            const price = RARITY_PRICES[g.r] || 1000;
-            if (G.coins >= price) { G.coins -= price;
-                addGif(id);
-                toast('🎨 +' + id);
-                updateUI();
-                saveGame();
-                renderShop(); } else { toast('❌ ' + price + '💰'); }
-        }
-
-        function buyTitle(id) {
-            if (hasTitle(id)) { toast('Вже є');
-                return; }
-            const t = TITLES[id];
-            if (!t || !t.price) return;
-            if (G.coins >= t.price) { G.coins -= t.price;
-                addTitle(id);
-                toast('🏅 ' + t.name);
-                updateUI();
-                saveGame();
-                renderShop(); } else { toast('❌ Мало монет'); }
-        }
-
-        function buyChest(type) {
-            const box = BOXES.find(b => b.id === type);
-            if (!box) return;
-            if (G.coins < box.price) { toast('❌ Не вистачає монет');
-                return; }
-            G.coins -= box.price;
-            G.chests[type] = (G.chests[type] || 0) + 1;
-            toast(`✅ ${box.emoji} ${box.name} ящик в інвентарі!`);
-            updateUI();
-            saveGame();
-            renderShop();
-            renderInventory();
-        }
-
-        // ============================================================
-        //  🏪 РИНОК
-        // ============================================================
-        function listMarketItem() {
-            const select = document.getElementById('marketItemSelect');
-            const priceInput = document.getElementById('marketPriceInput');
-            const itemId = select?.value;
-            const price = parseFloat(priceInput?.value);
-            if (!itemId) { toast('Виберіть предмет');
-                return; }
-            if (!price || price <= 0) { toast('Введіть ціну >0');
-                return; }
-            if (!G.upgradeInventory[itemId] || G.upgradeInventory[itemId] <= 0) { toast('У вас немає цього предмета');
-                return; }
-            G.upgradeInventory[itemId]--;
-            if (G.upgradeInventory[itemId] === 0) delete G.upgradeInventory[itemId];
-            G.marketListings.push({ itemId: itemId, price: price, seller: G.name, time: Date.now() });
-            toast('✅ Лот виставлено на ринок');
-            saveGame();
-            renderShop();
-            updateUI();
-        }
-
-        function buyMarketItem(idx) {
-            const item = G.marketListings[idx];
-            if (!item) { toast('Лот вже продано');
-                return; }
-            if (G.crypto < item.price) { toast(`❌ Потрібно ₿ ${item.price.toFixed(2)}`);
-                return; }
-            G.crypto -= item.price;
-            G.upgradeInventory[item.itemId] = (G.upgradeInventory[item.itemId] || 0) + 1;
-            G.marketListings.splice(idx, 1);
-            toast(`✅ Куплено`);
-            saveGame();
-            renderShop();
-            updateUI();
-        }
-
-        function buyFromTrader(traderId, itemId) {
-            const trader = G.traders.find(t => t.id === traderId);
-            if (!trader) return;
-            const item = UPGRADE_ITEMS.find(i => i.id === itemId);
-            if (!item) return;
-            const price = Math.floor((item.price / 1000000) * trader.multiplier) + 0.1;
-            if (G.crypto < price) { toast(`❌ Потрібно ${price.toFixed(2)} крипти`);
-                return; }
-            G.crypto -= price;
-            G.upgradeInventory[itemId] = (G.upgradeInventory[itemId] || 0) + 1;
-            toast(`✅ Куплено ${item.name}`);
-            saveGame();
-            renderShop();
-            updateUI();
         }
 
         // ============================================================
@@ -2518,7 +2478,7 @@
                             G.crypto += a;
                             toast(`₿ +${a.toFixed(2)}`); } else if (rew === 'crypto2') { let a = rand(1, 10);
                             G.crypto2 += a;
-                            toast(`🪙 +${a} T-HAM`); } else if (rew === 'eventHoma') { let a = rand(1, 5);
+                            toast(`🪙 +${a} HAM2`); } else if (rew === 'eventHoma') { let a = rand(1, 5);
                             G.eventHoma += a;
                             toast(`🌸 +${a}`); } else if (rew === 'upgrade_item') {
                             const items = UPGRADE_ITEMS.filter(i => i.price < 100000000);
@@ -2897,7 +2857,7 @@
         }
 
         // ============================================================
-        //  ₿ КРИПТА ВКЛАДКА
+        //  ₿ КРИПТА ВКЛАДКА (ЛАЙВ ГРАФІК)
         // ============================================================
         function renderCrypto() {
             const el = document.getElementById('crypto-area');
@@ -2910,7 +2870,7 @@
             const changeClass = change >= 0 ? 'up' : 'down';
             const changeText = (change >= 0 ? '+' : '') + change.toFixed(2) + '%';
 
-            // T-HAM
+            // HAM2
             const firstVal2 = G.crypto2History.length > 0 ? G.crypto2History[0] : G.crypto2Rate;
             const lastVal2 = G.crypto2History.length > 0 ? G.crypto2History[G.crypto2History.length - 1] : G.crypto2Rate;
             const change2 = firstVal2 > 0 ? ((lastVal2 - firstVal2) / firstVal2 * 100) : 0;
@@ -2953,10 +2913,10 @@
 
                     <div style="height:8px;"></div>
 
-                    <!-- T-HAM -->
+                    <!-- HAM2 -->
                     <div class="crypto-card" style="width:100%;border-color:var(--crypto2);">
                         <div class="flex">
-                            <div><div class="symbol" style="color:var(--crypto2);">🪙 T-HAM</div></div>
+                            <div><div class="symbol" style="color:var(--crypto2);">🪙 HAM2</div><div style="font-size:7px;color:var(--text-secondary);">Зростаюча криптовалюта</div></div>
                             <div style="text-align:right;">
                                 <div class="price" style="color:var(--crypto2);">${G.crypto2Rate}💰</div>
                                 <div class="change ${changeClass2}" style="color:var(--primary);">${changeText2}</div>
@@ -2968,7 +2928,7 @@
                     </div>
                     <div style="width:100%;display:grid;grid-template-columns:1fr 1fr;gap:4px;">
                         <div class="card">
-                            <div class="card-title">💰 Купити T-HAM</div>
+                            <div class="card-title">💰 Купити HAM2</div>
                             <div class="flex">
                                 <input type="number" id="crypto2BuyAmount" placeholder="Кількість" style="flex:1;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:3px;border-radius:var(--radius);font-size:7px;text-align:center;outline:none;">
                                 <button class="btn btn-c2 btn-sm" onclick="buyCrypto2()">Купити</button>
@@ -2976,7 +2936,7 @@
                             <div style="font-size:6px;color:var(--text-muted);margin-top:2px;">1 🪙 = ${G.crypto2Rate}💰</div>
                         </div>
                         <div class="card">
-                            <div class="card-title">💸 Продати T-HAM</div>
+                            <div class="card-title">💸 Продати HAM2</div>
                             <div class="flex">
                                 <input type="number" id="crypto2SellAmount" placeholder="Кількість" style="flex:1;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:3px;border-radius:var(--radius);font-size:7px;text-align:center;outline:none;">
                                 <button class="btn btn-o btn-sm" onclick="sellCrypto2()">Продати</button>
@@ -2996,9 +2956,69 @@
                 </div>
             `;
 
-            // Малюємо графіки
             drawLineChart('cryptoChart', G.cryptoHistory, '#f472b6');
             drawLineChart('crypto2Chart', G.crypto2History, '#fbbf24');
+        }
+
+        // Купівля/продаж крипти (за монети)
+        function buyCrypto() {
+            let amount = parseFloat(document.getElementById('cryptoBuyAmount')?.value) || 0;
+            if (amount <= 0) { toast('Введіть суму');
+                return; }
+            let cost = Math.floor(amount * G.cryptoRate);
+            if (G.coins < cost) { toast('❌ Не вистачає монет');
+                return; }
+            G.coins -= cost;
+            G.crypto += amount;
+            toast(`✅ Куплено ${amount.toFixed(2)} ₿ за ${cost}💰`);
+            updateUI();
+            saveGame();
+            renderCrypto();
+        }
+
+        function sellCrypto() {
+            let amount = parseFloat(document.getElementById('cryptoSellAmount')?.value) || 0;
+            if (amount <= 0) { toast('Введіть суму');
+                return; }
+            if (G.crypto < amount) { toast('❌ Не вистачає крипти');
+                return; }
+            let profit = Math.floor(amount * G.cryptoRate);
+            G.crypto -= amount;
+            G.coins += profit;
+            toast(`✅ Продано ${amount.toFixed(2)} ₿ за ${profit}💰`);
+            updateUI();
+            saveGame();
+            renderCrypto();
+        }
+
+        function buyCrypto2() {
+            let amount = parseFloat(document.getElementById('crypto2BuyAmount')?.value) || 0;
+            if (amount <= 0) { toast('Введіть суму');
+                return; }
+            let cost = Math.floor(amount * G.crypto2Rate);
+            if (G.coins < cost) { toast('❌ Не вистачає монет');
+                return; }
+            G.coins -= cost;
+            G.crypto2 += amount;
+            toast(`✅ Куплено ${amount.toFixed(2)} 🪙 HAM2 за ${cost}💰`);
+            updateUI();
+            saveGame();
+            renderCrypto();
+        }
+
+        function sellCrypto2() {
+            let amount = parseFloat(document.getElementById('crypto2SellAmount')?.value) || 0;
+            if (amount <= 0) { toast('Введіть суму');
+                return; }
+            if (G.crypto2 < amount) { toast('❌ Не вистачає HAM2');
+                return; }
+            let profit = Math.floor(amount * G.crypto2Rate);
+            G.crypto2 -= amount;
+            G.coins += profit;
+            toast(`✅ Продано ${amount.toFixed(2)} 🪙 HAM2 за ${profit}💰`);
+            updateUI();
+            saveGame();
+            renderCrypto();
         }
 
         // ============================================================
@@ -3190,7 +3210,7 @@
         }
 
         // ============================================================
-        //  🐹 ТАП
+        //  🐹 ТАП (БЕЗ КРИПТИ)
         // ============================================================
         function handleTap(e) {
             e.preventDefault();
@@ -3222,10 +3242,7 @@
             addXP(1);
             G.seasonPoints = (G.seasonPoints || 0) + 1;
 
-            if (G.totalTaps % 30 === 0) { G.crypto += 0.5;
-                toast('₿ +0.5 крипти!'); }
-            if (G.totalTaps % 60 === 0) { G.crypto2 += 0.5;
-                toast('🪙 +0.5 T-HAM!'); }
+            // Більше НІЯКОЇ КРИПТИ З ТАПА!
             if (G.totalTaps % 100 === 0) { G.eventHoma += 1;
                 toast('🌸 +1 івенхом!'); }
 
@@ -3448,7 +3465,6 @@
             updateUI();
             buildPages();
 
-            // Завантажуємо глобальні ціни
             if (db) {
                 db.ref('global/cryptoRate').once('value').then(snap => {
                     if (snap.val()) {
@@ -3572,9 +3588,12 @@
         }
 
         console.log('🐹 Hamka — Сезон 2');
-        console.log('✅ Дві криптовалюти: HAM (1000-5000💰) та T-HAM (зростає до 1,000,000💰)');
-        console.log('✅ Топ: Рубін 1+ (8+ рівень) та Майстри');
-        console.log('✅ Кнопка тапа збільшена в 3 рази');
+        console.log('✅ З тапа більше не випадає крипта!');
+        console.log('✅ Скіни, гіфки, титули, ящики — за Хоми (🟣)');
+        console.log('✅ Прокачка, енергія, автотап — за монети (💰)');
+        console.log('✅ VIP за монети (20000💰)');
+        console.log('✅ Крипта тільки з босів та промокодів');
+        console.log('✅ Графік крипти працює в реальному часі (лайф)');
     </script>
 </body>
-    </html>
+</html>
