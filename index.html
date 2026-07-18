@@ -1325,7 +1325,7 @@
             legendary: 500000 };
 
         // ============================================================
-        //  🏆 НОВІ РІВНІ
+        //  🏆 РІВНІ
         // ============================================================
         const LEVEL_NAMES = {
             1: '🌱 Новачок',
@@ -1354,7 +1354,6 @@
             return LEVEL_NAMES[level] || `⭐ Рівень ${level}`;
         }
 
-        // XP для кожного рівня
         const LEVELS = [];
         let xp = 0;
         for (let l = 1; l <= 20; l++) {
@@ -1366,15 +1365,15 @@
 
         const TITLES = {
             'none': { name: 'Без титулу', color: '#888' },
-            'noob': { name: '🌱 Новачок', color: '#aaa', price: 50000 },
-            'player': { name: '🎮 Геймер', color: '#3b82f6', price: 150000 },
-            'pro': { name: '⚡ Кіберспортсмен', color: '#a855f7', price: 500000 },
-            'veteran': { name: '🎖️ Ветеран', color: '#f97316', price: 1000000 },
-            'elite': { name: '💎 Елітний', color: '#06b6d4', price: 2500000 },
-            'legend': { name: '🏆 Легендарний', color: '#ffd700', price: 5000000 },
-            'mythic': { name: '✨ Міфічний', color: '#ec4899', price: 10000000 },
-            'god': { name: '👑 Бог', color: '#00ff88', price: 25000000 },
-            'hamka': { name: '🐹 Хамка', color: '#00ff88', price: 25000 }
+            'noob': { name: '🌱 Новачок', color: '#aaa', price: 50 },
+            'player': { name: '🎮 Геймер', color: '#3b82f6', price: 150 },
+            'pro': { name: '⚡ Кіберспортсмен', color: '#a855f7', price: 500 },
+            'veteran': { name: '🎖️ Ветеран', color: '#f97316', price: 1000 },
+            'elite': { name: '💎 Елітний', color: '#06b6d4', price: 2500 },
+            'legend': { name: '🏆 Легендарний', color: '#ffd700', price: 5000 },
+            'mythic': { name: '✨ Міфічний', color: '#ec4899', price: 10000 },
+            'god': { name: '👑 Бог', color: '#00ff88', price: 25000 },
+            'hamka': { name: '🐹 Хамка', color: '#00ff88', price: 25 }
         };
 
         const UPGRADE_ITEMS = [
@@ -1403,21 +1402,21 @@
         ];
 
         const BOXES = [
-            { id: 'common', emoji: '📦', name: 'Простий', price: 30000, homyMin: 5, homyMax: 50, color: '#888' },
-            { id: 'rare', emoji: '📦', name: 'Рідкісний', price: 100000, homyMin: 10, homyMax: 100, color: '#3b82f6' },
-            { id: 'epic', emoji: '📦', name: 'Епічний', price: 500000, homyMin: 20, homyMax: 200, color: '#a855f7' },
-            { id: 'legendary', emoji: '📦', name: 'Легендарний', price: 2000000, homyMin: 50, homyMax: 500,
+            { id: 'common', emoji: '📦', name: 'Простий', price: 30, homyMin: 5, homyMax: 50, color: '#888' },
+            { id: 'rare', emoji: '📦', name: 'Рідкісний', price: 100, homyMin: 10, homyMax: 100, color: '#3b82f6' },
+            { id: 'epic', emoji: '📦', name: 'Епічний', price: 500, homyMin: 20, homyMax: 200, color: '#a855f7' },
+            { id: 'legendary', emoji: '📦', name: 'Легендарний', price: 2000, homyMin: 50, homyMax: 500,
                 color: '#fbbf24' },
-            { id: 'mythic', emoji: '📦', name: 'Міфічний', price: 10000000, homyMin: 100, homyMax: 1000,
+            { id: 'mythic', emoji: '📦', name: 'Міфічний', price: 10000, homyMin: 100, homyMax: 1000,
                 color: '#ec4899' }
         ];
 
         const SHOP_SKINS = [
-            { id: 'skin_potuzhnolit', name: 'Потужноліт', file: '4dbb8688-018b-4109-8ff7-2f6a0e877171.png', price: 150000,
+            { id: 'skin_potuzhnolit', name: 'Потужноліт', file: '4dbb8688-018b-4109-8ff7-2f6a0e877171.png', price: 150,
                 emoji: '💪' },
-            { id: 'skin_homyak', name: 'Хомяк', file: '01790a98-cfd2-4abb-8e1b-04450faefe1b.png', price: 300000,
+            { id: 'skin_homyak', name: 'Хомяк', file: '01790a98-cfd2-4abb-8e1b-04450faefe1b.png', price: 300,
                 emoji: '🐹' },
-            { id: 'skin_polisya', name: 'Поліся', file: 'Skin3.jpg', price: 600000, emoji: '🌲' }
+            { id: 'skin_polisya', name: 'Поліся', file: 'Skin3.jpg', price: 600, emoji: '🌲' }
         ];
 
         // ============================================================
@@ -2015,23 +2014,23 @@
         }
 
         // ============================================================
-        //  🏪 МАГАЗИН
+        //  🏪 МАГАЗИН (ВСІ ЦІНИ В ХОМАХ 🟣, В 300 РАЗІВ ДЕШЕВШЕ)
         // ============================================================
-        function getPriceCoin(item) {
-            const base = { maxEnergy: 2000, autoXP: 5000, energyRegen: 15000, tapLevel: 1000, coinBoost: 5000,
-                energyUp: 5000, tapPower: 15000, critChance: 10000, luckB: 3000 };
+        function getPriceHoma(item) {
+            const base = { maxEnergy: 7, autoXP: 17, energyRegen: 50, tapLevel: 3, coinBoost: 17,
+                energyUp: 17, tapPower: 50, critChance: 33, luckB: 10 };
             const mult = { maxEnergy: 1.5, autoXP: 2, energyRegen: 2.5, tapLevel: 1.8, coinBoost: 2, energyUp: 1.8,
                 tapPower: 2.5, critChance: 2, luckB: 2 };
-            if (item === 'autoTap') return 1500 + (G.upgrades.autoTap || 0) * 2000;
+            if (item === 'autoTap') return 5 + (G.upgrades.autoTap || 0) * 7;
             if (item === 'tapLevel') return Math.floor(base.tapLevel * Math.pow(mult.tapLevel, G.upgrades.tapLevel || 0));
             return Math.floor((base[item] || 1000) * Math.pow((mult[item] || 1.5), (G.upgrades[item] || 0)));
         }
 
-        function buyItemCoin(item) {
-            const p = getPriceCoin(item);
-            if (G.coins < p) { toast(`❌ Потрібно ${p}💰`);
+        function buyItemHoma(item) {
+            const p = getPriceHoma(item);
+            if (G.homa < p) { toast(`❌ Потрібно ${p}🟣`);
                 return; }
-            G.coins -= p;
+            G.homa -= p;
             if (item === 'maxEnergy') { G.maxEnergy += 50;
                 G.energy += 50;
                 G.upgrades.maxEnergy++; } else if (item === 'autoXP') { G.autoXP++;
@@ -2043,7 +2042,14 @@
                 'energyUp') { G.maxEnergy += 100;
                 G.energy += 100;
                 G.upgrades.energyUp++; } else if (item === 'tapPower') { G.upgrades.tapPower++; } else if (item ===
-                'critChance') { G.upgrades.critChance++; } else if (item === 'luckB') { G.upgrades.luckB++; }
+                'critChance') { G.upgrades.critChance++; } else if (item === 'luckB') { G.upgrades.luckB++; } else if (
+                item === 'vip') {
+                if (G.vip) { toast('Вже є');
+                    return; }
+                G.vip = true;
+                G.inv.push('VIP');
+                G.luck = Math.min(G.luck + 0.1, 1.3);
+            }
             toast('✅ Куплено!');
             updateUI();
             saveGame();
@@ -2073,7 +2079,7 @@
         function buyGifHoma(id) {
             const g = GIFS.find(x => x.id === id);
             if (!g || hasGif(id)) return;
-            const price = RARITY_PRICES[g.r] || 1000;
+            const price = Math.floor((RARITY_PRICES[g.r] || 1000) / 300);
             if (G.homa >= price) { G.homa -= price;
                 addGif(id);
                 toast('🎨 +' + id);
@@ -2109,12 +2115,13 @@
             renderInventory();
         }
 
-        function buyVip() {
+        function buyVipHoma() {
             if (G.vip) { toast('Вже є');
                 return; }
-            if (G.coins < 20000) { toast('❌ Потрібно 20000💰');
+            const price = Math.floor(20000 / 300);
+            if (G.homa < price) { toast(`❌ Потрібно ${price}🟣`);
                 return; }
-            G.coins -= 20000;
+            G.homa -= price;
             G.vip = true;
             G.inv.push('VIP');
             G.luck = Math.min(G.luck + 0.1, 1.3);
@@ -2206,23 +2213,23 @@
 
             if (tab === 'res') {
                 el.innerHTML = `
-                    <div class="card"><div class="flex"><b>⚡ Енергія +50</b> <span style="color:var(--gold);">${getPriceCoin('maxEnergy')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItemCoin('maxEnergy')">Купити</button></div></div>
-                    <div class="card"><div class="flex"><b>✨ Авто XP</b> <span style="color:var(--gold);">${getPriceCoin('autoXP')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItemCoin('autoXP')">Купити</button></div></div>
-                    <div class="card"><div class="flex"><b>🚀 XP Бустер</b> <span style="color:var(--gold);">300💰</span> <button class="btn btn-g btn-sm" onclick="buyItemCoin('xpBoost')">Купити</button></div></div>
-                    <div class="card"><div class="flex"><b>⚡ Авто тап</b> <span style="color:var(--gold);">${getPriceCoin('autoTap')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItemCoin('autoTap')">Купити</button></div></div>
-                    <div class="card"><div class="flex"><b>🔄 Регенерація +1</b> <span style="color:var(--gold);">${getPriceCoin('energyRegen')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItemCoin('energyRegen')">Купити</button></div></div>
+                    <div class="card"><div class="flex"><b>⚡ Енергія +50</b> <span style="color:var(--gold);">${getPriceHoma('maxEnergy')}🟣</span> <button class="btn btn-g btn-sm" onclick="buyItemHoma('maxEnergy')">Купити</button></div></div>
+                    <div class="card"><div class="flex"><b>✨ Авто XP</b> <span style="color:var(--gold);">${getPriceHoma('autoXP')}🟣</span> <button class="btn btn-g btn-sm" onclick="buyItemHoma('autoXP')">Купити</button></div></div>
+                    <div class="card"><div class="flex"><b>🚀 XP Бустер</b> <span style="color:var(--gold);">1🟣</span> <button class="btn btn-g btn-sm" onclick="buyItemHoma('xpBoost')">Купити</button></div></div>
+                    <div class="card"><div class="flex"><b>⚡ Авто тап</b> <span style="color:var(--gold);">${getPriceHoma('autoTap')}🟣</span> <button class="btn btn-g btn-sm" onclick="buyItemHoma('autoTap')">Купити</button></div></div>
+                    <div class="card"><div class="flex"><b>🔄 Регенерація +1</b> <span style="color:var(--gold);">${getPriceHoma('energyRegen')}🟣</span> <button class="btn btn-g btn-sm" onclick="buyItemHoma('energyRegen')">Купити</button></div></div>
                     <div class="card"><div class="flex"><b>🟣 Купити Хоми</b> <span><button class="btn btn-g btn-sm" onclick="buyHoma(1)">1</button> <button class="btn btn-g btn-sm" onclick="buyHoma(5)">5</button> <button class="btn btn-g btn-sm" onclick="buyHoma(10)">10</button></span></div></div>
                     <div class="card"><div class="flex"><b>🌸 Купити Івенхоми</b> <span><button class="btn btn-gold btn-sm" onclick="buyEventHoma(1)">1</button> <button class="btn btn-gold btn-sm" onclick="buyEventHoma(5)">5</button> <button class="btn btn-gold btn-sm" onclick="buyEventHoma(10)">10</button></span></div></div>
                 `;
             } else if (tab === 'upg') {
                 el.innerHTML = `
-                    <div class="card"><div class="flex"><b>⭐ Прокачка тапу</b> <span style="color:var(--gold);">${getPriceCoin('tapLevel')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItemCoin('tapLevel')">Купити</button></div></div>
-                    <div class="card"><div class="flex"><b>🪙 Бустер монет</b> <span style="color:var(--gold);">${getPriceCoin('coinBoost')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItemCoin('coinBoost')">Купити</button></div></div>
-                    <div class="card"><div class="flex"><b>⚡ Енергія +100</b> <span style="color:var(--gold);">${getPriceCoin('energyUp')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItemCoin('energyUp')">Купити</button></div></div>
-                    <div class="card"><div class="flex"><b>💪 Сила тапа +50%</b> <span style="color:var(--gold);">${getPriceCoin('tapPower')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItemCoin('tapPower')">Купити</button></div></div>
-                    <div class="card"><div class="flex"><b>🎯 Крит +5%</b> <span style="color:var(--gold);">${getPriceCoin('critChance')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItemCoin('critChance')">Купити</button></div></div>
-                    <div class="card"><div class="flex"><b>🍀 Удача +0.1</b> <span style="color:var(--gold);">${getPriceCoin('luckB')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItemCoin('luckB')">Купити</button></div></div>
-                    <div class="card"><div class="flex"><b>👑 VIP</b> <span style="color:var(--gold);">20000💰</span> <button class="btn btn-g btn-sm" onclick="buyVip()">Купити</button></div></div>
+                    <div class="card"><div class="flex"><b>⭐ Прокачка тапу</b> <span style="color:var(--gold);">${getPriceHoma('tapLevel')}🟣</span> <button class="btn btn-g btn-sm" onclick="buyItemHoma('tapLevel')">Купити</button></div></div>
+                    <div class="card"><div class="flex"><b>🪙 Бустер монет</b> <span style="color:var(--gold);">${getPriceHoma('coinBoost')}🟣</span> <button class="btn btn-g btn-sm" onclick="buyItemHoma('coinBoost')">Купити</button></div></div>
+                    <div class="card"><div class="flex"><b>⚡ Енергія +100</b> <span style="color:var(--gold);">${getPriceHoma('energyUp')}🟣</span> <button class="btn btn-g btn-sm" onclick="buyItemHoma('energyUp')">Купити</button></div></div>
+                    <div class="card"><div class="flex"><b>💪 Сила тапа +50%</b> <span style="color:var(--gold);">${getPriceHoma('tapPower')}🟣</span> <button class="btn btn-g btn-sm" onclick="buyItemHoma('tapPower')">Купити</button></div></div>
+                    <div class="card"><div class="flex"><b>🎯 Крит +5%</b> <span style="color:var(--gold);">${getPriceHoma('critChance')}🟣</span> <button class="btn btn-g btn-sm" onclick="buyItemHoma('critChance')">Купити</button></div></div>
+                    <div class="card"><div class="flex"><b>🍀 Удача +0.1</b> <span style="color:var(--gold);">${getPriceHoma('luckB')}🟣</span> <button class="btn btn-g btn-sm" onclick="buyItemHoma('luckB')">Купити</button></div></div>
+                    <div class="card"><div class="flex"><b>👑 VIP</b> <span style="color:var(--gold);">67🟣</span> <button class="btn btn-g btn-sm" onclick="buyVipHoma()">Купити</button></div></div>
                 `;
             } else if (tab === 'skins') {
                 let skinsHtml = SHOP_SKINS.map(skin => {
@@ -2251,7 +2258,7 @@
             } else if (tab === 'vis') {
                 let gifs = GIFS.map(g => {
                     let owned = hasGif(g.id);
-                    let price = RARITY_PRICES[g.r] || 1000;
+                    let price = Math.floor((RARITY_PRICES[g.r] || 1000) / 300);
                     return `<div class="gif-cell" style="width:32px;height:32px;flex-direction:column;gap:1px;padding:1px;background:${owned?'rgba(0,255,136,0.08)':'rgba(255,255,255,0.02)'}">
                         <div style="font-size:14px;">${g.id}</div>
                         ${!owned ? `<button class="btn btn-g btn-sm" style="padding:1px 3px;font-size:4px;" onclick="buyGifHoma('${g.id}')">${price}🟣</button>` : `<span style="font-size:4px;color:var(--primary);">x${getGifCount(g.id)}</span>`}
@@ -2440,7 +2447,7 @@
         }
 
         // ============================================================
-        //  🐉 БОСИ
+        //  🐉 БОСИ (ЦІНИ НЕ ЗМІНЮЮТЬСЯ)
         // ============================================================
         function fightBoss(idx) {
             const b = BOSSES[idx];
@@ -2719,7 +2726,7 @@
         }
 
         // ============================================================
-        //  🏆 ТОП (з титулами та активністю)
+        //  🏆 ТОП
         // ============================================================
         function renderTop() {
             const el = document.getElementById('top-area');
@@ -2806,7 +2813,6 @@
                         rc = 'rank-2'; } else if (index === 2) { medal = '🥉';
                         rc = 'rank-3'; } else { medal = `${index + 1}`; }
 
-                    // Отримуємо назву титулу
                     const titleName = TITLES[user.title]?.name || 'Без титулу';
                     const titleColor = TITLES[user.title]?.color || '#888';
                     const levelName = getLevelName(user.level);
@@ -2858,7 +2864,7 @@
         }
 
         // ============================================================
-        //  ₿ КРИПТА ВКЛАДКА (ЛАЙВ ГРАФІК)
+        //  ₿ КРИПТА ВКЛАДКА
         // ============================================================
         function renderCrypto() {
             const el = document.getElementById('crypto-area');
@@ -3206,7 +3212,7 @@
         }
 
         // ============================================================
-        //  🐹 ТАП (БЕЗ КРИПТИ)
+        //  🐹 ТАП
         // ============================================================
         function handleTap(e) {
             e.preventDefault();
@@ -3382,9 +3388,6 @@
                 });
         }
 
-        // ============================================================
-        //  📱 ВХІД ЧЕРЕЗ TELEGRAM (ВИПРАВЛЕНО)
-        // ============================================================
         function handleTelegramGuest() {
             if (!auth) {
                 document.getElementById('authError').textContent = '❌ Firebase не готовий.';
@@ -3400,7 +3403,6 @@
             error.textContent = '';
             success.textContent = '⏳ Вхід через Telegram...';
 
-            // Використовуємо унікальний ID для входу
             const uid = 'tg_' + tgUserId;
             G.uid = uid;
             G.isTelegramUser = true;
@@ -3414,13 +3416,11 @@
 
             G.season = 2;
 
-            // Завантажуємо дані з Firebase
             db.ref('users/' + uid).once('value').then(snap => {
                 if (snap.val()) {
                     loadGame(snap.val());
                     success.textContent = '✅ Дані завантажено!';
                 } else {
-                    // Новий користувач
                     saveGame();
                     success.textContent = '✅ Новий акаунт створено!';
                 }
@@ -3562,7 +3562,6 @@
         //  🔄 АВТОВХІД ДЛЯ TELEGRAM
         // ============================================================
         if (tg && tgUserId && !gameStarted) {
-            // Автоматичний вхід через Telegram при завантаженні
             setTimeout(() => {
                 if (db) {
                     const uid = 'tg_' + tgUserId;
@@ -3588,7 +3587,6 @@
                         startGame();
                     }).catch(e => {
                         console.error('Auto login error:', e);
-                        // Якщо помилка - показуємо екран входу
                         document.getElementById('authStatus').textContent = '❌ Помилка входу';
                     });
                 } else {
@@ -3596,7 +3594,6 @@
                 }
             }, 500);
         } else {
-            // Стандартний вхід через Firebase Auth
             document.getElementById('authStatus').textContent = '🔐 Виберіть спосіб входу';
 
             if (!authListenerSet) {
@@ -3619,7 +3616,6 @@
                             startGame();
                         });
                     } else if (!user && !G.isTelegramUser) {
-                        // Показуємо екран входу тільки якщо немає активного Telegram входу
                         if (!gameStarted) {
                             document.getElementById('authScreen').style.display = 'flex';
                             document.getElementById('game').style.display = 'none';
@@ -3630,12 +3626,10 @@
         }
 
         console.log('🐹 Hamka — Сезон 2');
+        console.log('✅ ВСІ ЦІНИ В ХОМАХ (🟣) В 300 РАЗІВ ДЕШЕВШЕ!');
+        console.log('✅ Боси та апгрейдер залишились без змін');
         console.log('✅ Топ показує титули гравців');
         console.log('✅ Вхід через Telegram виправлено');
-        console.log('✅ З тапа більше не випадає крипта');
-        console.log('✅ Скіни, гіфки, титули, ящики — за Хоми (🟣)');
-        console.log('✅ Прокачка, енергія, автотап — за монети (💰)');
-        console.log('✅ VIP за монети (20000💰)');
     </script>
 </body>
-    </html>
+</html>
