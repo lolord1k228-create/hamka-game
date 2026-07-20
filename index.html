@@ -24,6 +24,7 @@
             --crypto: #f472b6;
             --crypto2: #fbbf24;
             --radius: 12px;
+            --neon-glow: 0 0 20px rgba(0, 255, 136, 0.3);
         }
         * {
             margin: 0;
@@ -1254,7 +1255,7 @@
                 <button class="btn btn-g btn-sm promo-btn" onclick="activatePromo()">OK</button>
                 <button class="btn btn-r btn-sm" onclick="logout()">🚪</button>
             </div>
-            <div class="antibot-warning" id="antibotWarning">⚠️ Перевищено ліміт тапів! Зачекайте 30 секунд.</div>
+            <div class="antibot-warning" id="antibotWarning">⚠️ Перевищено ліміт тапів! Штраф: <span id="penaltyAmount">0</span>🟣</div>
         </div>
     </div>
 
@@ -1321,8 +1322,8 @@
             { id: '🌟', r: 'epic' }, { id: '🔥', r: 'epic' }, { id: '🚀', r: 'mythic' },
             { id: '🦄', r: 'legendary' }, { id: '🐲', r: 'legendary' }
         ];
-        const RARITY_PRICES = { common: 1000, rare: 3000, superrare: 8000, epic: 50000, mythic: 150000,
-            legendary: 500000 };
+        const RARITY_PRICES = { common: 10, rare: 30, superrare: 80, epic: 500, mythic: 1500,
+            legendary: 5000 };
 
         // ============================================================
         //  🏆 РІВНІ
@@ -1363,17 +1364,20 @@
             LEVELS.push({ l: l, x: xp, rw: Math.floor(xp * 0.05) + 100 });
         }
 
+        // ============================================================
+        //  🏅 ТИТУЛИ (НЕОНОВІ)
+        // ============================================================
         const TITLES = {
             'none': { name: 'Без титулу', color: '#888' },
-            'noob': { name: '🌱 Новачок', color: '#aaa', price: 50000 },
-            'player': { name: '🎮 Геймер', color: '#3b82f6', price: 150000 },
-            'pro': { name: '⚡ Кіберспортсмен', color: '#a855f7', price: 500000 },
-            'veteran': { name: '🎖️ Ветеран', color: '#f97316', price: 1000000 },
-            'elite': { name: '💎 Елітний', color: '#06b6d4', price: 2500000 },
-            'legend': { name: '🏆 Легендарний', color: '#ffd700', price: 5000000 },
-            'mythic': { name: '✨ Міфічний', color: '#ec4899', price: 10000000 },
-            'god': { name: '👑 Бог', color: '#00ff88', price: 25000000 },
-            'hamka': { name: '🐹 Хамка', color: '#00ff88', price: 25000 }
+            'noob': { name: '🌱 Новачок', color: '#aaa', price: 500 },
+            'player': { name: '🎮 Геймер', color: '#3b82f6', price: 1500 },
+            'pro': { name: '⚡ Кіберспортсмен', color: '#a855f7', price: 5000 },
+            'veteran': { name: '🎖️ Ветеран', color: '#f97316', price: 10000 },
+            'elite': { name: '💎 Елітний', color: '#06b6d4', price: 25000 },
+            'legend': { name: '🏆 Легендарний', color: '#ffd700', price: 50000 },
+            'mythic': { name: '✨ Міфічний', color: '#ec4899', price: 100000 },
+            'god': { name: '👑 Бог', color: '#00ff88', price: 250000 },
+            'hamka': { name: '🐹 Хамка', color: '#00ff88', price: 250 }
         };
 
         const UPGRADE_ITEMS = [
@@ -1401,27 +1405,28 @@
             { id: 6, name: '👾 Бос 6', cost: 50000, chance: 0.40, rewardMin: 50, rewardMax: 150 }
         ];
 
+        // ============================================================
+        //  📦 ЯЩИКИ (ЦІНИ ЗМЕНШЕНО В 100 РАЗІВ)
+        // ============================================================
         const BOXES = [
-            { id: 'common', emoji: '📦', name: 'Простий', price: 30000, homyMin: 5, homyMax: 50, color: '#888' },
-            { id: 'rare', emoji: '📦', name: 'Рідкісний', price: 100000, homyMin: 10, homyMax: 100, color: '#3b82f6' },
-            { id: 'epic', emoji: '📦', name: 'Епічний', price: 500000, homyMin: 20, homyMax: 200, color: '#a855f7' },
-            { id: 'legendary', emoji: '📦', name: 'Легендарний', price: 2000000, homyMin: 50, homyMax: 500,
+            { id: 'common', emoji: '📦', name: 'Простий', price: 300, homyMin: 5, homyMax: 50, color: '#888' },
+            { id: 'rare', emoji: '📦', name: 'Рідкісний', price: 1000, homyMin: 10, homyMax: 100, color: '#3b82f6' },
+            { id: 'epic', emoji: '📦', name: 'Епічний', price: 5000, homyMin: 20, homyMax: 200, color: '#a855f7' },
+            { id: 'legendary', emoji: '📦', name: 'Легендарний', price: 20000, homyMin: 50, homyMax: 500,
                 color: '#fbbf24' },
-            { id: 'mythic', emoji: '📦', name: 'Міфічний', price: 10000000, homyMin: 100, homyMax: 1000,
+            { id: 'mythic', emoji: '📦', name: 'Міфічний', price: 100000, homyMin: 100, homyMax: 1000,
                 color: '#ec4899' }
         ];
 
         // ============================================================
-        //  🎨 СКІНИ (НАЗВИ ФАЙЛІВ ПОМІНЯНО МІСЦЯМИ)
+        //  🎨 СКІНИ (ЦІНИ ЗМЕНШЕНО В 100 РАЗІВ)
         // ============================================================
         const SHOP_SKINS = [
-            // Потужноліт тепер використовує файл Хомяка
-            { id: 'skin_potuzhnolit', name: 'Потужноліт', file: '01790a98-cfd2-4abb-8e1b-04450faefe1b.png', price: 150000,
+            { id: 'skin_potuzhnolit', name: 'Потужноліт', file: '01790a98-cfd2-4abb-8e1b-04450faefe1b.png', price: 1500,
                 emoji: '💪' },
-            // Хомяк тепер використовує файл Потужноліта
-            { id: 'skin_homyak', name: 'Хомяк', file: '4dbb8688-018b-4109-8ff7-2f6a0e877171.png', price: 300000,
+            { id: 'skin_homyak', name: 'Хомяк', file: '4dbb8688-018b-4109-8ff7-2f6a0e877171.png', price: 3000,
                 emoji: '🐹' },
-            { id: 'skin_polisya', name: 'Поліся', file: 'Skin3.jpg', price: 600000, emoji: '🌲' }
+            { id: 'skin_polisya', name: 'Поліся', file: 'Skin3.jpg', price: 6000, emoji: '🌲' }
         ];
 
         // ============================================================
@@ -1494,6 +1499,7 @@
             eventTapCooldown: 0,
             tapCountMinute: 0,
             isBanned: false,
+            penaltyLevel: 0,
             currentGame: 'tap',
             isTelegramUser: false,
             ownedShopSkins: [],
@@ -1501,7 +1507,8 @@
             skins: {
                 plow: { has: false, use: false, file: 'Plow.jpg' },
                 ronaldo: { has: false, use: false, file: 'Ronaldo.jpg' }
-            }
+            },
+            tapHistory: []
         };
 
         // ============================================================
@@ -1570,7 +1577,7 @@
 
         function getTitleDisplay(id) {
             const t = TITLES[id] || { name: id, color: '#fff' };
-            return `<span style="color:${t.color}">${t.name}</span>`;
+            return `<span style="color:${t.color};text-shadow:0 0 15px ${t.color};font-weight:700;">${t.name}</span>`;
         }
 
         // ============================================================
@@ -1918,7 +1925,7 @@
         // ============================================================
         //  📊 КРИПТА (ЛАЙФ ГРАФІК)
         // ============================================================
-        // B HAM (колишній HAM) - стабільний
+        // B HAM - стабільний
         function updateCryptoRate() {
             let change = (Math.random() - 0.48) * 50;
             let newRate = G.cryptoRate + change;
@@ -1942,14 +1949,13 @@
             saveGame();
         }
 
-        // T HAM (колишній HAM2) - 70% зростання, 30% падіння
+        // T HAM - 60% зростання, 40% падіння
         function updateCrypto2Rate() {
             let change;
-            // 70% шанс на зростання, 30% на падіння
-            if (Math.random() < 0.7) {
-                change = rand(5, 30); // зростання
+            if (Math.random() < 0.6) {
+                change = rand(3, 20);
             } else {
-                change = -rand(5, 25); // падіння
+                change = -rand(3, 18);
             }
             let newRate = G.crypto2Rate + change;
             newRate = Math.max(500, Math.min(2000000, newRate));
@@ -2085,7 +2091,7 @@
         function buyGifHoma(id) {
             const g = GIFS.find(x => x.id === id);
             if (!g || hasGif(id)) return;
-            const price = RARITY_PRICES[g.r] || 1000;
+            const price = Math.floor((RARITY_PRICES[g.r] || 1000) / 50);
             if (G.homa >= price) { G.homa -= price;
                 addGif(id);
                 toast('🎨 +' + id);
@@ -2137,7 +2143,7 @@
         }
 
         // ============================================================
-        //  🏪 РИНОК ДЛЯ T HAM
+        //  🏪 РИНОК (ВИПРАВЛЕНО ВІДОБРАЖЕННЯ)
         // ============================================================
         function listMarketItemHoma() {
             const select = document.getElementById('marketItemSelect');
@@ -2200,8 +2206,7 @@
                 <div class="shop-tabs">
                     <button class="shop-tab active" onclick="renderShopTab('res')">⚡ Ресурси</button>
                     <button class="shop-tab" onclick="renderShopTab('upg')">⭐ Прокачка</button>
-                    <button class="shop-tab" onclick="renderShopTab('skins')">🎨 Скіни</button>
-                    <button class="shop-tab" onclick="renderShopTab('vis')">🎨 Гіфки</button>
+                    <button class="shop-tab" onclick="renderShopTab('visual')">🎨 Візуальне</button>
                     <button class="shop-tab" onclick="renderShopTab('box')">📦 Ящики</button>
                     <button class="shop-tab" onclick="renderShopTab('market')">🏪 Ринок</button>
                 </div>
@@ -2213,7 +2218,7 @@
         function renderShopTab(tab) {
             document.querySelectorAll('.shop-tab').forEach(t => t.classList.remove('active'));
             const btns = document.querySelectorAll('.shop-tab');
-            const tabs = ['res', 'upg', 'skins', 'vis', 'box', 'market'];
+            const tabs = ['res', 'upg', 'visual', 'box', 'market'];
             const idx = tabs.indexOf(tab);
             if (btns[idx]) btns[idx].classList.add('active');
             const el = document.getElementById('shop-inner');
@@ -2223,7 +2228,7 @@
                 el.innerHTML = `
                     <div class="card"><div class="flex"><b>⚡ Енергія +50</b> <span style="color:var(--gold);">${getPriceCoin('maxEnergy')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItemCoin('maxEnergy')">Купити</button></div></div>
                     <div class="card"><div class="flex"><b>✨ Авто XP</b> <span style="color:var(--gold);">${getPriceCoin('autoXP')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItemCoin('autoXP')">Купити</button></div></div>
-                    <div class="card"><div class="flex"><b>🚀 XP Бустер</b> <span style="color:var(--gold);">${getPriceCoin('xpBoost') || 300}💰</span> <button class="btn btn-g btn-sm" onclick="buyItemCoin('xpBoost')">Купити</button></div></div>
+                    <div class="card"><div class="flex"><b>🚀 XP Бустер</b> <span style="color:var(--gold);">300💰</span> <button class="btn btn-g btn-sm" onclick="buyItemCoin('xpBoost')">Купити</button></div></div>
                     <div class="card"><div class="flex"><b>⚡ Авто тап</b> <span style="color:var(--gold);">${getPriceCoin('autoTap')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItemCoin('autoTap')">Купити</button></div></div>
                     <div class="card"><div class="flex"><b>🔄 Регенерація +1</b> <span style="color:var(--gold);">${getPriceCoin('energyRegen')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItemCoin('energyRegen')">Купити</button></div></div>
                     <div class="card"><div class="flex"><b>🟣 Купити Хоми</b> <span><button class="btn btn-g btn-sm" onclick="buyHoma(1)">1</button> <button class="btn btn-g btn-sm" onclick="buyHoma(5)">5</button> <button class="btn btn-g btn-sm" onclick="buyHoma(10)">10</button></span></div></div>
@@ -2239,7 +2244,8 @@
                     <div class="card"><div class="flex"><b>🍀 Удача +0.1</b> <span style="color:var(--gold);">${getPriceCoin('luckB')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItemCoin('luckB')">Купити</button></div></div>
                     <div class="card"><div class="flex"><b>👑 VIP</b> <span style="color:var(--gold);">20000💰</span> <button class="btn btn-g btn-sm" onclick="buyVip()">Купити</button></div></div>
                 `;
-            } else if (tab === 'skins') {
+            } else if (tab === 'visual') {
+                // Скіни
                 let skinsHtml = SHOP_SKINS.map(skin => {
                     const owned = G.ownedShopSkins.includes(skin.id);
                     const active = G.activeShopSkin === skin.id;
@@ -2257,28 +2263,31 @@
                         </div>
                     `;
                 }).join('');
-                el.innerHTML = `
-                    <div class="card"><div class="card-title">🎨 Скіни для тапалки (🟣)</div>
-                    ${skinsHtml}
-                    <div style="font-size:6px;color:var(--text-secondary);margin-top:6px;text-align:center;">💡 Купіть скін за Хоми (🟣)</div>
-                    </div>
-                `;
-            } else if (tab === 'vis') {
+
+                // Гіфки (зменшені ціни в 50 разів)
                 let gifs = GIFS.map(g => {
                     let owned = hasGif(g.id);
-                    let price = RARITY_PRICES[g.r] || 1000;
+                    let price = Math.floor((RARITY_PRICES[g.r] || 1000) / 50);
                     return `<div class="gif-cell" style="width:32px;height:32px;flex-direction:column;gap:1px;padding:1px;background:${owned?'rgba(0,255,136,0.08)':'rgba(255,255,255,0.02)'}">
                         <div style="font-size:14px;">${g.id}</div>
                         ${!owned ? `<button class="btn btn-g btn-sm" style="padding:1px 3px;font-size:4px;" onclick="buyGifHoma('${g.id}')">${price}🟣</button>` : `<span style="font-size:4px;color:var(--primary);">x${getGifCount(g.id)}</span>`}
                     </div>`;
                 }).join('');
+
+                // Титули (зменшені ціни в 100 разів)
                 let titles = Object.entries(TITLES).filter(([id, t]) => t.price).map(([id, t]) => {
                     let owned = hasTitle(id);
-                    return `<div class="card"><div class="flex"><b>${t.name}</b> <span style="color:var(--gold);">${t.price}🟣</span> <button class="btn btn-g btn-sm" onclick="buyTitleHoma('${id}')" ${owned?'disabled':''}>${owned?'✅':'Купити'}</button></div></div>`;
+                    let price = Math.floor(t.price / 100);
+                    return `<div class="card"><div class="flex"><b style="color:${t.color};text-shadow:0 0 15px ${t.color};">${t.name}</b> <span style="color:var(--gold);font-size:6px;">${price}🟣</span> <button class="btn btn-g btn-sm" onclick="buyTitleHoma('${id}')" ${owned?'disabled':''}>${owned?'✅':'Купити'}</button></div></div>`;
                 }).join('');
+
                 el.innerHTML = `
+                    <div class="card"><div class="card-title">🎨 Скіни для тапалки (🟣)</div>
+                    ${skinsHtml}
+                    <div style="font-size:6px;color:var(--text-secondary);margin-top:6px;text-align:center;">💡 Купіть скін за Хоми (🟣)</div>
+                    </div>
                     <div class="card"><div class="card-title">🎨 Гіфки (🟣)</div><div class="gif-row">${gifs}</div></div>
-                    <div class="card"><div class="card-title">🏅 Титули (🟣)</div>${titles}</div>
+                    <div class="card"><div class="card-title">🏅 Титули (🟣) — Неонові</div>${titles}</div>
                 `;
             } else if (tab === 'box') {
                 let boxes = BOXES.map(b => {
@@ -2666,7 +2675,7 @@
                 `<div class="inv-item"><span class="icon">${id}</span><span class="count">x${c}</span></div>`
             ).join('');
             let titles = Object.entries(G.ownedTitles).map(([id, c]) =>
-                `<div class="inv-item"><span style="font-size:7px;">${TITLES[id]?.name || id}</span><span class="count">x${c}</span></div>`
+                `<div class="inv-item"><span style="font-size:7px;color:${TITLES[id]?.color || '#fff'};text-shadow:0 0 10px ${TITLES[id]?.color || '#fff'};">${TITLES[id]?.name || id}</span><span class="count">x${c}</span></div>`
             ).join('');
             let chests = Object.entries(G.chests).filter(([_, c]) => c > 0).map(([id, c]) => {
                 const box = BOXES.find(b => b.id === id);
@@ -2727,14 +2736,14 @@
                 ${skinsHtml ? `<div class="card"><div class="card-title">🎨 Скіни</div>${skinsHtml}</div>` : ''}
                 ${chests ? `<div class="card"><div class="card-title">📦 Ящики (натисніть щоб відкрити)</div><div class="inventory-grid">${chests}</div></div>` : ''}
                 ${gifs ? `<div class="card"><div class="card-title">🎨 Гіфки</div><div class="inventory-grid">${gifs}</div></div>` : ''}
-                ${titles ? `<div class="card"><div class="card-title">🏅 Титули</div><div class="inventory-grid">${titles}</div></div>` : ''}
+                ${titles ? `<div class="card"><div class="card-title">🏅 Титули (Неонові)</div><div class="inventory-grid">${titles}</div></div>` : ''}
                 ${upItems ? `<div class="card"><div class="card-title">🔧 Предмети</div><div class="inventory-grid">${upItems}</div></div>` : ''}
                 <div class="card" style="text-align:center;color:var(--text-muted);font-size:7px;">Всього: ${Object.values(G.ownedGifs).reduce((a,b)=>a+b,0) + Object.values(G.ownedTitles).reduce((a,b)=>a+b,0)}</div>
             `;
         }
 
         // ============================================================
-        //  🏆 ТОП
+        //  🏆 ТОП (з титулами)
         // ============================================================
         function renderTop() {
             const el = document.getElementById('top-area');
@@ -2749,7 +2758,7 @@
                     </div>
                     ${G.seasonRewardClaimed ? '<div style="color:var(--gold);font-size:7px;margin-top:3px;">✅ Отримано!</div>' : ''}
                 </div>
-                <div class="card"><div class="flex"><b style="color:var(--gold);">🏆 Топ (Рубін 1+ та Майстри)</b><button class="btn btn-g btn-sm" onclick="renderTop()">🔄</button></div></div>
+                <div class="card"><div class="flex"><b style="color:var(--gold);">🏆 ТОП ГРАВЦІВ</b><button class="btn btn-g btn-sm" onclick="renderTop()">🔄</button></div></div>
                 <p style="text-align:center;color:var(--text-secondary);font-size:6px;padding:4px;">⏳ Завантаження...</p>
             `;
 
@@ -2769,7 +2778,7 @@
                     const data = child.val();
                     if (data && data.name && !data.hideFromTop) {
                         const lastUpdate = data.lastUpdate || 0;
-                        if (lastUpdate >= weekAgo && (data.level || 1) >= 8) {
+                        if (lastUpdate >= weekAgo) {
                             users.push({ uid: uid, name: data.name || 'Анонім', level: data.level || 1,
                                 xp: data.xp || 0, avatar: data.avatar || '🐹', title: data.title ||
                                 'none' });
@@ -2793,8 +2802,7 @@
                             ${G.seasonRewardClaimed ? '<div style="color:var(--gold);font-size:7px;margin-top:3px;">✅ Отримано!</div>' : ''}
                         </div>
                         <div class="card"><div class="flex"><b style="color:var(--gold);">🏆 Топ</b><button class="btn btn-g btn-sm" onclick="renderTop()">🔄</button></div></div>
-                        <p style="text-align:center;color:var(--text-secondary);font-size:6px;padding:10px;">😅 Немає гравців з рівнем Рубін 1+</p>
-                        <p style="text-align:center;color:var(--text-secondary);font-size:6px;">👑 Досягніть 8 рівня (Рубін 1) щоб потрапити в топ!</p>
+                        <p style="text-align:center;color:var(--text-secondary);font-size:6px;padding:10px;">😅 Немає гравців</p>
                     `;
                     return;
                 }
@@ -2808,18 +2816,31 @@
                         </div>
                         ${G.seasonRewardClaimed ? '<div style="color:var(--gold);font-size:7px;margin-top:3px;">✅ Отримано!</div>' : ''}
                     </div>
-                    <div class="card"><div class="flex"><b style="color:var(--gold);">🏆 Топ (Рубін 1+ та Майстри)</b><button class="btn btn-g btn-sm" onclick="renderTop()">🔄</button></div></div>
-                    ${!isInTop ? `<div class="card" style="border-color:var(--gold);background:rgba(251,191,36,0.05);"><div style="text-align:center;font-size:7px;color:var(--gold);">👑 Досягніть Рубін 1 (8 рівень) щоб потрапити в топ!</div></div>` : ''}
+                    <div class="card"><div class="flex"><b style="color:var(--gold);">🏆 ТОП ГРАВЦІВ</b><button class="btn btn-g btn-sm" onclick="renderTop()">🔄</button></div></div>
+                    ${!isInTop ? `<div class="card" style="border-color:var(--gold);background:rgba(251,191,36,0.05);"><div style="text-align:center;font-size:7px;color:var(--gold);">👑 Потрапте в топ, набравши більше XP!</div></div>` : ''}
                 `;
 
                 topUsers.forEach((user, index) => {
                     const isCurrent = user.uid === G.uid;
                     let medal = '';
                     let rc = '';
-                    if (index === 0) { medal = '🥇';
-                        rc = 'rank-1'; } else if (index === 1) { medal = '🥈';
-                        rc = 'rank-2'; } else if (index === 2) { medal = '🥉';
-                        rc = 'rank-3'; } else { medal = `${index + 1}`; }
+                    let titleText = '';
+                    
+                    if (index === 0) { 
+                        medal = '👑'; 
+                        rc = 'rank-1';
+                        titleText = 'КОРОЛЬ';
+                    } else if (index === 1) { 
+                        medal = '🥈'; 
+                        rc = 'rank-2';
+                        titleText = 'ПАЛАДИН';
+                    } else if (index === 2) { 
+                        medal = '🥉'; 
+                        rc = 'rank-3';
+                        titleText = 'ХОМЯК';
+                    } else { 
+                        medal = `${index + 1}`; 
+                    }
 
                     const titleName = TITLES[user.title]?.name || 'Без титулу';
                     const titleColor = TITLES[user.title]?.color || '#888';
@@ -2831,7 +2852,8 @@
                             <span>${user.avatar || '🐹'}</span>
                             <span><b>${user.name}</b></span>
                             <span style="font-size:5px;color:var(--gold);">${levelName}</span>
-                            <span style="font-size:5px;color:${titleColor};">${titleName}</span>
+                            <span style="font-size:5px;color:${titleColor};text-shadow:0 0 10px ${titleColor};">${titleName}</span>
+                            ${index < 3 ? `<span style="font-size:5px;color:var(--gold);font-weight:700;text-shadow:0 0 15px var(--gold);">${titleText}</span>` : ''}
                             <span style="margin-left:auto;color:var(--primary);font-weight:700;">${formatNum(user.xp)} XP</span>
                             ${isCurrent ? '<span style="color:var(--gold);font-size:7px;">👈</span>' : ''}
                         </div>
@@ -2927,7 +2949,7 @@
 
                     <div class="crypto-card" style="width:100%;border-color:var(--crypto2);">
                         <div class="flex">
-                            <div><div class="symbol" style="color:var(--crypto2);">🪙 T HAM</div><div style="font-size:7px;color:var(--text-secondary);">Волатильна криптовалюта (70% зростання / 30% падіння)</div></div>
+                            <div><div class="symbol" style="color:var(--crypto2);">🪙 T HAM</div><div style="font-size:7px;color:var(--text-secondary);">Волатильна (60% ріст / 40% падіння)</div></div>
                             <div style="text-align:right;">
                                 <div class="price" style="color:var(--crypto2);">${G.crypto2Rate}💰</div>
                                 <div class="change ${changeClass2}" style="color:var(--primary);">${changeText2}</div>
@@ -3220,25 +3242,44 @@
         }
 
         // ============================================================
-        //  🐹 ТАП
+        //  🐹 ТАП (з анти-автоклікером)
         // ============================================================
         function handleTap(e) {
             e.preventDefault();
-            if (G.isBanned) { toast('⛔ Тапи заблоковано! Зачекайте 30 секунд.');
-                return; }
+            if (G.isBanned) { 
+                toast(`⛔ Штраф: ${getPenaltyAmount()}🟣`);
+                return; 
+            }
             if (G.energy < 1) { toast('⚡ Немає енергії! Зачекай.');
                 return; }
 
-            G.tapCountMinute++;
-            if (G.tapCountMinute > 1500) {
+            // Анти-автоклікер: перевірка частоти тапів
+            const now = Date.now();
+            G.tapHistory.push(now);
+            if (G.tapHistory.length > 120) {
+                G.tapHistory.shift();
+            }
+            
+            // Рахуємо тапи за останню хвилину
+            const oneMinAgo = now - 60000;
+            const tapsLastMin = G.tapHistory.filter(t => t > oneMinAgo).length;
+            
+            // Якщо більше 1200 тапів за хвилину (20/сек) - штраф
+            if (tapsLastMin > 1200) {
+                const penalty = getPenaltyAmount();
+                G.homa = Math.max(0, G.homa - penalty);
                 G.isBanned = true;
                 document.getElementById('antibotWarning').classList.add('show');
-                toast('⚠️ Перевищено 1500 тапів! Блокування 30 секунд.');
+                document.getElementById('penaltyAmount').textContent = penalty;
+                toast(`⚠️ Анти-автоклікер! Штраф: ${penalty}🟣`);
+                
+                // Розраховуємо час блокування (зростає з рівнем)
+                const banTime = Math.min(60, 5 + G.level * 2);
                 setTimeout(() => {
                     G.isBanned = false;
                     document.getElementById('antibotWarning').classList.remove('show');
                     toast('✅ Тапи розблоковано');
-                }, 30000);
+                }, banTime * 1000);
                 return;
             }
 
@@ -3258,6 +3299,11 @@
             updateUI();
             showTapAnimation(x, y, inc);
             if (G.taps % 10 === 0) saveGame();
+        }
+
+        function getPenaltyAmount() {
+            // Штраф зростає з рівнем: від 10 до 1000+ 🟣
+            return Math.floor(10 + G.level * 15 + Math.pow(G.level, 1.5));
         }
 
         function showTapAnimation(x, y, amount) {
@@ -3515,7 +3561,7 @@
 
             setInterval(() => { updateCryptoRate(); }, 3000);
             setInterval(() => { updateCrypto2Rate(); }, 3000);
-            setInterval(() => { G.tapCountMinute = 0; }, 60000);
+            setInterval(() => { G.tapHistory = []; }, 60000);
 
             setInterval(() => {
                 let regen = G.energyRegen + G.upgrades.energyRegen;
@@ -3633,12 +3679,13 @@
         }
 
         console.log('🐹 Hamka — Сезон 2');
-        console.log('✅ Перейменовано: HAM → B HAM, HAM2 → T HAM');
-        console.log('✅ T HAM: 70% зростання, 30% падіння');
-        console.log('✅ Назви файлів скінів поміняно місцями');
-        console.log('✅ XP Бустер має реальну ціну');
-        console.log('✅ Топ показує титули гравців');
-        console.log('✅ Вхід через Telegram виправлено');
+        console.log('✅ Анти-автоклікер: 1200 тапів/хв → штраф 🟣');
+        console.log('✅ T HAM: 60% зростання, 40% падіння');
+        console.log('✅ Ціни зменшено: скіни/ящики ×100, гіфки ×50');
+        console.log('✅ Вкладка "Гіф" → "Візуальне" (скіни+гіфки+титули)');
+        console.log('✅ Топ: 1-Король, 2-Паладин, 3-Хомяк');
+        console.log('✅ Титули неонові');
+        console.log('✅ Ринок виправлено');
     </script>
 </body>
 </html>
