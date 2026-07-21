@@ -2256,56 +2256,36 @@
         }
 
         // ============================================================
-        //  🏪 РИНОК ЗА ХОМИ (ВИПРАВЛЕНО)
+        //  🏪 РИНОК ТІЛЬКИ ДЛЯ ТИТУЛІВ
         // ============================================================
         function listMarketItemHoma() {
             const select = document.getElementById('marketItemSelect');
             const priceInput = document.getElementById('marketPriceInputHoma');
-            const itemType = document.getElementById('marketItemTypeSelect').value;
-            const itemId = select?.value;
+            const titleId = select?.value;
             const price = parseFloat(priceInput?.value);
             
-            if (!itemId) { toast('Виберіть предмет'); return; }
+            if (!titleId) { toast('Виберіть титул'); return; }
             if (!price || price <= 0) { toast('Введіть ціну >0'); return; }
             
-            // Перевіряємо чи є предмет у гравця
-            if (itemType === 'gif') {
-                if (!hasGif(itemId) || getGifCount(itemId) < 1) {
-                    toast('❌ У вас немає цієї гіфки');
-                    return;
-                }
-                removeGif(itemId, 1);
-            } else if (itemType === 'title') {
-                if (!hasTitle(itemId) || G.ownedTitles[itemId] < 1) {
-                    toast('❌ У вас немає цього титулу');
-                    return;
-                }
-                removeTitle(itemId, 1);
-            } else if (itemType === 'chest') {
-                if (!G.chests[itemId] || G.chests[itemId] < 1) {
-                    toast('❌ У вас немає цього ящика');
-                    return;
-                }
-                G.chests[itemId]--;
-                if (G.chests[itemId] <= 0) delete G.chests[itemId];
-            } else if (itemType === 'eventHoma') {
-                if (G.eventHoma < 1) {
-                    toast('❌ У вас немає Івенхомів');
-                    return;
-                }
-                G.eventHoma -= 1;
+            // Перевіряємо чи є титул у гравця
+            if (!hasTitle(titleId) || G.ownedTitles[titleId] < 1) {
+                toast('❌ У вас немає цього титулу');
+                return;
             }
             
+            // Знімаємо титул з гравця
+            removeTitle(titleId, 1);
+            
             G.marketListings.push({
-                itemType: itemType,
-                itemId: itemId,
+                itemType: 'title',
+                itemId: titleId,
                 price: price,
                 seller: G.name,
                 sellerId: G.uid,
                 time: Date.now()
             });
             
-            toast('✅ Лот виставлено на ринок за 🟣 ' + price);
+            toast('✅ Титул виставлено на ринок за 🟣 ' + price);
             saveGame();
             renderMarketTab();
             updateUI();
@@ -2318,16 +2298,10 @@
             
             G.homa -= item.price;
             
-            if (item.itemType === 'gif') {
-                addGif(item.itemId, 1);
-            } else if (item.itemType === 'title') {
-                addTitle(item.itemId, 1);
-            } else if (item.itemType === 'chest') {
-                G.chests[item.itemId] = (G.chests[item.itemId] || 0) + 1;
-            } else if (item.itemType === 'eventHoma') {
-                G.eventHoma += 1;
-            }
+            // Даємо титул покупцю
+            addTitle(item.itemId, 1);
             
+            // Даємо Хоми продавцю (з комісією 10%)
             const sellerGain = Math.floor(item.price * 0.9);
             if (item.sellerId && item.sellerId !== G.uid) {
                 db.ref('users/' + item.sellerId + '/homa').set(firebase.database.ServerValue.increment(sellerGain));
@@ -2345,15 +2319,8 @@
             if (!item) { toast('Лот вже продано'); return; }
             if (item.sellerId !== G.uid) { toast('Це не ваш лот'); return; }
             
-            if (item.itemType === 'gif') {
-                addGif(item.itemId, 1);
-            } else if (item.itemType === 'title') {
-                addTitle(item.itemId, 1);
-            } else if (item.itemType === 'chest') {
-                G.chests[item.itemId] = (G.chests[item.itemId] || 0) + 1;
-            } else if (item.itemType === 'eventHoma') {
-                G.eventHoma += 1;
-            }
+            // Повертаємо титул продавцю
+            addTitle(item.itemId, 1);
             
             G.marketListings.splice(idx, 1);
             toast('✅ Лот скасовано');
@@ -2369,31 +2336,14 @@
             const el = document.getElementById('shop-inner');
             if (!el) return;
 
-            const offerSelect = document.getElementById('marketItemSelect');
-            const itemType = document.getElementById('marketItemTypeSelect')?.value || 'gif';
-            
-            let itemsHtml = '<option value="">Виберіть предмет...</option>';
-            if (itemType === 'gif') {
-                Object.entries(G.ownedGifs).forEach(([id, count]) => {
-                    if (count > 0) itemsHtml += `<option value="${id}">${id} (x${count})</option>`;
-                });
-            } else if (itemType === 'title') {
-                Object.entries(G.ownedTitles).forEach(([id, count]) => {
-                    if (count > 0 && id !== 'none') {
-                        const t = TITLES[id] || { name: id };
-                        itemsHtml += `<option value="${id}">${t.name} (x${count})</option>`;
-                    }
-                });
-            } else if (itemType === 'chest') {
-                Object.entries(G.chests).forEach(([id, count]) => {
-                    if (count > 0) {
-                        const box = BOXES.find(b => b.id === id);
-                        itemsHtml += `<option value="${id}">${box?.name || id} (x${count})</option>`;
-                    }
-                });
-            } else if (itemType === 'eventHoma') {
-                if (G.eventHoma > 0) itemsHtml += `<option value="eventHoma">Івенхоми (${G.eventHoma.toFixed(2)})</option>`;
-            }
+            // Список титулів для продажу
+            let itemsHtml = '<option value="">Виберіть титул...</option>';
+            Object.entries(G.ownedTitles).forEach(([id, count]) => {
+                if (count > 0 && id !== 'none') {
+                    const t = TITLES[id] || { name: id };
+                    itemsHtml += `<option value="${id}">${t.name} (x${count})</option>`;
+                }
+            });
 
             let listingsHtml = '';
             if (G.marketListings.length === 0) {
@@ -2401,21 +2351,12 @@
             } else {
                 G.marketListings.forEach((item, idx) => {
                     const isOwn = item.sellerId === G.uid;
-                    const typeNames = {
-                        'gif': '🎨 Гіфка',
-                        'title': '🏅 Титул',
-                        'chest': '📦 Ящик',
-                        'eventHoma': '🌸 Івенхоми'
-                    };
-                    const itemDisplay = item.itemType === 'gif' ? item.itemId :
-                        item.itemType === 'title' ? (TITLES[item.itemId]?.name || item.itemId) :
-                        item.itemType === 'chest' ? (BOXES.find(b => b.id === item.itemId)?.name || item.itemId) :
-                        'Івенхоми';
+                    const titleDisplay = TITLES[item.itemId]?.name || item.itemId;
                     
                     listingsHtml += `
                         <div class="market-item" style="${isOwn ? 'border-color:var(--gold);' : ''}">
                             <div class="info">
-                                <div class="name">${typeNames[item.itemType]} ${itemDisplay}</div>
+                                <div class="name">🏅 ${titleDisplay}</div>
                                 <div class="desc">${item.seller} • ${new Date(item.time).toLocaleString()}</div>
                             </div>
                             <div class="price">🟣 ${item.price}</div>
@@ -2429,19 +2370,13 @@
             }
 
             el.innerHTML = `
-                <div class="card"><div class="card-title">🏪 РИНОК (торгівля за 🟣 Хоми)</div>
-                <div style="font-size:6px;color:var(--text-secondary);margin-bottom:6px;">Продавайте та купуйте: 🎨 Гіфки, 🏅 Титули, 📦 Ящики, 🌸 Івенхоми</div>
+                <div class="card"><div class="card-title">🏪 РИНОК ТИТУЛІВ (торгівля за 🟣 Хоми)</div>
+                <div style="font-size:6px;color:var(--text-secondary);margin-bottom:6px;">Продавайте та купуйте 🏅 титули!</div>
                 </div>
 
-                <div class="card"><div class="card-title">📤 Виставити на продаж</div>
+                <div class="card"><div class="card-title">📤 Виставити титул на продаж</div>
                 <div class="flex" style="margin-bottom:4px;">
-                    <select id="marketItemTypeSelect" style="flex:1;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:3px;border-radius:var(--radius);font-size:6px;outline:none;" onchange="renderMarketTab()">
-                        <option value="gif">🎨 Гіфка</option>
-                        <option value="title">🏅 Титул</option>
-                        <option value="chest">📦 Ящик</option>
-                        <option value="eventHoma">🌸 Івенхоми</option>
-                    </select>
-                    <select id="marketItemSelect" style="flex:2;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:3px;border-radius:var(--radius);font-size:6px;outline:none;margin-left:2px;">
+                    <select id="marketItemSelect" style="flex:2;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:3px;border-radius:var(--radius);font-size:6px;outline:none;">
                         ${itemsHtml}
                     </select>
                 </div>
@@ -2457,11 +2392,6 @@
                 ${listingsHtml}
                 </div>
             `;
-
-            const typeSelect = document.getElementById('marketItemTypeSelect');
-            if (typeSelect) {
-                typeSelect.onchange = renderMarketTab;
-            }
         }
 
         // ============================================================
@@ -4027,9 +3957,9 @@
         }
 
         console.log('🐹 Hamka — Сезон 2');
+        console.log('✅ Ринок ТІЛЬКИ для ТИТУЛІВ 🏅');
         console.log('✅ XP Бустер коштує 1000💰');
         console.log('✅ МАКСИМАЛЬНА УДАЧА +30%');
-        console.log('✅ Ринок за Хоми: 🎨 Гіфки, 🏅 Титули, 📦 Ящики, 🌸 Івенхоми');
         console.log('✅ Комісія 10% при продажу');
         console.log('✅ Топ-3: Король, Паладин, Хомяк');
         console.log('✅ Анти-автоклікер: 1200 тапів/хв');
