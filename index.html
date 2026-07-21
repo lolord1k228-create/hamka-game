@@ -1555,7 +1555,7 @@
         };
 
         // ============================================================
-        //  🔧 ДОПОМІЖНІ ФУНКЦІЇ (МАКС УДАЧА +30%)
+        //  🔧 ДОПОМІЖНІ ФУНКЦІЇ
         // ============================================================
         function rand(a, b) { return Math.floor(Math.random() * (b - a + 1)) + a; }
 
@@ -1608,9 +1608,7 @@
             return Math.floor(inc);
         }
 
-        // УДАЧА - МАКСИМУМ +30%
         function getLuckBonus() {
-            // Максимальна удача +30% (0.3)
             return Math.min(G.luck - 1, 0.3);
         }
 
@@ -1965,7 +1963,6 @@
                 icon.style.animation = 'chestShake 0.5s ease';
             }, 10);
 
-            // Додаткові дропи з ящиків з удачею
             const extraDrop = Math.random() - luckBonus * 0.1;
             if (extraDrop < 0.20) {
                 const g = GIFS[rand(0, GIFS.length - 1)];
@@ -2259,7 +2256,7 @@
         }
 
         // ============================================================
-        //  🏪 РИНОК ЗА ХОМИ
+        //  🏪 РИНОК ЗА ХОМИ (ВИПРАВЛЕНО)
         // ============================================================
         function listMarketItemHoma() {
             const select = document.getElementById('marketItemSelect');
@@ -2271,6 +2268,7 @@
             if (!itemId) { toast('Виберіть предмет'); return; }
             if (!price || price <= 0) { toast('Введіть ціну >0'); return; }
             
+            // Перевіряємо чи є предмет у гравця
             if (itemType === 'gif') {
                 if (!hasGif(itemId) || getGifCount(itemId) < 1) {
                     toast('❌ У вас немає цієї гіфки');
@@ -2504,7 +2502,7 @@
                 el.innerHTML = `
                     <div class="card"><div class="flex"><b>⚡ Енергія +50</b> <span style="color:var(--gold);">${getPriceCoin('maxEnergy')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItemCoin('maxEnergy')">Купити</button></div></div>
                     <div class="card"><div class="flex"><b>✨ Авто XP</b> <span style="color:var(--gold);">${getPriceCoin('autoXP')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItemCoin('autoXP')">Купити</button></div></div>
-                    <div class="card"><div class="flex"><b>🚀 XP Бустер</b> <span style="color:var(--gold);">300💰</span> <button class="btn btn-g btn-sm" onclick="buyItemCoin('xpBoost')">Купити</button></div></div>
+                    <div class="card"><div class="flex"><b>🚀 XP Бустер</b> <span style="color:var(--gold);">1000💰</span> <button class="btn btn-g btn-sm" onclick="buyItemCoin('xpBoost')">Купити</button></div></div>
                     <div class="card"><div class="flex"><b>⚡ Авто тап</b> <span style="color:var(--gold);">${getPriceCoin('autoTap')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItemCoin('autoTap')">Купити</button></div></div>
                     <div class="card"><div class="flex"><b>🔄 Регенерація +1</b> <span style="color:var(--gold);">${getPriceCoin('energyRegen')}💰</span> <button class="btn btn-g btn-sm" onclick="buyItemCoin('energyRegen')">Купити</button></div></div>
                     <div class="card"><div class="flex"><b>🟣 Купити Хоми</b> <span><button class="btn btn-g btn-sm" onclick="buyHoma(1)">1</button> <button class="btn btn-g btn-sm" onclick="buyHoma(5)">5</button> <button class="btn btn-g btn-sm" onclick="buyHoma(10)">10</button></span></div></div>
@@ -2606,7 +2604,7 @@
         }
 
         // ============================================================
-        //  🧰 АПГРЕЙДЕР (без гіфок та титулів)
+        //  🧰 АПГРЕЙДЕР
         // ============================================================
         function renderUpgrader() {
             const inItem = G.selectedItemIn ? UPGRADE_ITEMS.find(i => i.id === G.selectedItemIn) : null;
@@ -4029,10 +4027,10 @@
         }
 
         console.log('🐹 Hamka — Сезон 2');
+        console.log('✅ XP Бустер коштує 1000💰');
         console.log('✅ МАКСИМАЛЬНА УДАЧА +30%');
         console.log('✅ Ринок за Хоми: 🎨 Гіфки, 🏅 Титули, 📦 Ящики, 🌸 Івенхоми');
         console.log('✅ Комісія 10% при продажу');
-        console.log('✅ Нові ціни на титули');
         console.log('✅ Топ-3: Король, Паладин, Хомяк');
         console.log('✅ Анти-автоклікер: 1200 тапів/хв');
     </script>
