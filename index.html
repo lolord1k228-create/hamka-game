@@ -2256,125 +2256,228 @@
         }
 
         // ============================================================
-        //  🏪 РИНОК ТІЛЬКИ ДЛЯ ТИТУЛІВ
+        //  🏪 ГЛОБАЛЬНИЙ РИНОК (у Firebase)
         // ============================================================
-        function listMarketItemHoma() {
+
+        // Функція для отримання всіх лотів з Firebase
+        function getMarketListings() {
+            return new Promise((resolve) => {
+                if (!db) {
+                    resolve([]);
+                    return;
+                }
+                db.ref('global/market').once('value').then(snap => {
+                    const data = snap.val();
+                    if (data) {
+                        // Перетворюємо об'єкт на масив
+                        const listings = Object.keys(data).map(key => ({
+                            id: key,
+                            ...data[key]
+                        }));
+                        resolve(listings);
+                    } else {
+                        resolve([]);
+                    }
+                }).catch(() => resolve([]));
+            });
+        }
+
+        // Функція для додавання лота на глобальний ринок
+        function listMarketItem() {
             const select = document.getElementById('marketItemSelect');
-            const priceInput = document.getElementById('marketPriceInputHoma');
-            const titleId = select?.value;
+            const priceInput = document.getElementById('marketPriceInput');
+            const type = select?.value;
             const price = parseFloat(priceInput?.value);
             
-            if (!titleId) { toast('Виберіть титул'); return; }
+            if (!type) { toast('Виберіть предмет'); return; }
             if (!price || price <= 0) { toast('Введіть ціну >0'); return; }
-            
-            // Перевіряємо чи є титул у гравця
-            if (!hasTitle(titleId) || G.ownedTitles[titleId] < 1) {
-                toast('❌ У вас немає цього титулу');
+            if (!G.uid) { toast('Увійдіть в акаунт'); return; }
+
+            // Перевіряємо чи є предмет у гравця
+            let found = false;
+            let itemType = '';
+            let itemId = '';
+            let itemDisplay = '';
+
+            // Перевіряємо гіфки
+            if (type.startsWith('gif_')) {
+                const id = type.replace('gif_', '');
+                if (hasGif(id) && G.ownedGifs[id] > 0) {
+                    found = true;
+                    itemType = 'gif';
+                    itemId = id;
+                    itemDisplay = `🎨 ${id}`;
+                    removeGif(id, 1);
+                }
+            }
+            // Перевіряємо титули
+            else if (type.startsWith('title_')) {
+                const id = type.replace('title_', '');
+                if (hasTitle(id) && G.ownedTitles[id] > 0 && id !== 'none') {
+                    found = true;
+                    itemType = 'title';
+                    itemId = id;
+                    const t = TITLES[id] || { name: id };
+                    itemDisplay = `🏅 ${t.name}`;
+                    removeTitle(id, 1);
+                }
+            }
+            // Перевіряємо ящики
+            else if (type.startsWith('chest_')) {
+                const id = type.replace('chest_', '');
+                if (G.chests[id] && G.chests[id] > 0) {
+                    found = true;
+                    itemType = 'chest';
+                    itemId = id;
+                    const box = BOXES.find(b => b.id === id);
+                    itemDisplay = `📦 ${box?.name || id}`;
+                    G.chests[id]--;
+                    if (G.chests[id] === 0) delete G.chests[id];
+                }
+            }
+
+            if (!found) {
+                toast('❌ У вас немає цього предмета');
                 return;
             }
-            
-            // Знімаємо титул з гравця
-            removeTitle(titleId, 1);
-            
-            G.marketListings.push({
-                itemType: 'title',
-                itemId: titleId,
+
+            // Зберігаємо лот у Firebase
+            const listingRef = db.ref('global/market').push();
+            listingRef.set({
+                itemType: itemType,
+                itemId: itemId,
+                itemDisplay: itemDisplay,
                 price: price,
                 seller: G.name,
                 sellerId: G.uid,
                 time: Date.now()
+            }).then(() => {
+                toast(`✅ ${itemDisplay} виставлено на ринок за 🟣 ${price}`);
+                saveGame();
+                renderMarketTab();
+                updateUI();
+            }).catch(e => {
+                toast('❌ Помилка збереження: ' + e.message);
+                // Повертаємо предмет
+                if (itemType === 'gif') addGif(itemId, 1);
+                else if (itemType === 'title') addTitle(itemId, 1);
+                else if (itemType === 'chest') G.chests[itemId] = (G.chests[itemId] || 0) + 1;
             });
-            
-            toast('✅ Титул виставлено на ринок за 🟣 ' + price);
-            saveGame();
-            renderMarketTab();
-            updateUI();
         }
 
-        function buyMarketItemHoma(idx) {
-            const item = G.marketListings[idx];
-            if (!item) { toast('Лот вже продано'); return; }
-            if (G.homa < item.price) { toast(`❌ Потрібно ${item.price}🟣`); return; }
+        // Функція для покупки лота
+        function buyMarketItem(itemId) {
+            if (!G.uid) { toast('Увійдіть в акаунт'); return; }
             
-            G.homa -= item.price;
-            
-            // Даємо титул покупцю
-            addTitle(item.itemId, 1);
-            
-            // Даємо Хоми продавцю (з комісією 10%)
-            const sellerGain = Math.floor(item.price * 0.9);
-            if (item.sellerId && item.sellerId !== G.uid) {
-                db.ref('users/' + item.sellerId + '/homa').set(firebase.database.ServerValue.increment(sellerGain));
-            }
-            
-            G.marketListings.splice(idx, 1);
-            toast(`✅ Куплено за ${item.price}🟣 (комісія 10%)`);
-            saveGame();
-            renderMarketTab();
-            updateUI();
+            db.ref('global/market/' + itemId).once('value').then(snap => {
+                const item = snap.val();
+                if (!item) { toast('Лот вже продано'); return; }
+                if (G.homa < item.price) { toast(`❌ Потрібно ${item.price}🟣`); return; }
+                if (item.sellerId === G.uid) { toast('❌ Не можна купити свій лот'); return; }
+
+                G.homa -= item.price;
+
+                // Даємо предмет покупцю
+                if (item.itemType === 'gif') {
+                    addGif(item.itemId, 1);
+                } else if (item.itemType === 'title') {
+                    addTitle(item.itemId, 1);
+                } else if (item.itemType === 'chest') {
+                    G.chests[item.itemId] = (G.chests[item.itemId] || 0) + 1;
+                }
+
+                // Даємо Хоми продавцю (з комісією 10%)
+                const sellerGain = Math.floor(item.price * 0.9);
+                if (item.sellerId) {
+                    db.ref('users/' + item.sellerId + '/homa').set(firebase.database.ServerValue.increment(sellerGain));
+                }
+
+                // Видаляємо лот
+                db.ref('global/market/' + itemId).remove().then(() => {
+                    toast(`✅ Куплено за ${item.price}🟣 (комісія 10%)`);
+                    saveGame();
+                    renderMarketTab();
+                    updateUI();
+                }).catch(e => {
+                    toast('❌ Помилка: ' + e.message);
+                    // Повертаємо гроші покупцю
+                    G.homa += item.price;
+                    // Повертаємо предмет
+                    if (item.itemType === 'gif') removeGif(item.itemId, 1);
+                    else if (item.itemType === 'title') removeTitle(item.itemId, 1);
+                    else if (item.itemType === 'chest') G.chests[item.itemId] = (G.chests[item.itemId] || 0) - 1;
+                });
+            }).catch(e => {
+                toast('❌ Помилка: ' + e.message);
+            });
         }
 
-        function cancelMarketListing(idx) {
-            const item = G.marketListings[idx];
-            if (!item) { toast('Лот вже продано'); return; }
-            if (item.sellerId !== G.uid) { toast('Це не ваш лот'); return; }
+        // Функція для скасування лота
+        function cancelMarketListing(itemId) {
+            if (!G.uid) { toast('Увійдіть в акаунт'); return; }
             
-            // Повертаємо титул продавцю
-            addTitle(item.itemId, 1);
-            
-            G.marketListings.splice(idx, 1);
-            toast('✅ Лот скасовано');
-            saveGame();
-            renderMarketTab();
-            updateUI();
+            db.ref('global/market/' + itemId).once('value').then(snap => {
+                const item = snap.val();
+                if (!item) { toast('Лот вже продано'); return; }
+                if (item.sellerId !== G.uid) { toast('Це не ваш лот'); return; }
+
+                // Повертаємо предмет продавцю
+                if (item.itemType === 'gif') {
+                    addGif(item.itemId, 1);
+                } else if (item.itemType === 'title') {
+                    addTitle(item.itemId, 1);
+                } else if (item.itemType === 'chest') {
+                    G.chests[item.itemId] = (G.chests[item.itemId] || 0) + 1;
+                }
+
+                db.ref('global/market/' + itemId).remove().then(() => {
+                    toast('✅ Лот скасовано');
+                    saveGame();
+                    renderMarketTab();
+                    updateUI();
+                });
+            });
         }
 
         // ============================================================
-        //  🏪 РИНОК (вкладка)
+        //  🏪 РИНОК (оновлена вкладка)
         // ============================================================
         function renderMarketTab() {
             const el = document.getElementById('shop-inner');
             if (!el) return;
 
-            // Список титулів для продажу
-            let itemsHtml = '<option value="">Виберіть титул...</option>';
+            // Список предметів для продажу
+            let itemsHtml = '<option value="">Виберіть предмет...</option>';
+            
+            // Гіфки
+            Object.entries(G.ownedGifs).forEach(([id, count]) => {
+                if (count > 0) {
+                    itemsHtml += `<option value="gif_${id}">🎨 ${id} (x${count})</option>`;
+                }
+            });
+            
+            // Титули
             Object.entries(G.ownedTitles).forEach(([id, count]) => {
                 if (count > 0 && id !== 'none') {
                     const t = TITLES[id] || { name: id };
-                    itemsHtml += `<option value="${id}">${t.name} (x${count})</option>`;
+                    itemsHtml += `<option value="title_${id}">🏅 ${t.name} (x${count})</option>`;
+                }
+            });
+            
+            // Ящики
+            Object.entries(G.chests).forEach(([id, count]) => {
+                if (count > 0) {
+                    const box = BOXES.find(b => b.id === id);
+                    itemsHtml += `<option value="chest_${id}">📦 ${box?.name || id} (x${count})</option>`;
                 }
             });
 
-            let listingsHtml = '';
-            if (G.marketListings.length === 0) {
-                listingsHtml = '<p style="color:var(--text-secondary);font-size:7px;padding:4px;">Немає активних лотів</p>';
-            } else {
-                G.marketListings.forEach((item, idx) => {
-                    const isOwn = item.sellerId === G.uid;
-                    const titleDisplay = TITLES[item.itemId]?.name || item.itemId;
-                    
-                    listingsHtml += `
-                        <div class="market-item" style="${isOwn ? 'border-color:var(--gold);' : ''}">
-                            <div class="info">
-                                <div class="name">🏅 ${titleDisplay}</div>
-                                <div class="desc">${item.seller} • ${new Date(item.time).toLocaleString()}</div>
-                            </div>
-                            <div class="price">🟣 ${item.price}</div>
-                            <div>
-                                ${!isOwn ? `<button class="btn btn-g btn-sm" onclick="buyMarketItemHoma(${idx})">Купити</button>` : 
-                                `<button class="btn btn-r btn-sm" onclick="cancelMarketListing(${idx})">Скасувати</button>`}
-                            </div>
-                        </div>
-                    `;
-                });
-            }
-
             el.innerHTML = `
-                <div class="card"><div class="card-title">🏪 РИНОК ТИТУЛІВ (торгівля за 🟣 Хоми)</div>
-                <div style="font-size:6px;color:var(--text-secondary);margin-bottom:6px;">Продавайте та купуйте 🏅 титули!</div>
+                <div class="card"><div class="card-title">🏪 ГЛОБАЛЬНИЙ РИНОК</div>
+                <div style="font-size:6px;color:var(--text-secondary);margin-bottom:6px;">🎨 Гіфки · 🏅 Титули · 📦 Ящики — всі лоти видно всім гравцям!</div>
                 </div>
 
-                <div class="card"><div class="card-title">📤 Виставити титул на продаж</div>
+                <div class="card"><div class="card-title">📤 Виставити предмет на продаж</div>
                 <div class="flex" style="margin-bottom:4px;">
                     <select id="marketItemSelect" style="flex:2;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:3px;border-radius:var(--radius);font-size:6px;outline:none;">
                         ${itemsHtml}
@@ -2382,16 +2485,58 @@
                 </div>
                 <div class="flex" style="margin-bottom:4px;">
                     <span style="font-size:6px;">Ціна в 🟣:</span>
-                    <input type="number" id="marketPriceInputHoma" placeholder="Ціна" style="flex:1;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:3px;border-radius:var(--radius);font-size:6px;text-align:center;outline:none;">
-                    <button class="btn btn-g btn-sm" onclick="listMarketItemHoma()">📤 Продати</button>
+                    <input type="number" id="marketPriceInput" placeholder="Ціна" style="flex:1;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:3px;border-radius:var(--radius);font-size:6px;text-align:center;outline:none;">
+                    <button class="btn btn-g btn-sm" onclick="listMarketItem()">📤 Продати</button>
                 </div>
                 <div style="font-size:5px;color:var(--text-secondary);">💡 Комісія 10% при продажу</div>
                 </div>
 
                 <div class="card"><div class="card-title">📋 Активні лоти</div>
-                ${listingsHtml}
+                <div id="marketListings" style="min-height:40px;">
+                    <p style="color:var(--text-secondary);font-size:6px;padding:4px;text-align:center;">⏳ Завантаження...</p>
+                </div>
                 </div>
             `;
+
+            // Завантажуємо лоти з Firebase
+            getMarketListings().then(listings => {
+                const container = document.getElementById('marketListings');
+                if (!container) return;
+                
+                if (listings.length === 0) {
+                    container.innerHTML = '<p style="color:var(--text-secondary);font-size:7px;padding:4px;text-align:center;">Немає активних лотів</p>';
+                    return;
+                }
+
+                // Сортуємо за часом (новіші зверху)
+                listings.sort((a, b) => b.time - a.time);
+
+                let html = '';
+                listings.forEach(item => {
+                    const isOwn = item.sellerId === G.uid;
+                    const timeStr = new Date(item.time).toLocaleString();
+                    
+                    html += `
+                        <div class="market-item" style="${isOwn ? 'border-color:var(--gold);' : ''}">
+                            <div class="info">
+                                <div class="name">${item.itemDisplay || '❓'}</div>
+                                <div class="desc">${item.seller} • ${timeStr}</div>
+                            </div>
+                            <div class="price">🟣 ${item.price}</div>
+                            <div>
+                                ${!isOwn ? `<button class="btn btn-g btn-sm" onclick="buyMarketItem('${item.id}')">Купити</button>` : 
+                                `<button class="btn btn-r btn-sm" onclick="cancelMarketListing('${item.id}')">Скасувати</button>`}
+                            </div>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            }).catch(e => {
+                const container = document.getElementById('marketListings');
+                if (container) {
+                    container.innerHTML = '<p style="color:var(--text-secondary);font-size:6px;padding:4px;text-align:center;">❌ Помилка завантаження ринку</p>';
+                }
+            });
         }
 
         // ============================================================
@@ -3957,7 +4102,7 @@
         }
 
         console.log('🐹 Hamka — Сезон 2');
-        console.log('✅ Ринок ТІЛЬКИ для ТИТУЛІВ 🏅');
+        console.log('✅ ГЛОБАЛЬНИЙ РИНОК — всі лоти видно всім гравцям! 🎨🏅📦');
         console.log('✅ XP Бустер коштує 1000💰');
         console.log('✅ МАКСИМАЛЬНА УДАЧА +30%');
         console.log('✅ Комісія 10% при продажу');
