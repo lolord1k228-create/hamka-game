@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Hamka Game</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <!-- AdsGram SDK -->
   <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -251,7 +250,6 @@
       margin-top: 8px; padding: 4px 16px; border-radius: 20px;
       font-size: 12px; font-weight: 700; color: #fff;
       box-shadow: 0 0 10px rgba(138, 43, 226, 0.5);
-      /* Колір задається через JS */
     }
     
     .profile-stats {
@@ -711,7 +709,6 @@
     const tg = window.Telegram.WebApp;
     try { tg.expand(); tg.ready(); } catch(e) {}
 
-    // === ADSGRAM INIT (ВИПРАВЛЕНО) ===
     let AdController = null;
 
     // === DOM ===
@@ -810,12 +807,10 @@
 
     const GITHUB_RAW = "https://raw.githubusercontent.com/lolord1k228-create/Hamkatest/main/skins/";
 
-    // === Глобальні дані (завантажуються з Firebase) ===
     let TITLES = [];
     let AVATARS = [];
     let SKINS = [];
 
-    // === Рівні ===
     const LEVELS = [
       { name: '0 початківець', xp: 0 },
       { name: '1 початківець', xp: 50 },
@@ -991,17 +986,12 @@
         authScreen.classList.add('hidden');
         gameScreen.classList.add('visible');
         
-        // === ІНІЦІАЛІЗАЦІЯ РЕКЛАМИ (ВИПРАВЛЕНО) ===
-        // Робимо це ТУТ, коли гра вже завантажена і вікно готове
         if (typeof window.Adsgram !== 'undefined') {
           try {
             AdController = window.Adsgram.init({ blockId: "59759" });
-            console.log("Adsgram initialized");
           } catch (e) {
             console.error("Adsgram init error:", e);
           }
-        } else {
-          console.warn("Adsgram SDK not loaded");
         }
 
         loadGameData().then(() => {
@@ -1485,7 +1475,6 @@
       }
     }
 
-    // === Перевірка нагороди за 100 переглядів ===
     function checkAdReward() {
       if (state.adWatches >= 100 && !state.purchasedTitles.includes("Час на вітер")) {
         update(ref(db, 'users/' + currentUid), {
@@ -1528,7 +1517,6 @@
       const lvlProgress = nextLvl.xp === currentLvl.xp ? 100 : ((state.xp - currentLvl.xp) / (nextLvl.xp - currentLvl.xp)) * 100;
       xpBar.style.width = Math.min(100, Math.max(0, lvlProgress)) + '%';
 
-      // Оновлення прогресу реклами
       adWatchCount.innerText = `${state.adWatches} / 100`;
       adProgressBar.style.width = Math.min(100, (state.adWatches / 100) * 100) + '%';
     }
@@ -1544,10 +1532,10 @@
         const grid = document.createElement('div');
         grid.className = 'shop-grid';
 
-        // Додаємо титули
+        // Титули (тільки ті, що купуються за монети)
         TITLES.forEach(item => {
-          if (item.price <= 0 && item.reqPrestige === 0) return;
-          const isOwned = state.purchasedTitles.includes(item.name) || state.prestige >= item.reqPrestige;
+          if (item.price <= 0) return; // Пропускаємо ті, що за престиж
+          const isOwned = state.purchasedTitles.includes(item.name);
 
           const card = document.createElement('div');
           card.className = 'shop-card';
@@ -1555,7 +1543,7 @@
             <div class="grid-preview" style="font-size:24px; background:${item.color};">🏆</div>
             <div class="shop-card-info">
               <div class="shop-card-title" style="background:${item.color}; -webkit-background-clip:text; -webkit-text-fill-color:transparent;">${item.name}</div>
-              <div class="shop-card-price">${item.price > 0 ? formatNumber(item.price) + ' 🪙' : 'За престиж'}</div>
+              <div class="shop-card-price">${formatNumber(item.price)} 🪙</div>
             </div>
             <button class="shop-card-btn" data-title-name="${item.name}" ${isOwned ? 'disabled' : ''}>
               ${isOwned ? 'Куплено' : 'Купити'}
@@ -1564,7 +1552,7 @@
           grid.appendChild(card);
         });
 
-        // Додаємо аватарки
+        // Аватарки
         AVATARS.forEach(item => {
           const isOwned = state.purchasedAvatars.includes(item.name);
 
@@ -1583,7 +1571,7 @@
           grid.appendChild(card);
         });
 
-        // Додаємо скіни
+        // Скіни
         SKINS.forEach(item => {
           const isOwned = state.purchasedSkins.includes(item.id);
 
@@ -1858,7 +1846,6 @@
         prestigeInfo.innerText = `Потрібно ${formatNumber(req)} XP (у вас ${formatNumber(state.xp)})`;
       }
       
-      // Оновлюємо прогрес реклами
       adWatchCount.innerText = `${state.adWatches} / 100`;
       adProgressBar.style.width = Math.min(100, (state.adWatches / 100) * 100) + '%';
     }
@@ -2098,46 +2085,100 @@
       const info = cryptoState[symbol];
       if (!info) return;
 
-      const price = info.price;
       const userRef = ref(db, 'users/' + currentUid);
 
       try {
         let success = false;
         let errorMsg = '';
         let finalTotal = 0;
+        let newPrice = 0;
 
-        await runTransaction(userRef, (data) => {
-          if (!data) return data;
-          if (!data.holdings) data.holdings = {};
-
-          if (action === 'buy') {
-            const buyPrice = price * (1 + CRYPTO_FEE);
-            const total = buyPrice * qty;
-            if ((data.coins || 0) < total) { errorMsg = 'Недостатньо монет'; return; }
-            data.coins = (data.coins || 0) - total;
-            data.holdings[symbol] = (data.holdings[symbol] || 0) + qty;
-            finalTotal = total;
-            success = true;
-          } else {
-            const sellPrice = price * (1 - CRYPTO_FEE);
-            const total = sellPrice * qty;
-            const owned = data.holdings[symbol] || 0;
-            if (owned < qty) { errorMsg = `У вас лише ${owned} ${symbol}`; return; }
-            data.coins = (data.coins || 0) + total;
-            data.holdings[symbol] = owned - qty;
-            finalTotal = total;
-            success = true;
+        // Для PLAYERHOM використовуємо спеціальну логіку
+        if (symbol === 'PLAYERHOM') {
+          // Отримуємо всіх користувачів
+          const usersSnap = await get(ref(db, 'users'));
+          const allUsers = usersSnap.val() || {};
+          let globalHoldings = 0;
+          for (const u in allUsers) {
+            globalHoldings += allUsers[u]?.holdings?.PLAYERHOM || 0;
           }
-          return data;
-        });
+
+          // Розраховуємо нову ціну для кожної монети
+          let currentPrice = PLAYERHOM_BASE + globalHoldings * PLAYERHOM_PER_UNIT;
+          
+          if (action === 'buy') {
+            for (let i = 0; i < qty; i++) {
+              finalTotal += currentPrice * (1 + CRYPTO_FEE);
+              currentPrice += PLAYERHOM_PER_UNIT; // Наступна монета дорожча
+            }
+          } else {
+            for (let i = 0; i < qty; i++) {
+              finalTotal += currentPrice * (1 - CRYPTO_FEE);
+              currentPrice -= PLAYERHOM_PER_UNIT; // Наступна монета дешевша
+              if (currentPrice < PLAYERHOM_BASE) currentPrice = PLAYERHOM_BASE;
+            }
+          }
+
+          newPrice = currentPrice;
+
+          // Виконуємо транзакцію
+          await runTransaction(userRef, (data) => {
+            if (!data) return data;
+            if (!data.holdings) data.holdings = {};
+
+            if (action === 'buy') {
+              if ((data.coins || 0) < finalTotal) { errorMsg = 'Недостатньо монет'; return; }
+              data.coins = (data.coins || 0) - finalTotal;
+              data.holdings[symbol] = (data.holdings[symbol] || 0) + qty;
+            } else {
+              const owned = data.holdings[symbol] || 0;
+              if (owned < qty) { errorMsg = `У вас лише ${owned} ${symbol}`; return; }
+              data.coins = (data.coins || 0) + finalTotal;
+              data.holdings[symbol] = owned - qty;
+            }
+            success = true;
+            return data;
+          });
+
+          if (success) {
+            // Оновлюємо ціну PLAYERHOM у базі
+            await update(ref(db, 'crypto/PLAYERHOM'), {
+              price: newPrice,
+              history: [...(cryptoState.PLAYERHOM?.history || []), { t: Date.now(), p: newPrice }].slice(-30)
+            });
+          }
+
+        } else {
+          // Для інших монет звичайна логіка (фіксована ціна)
+          const price = info.price;
+          const total = price * qty;
+
+          await runTransaction(userRef, (data) => {
+            if (!data) return data;
+            if (!data.holdings) data.holdings = {};
+
+            if (action === 'buy') {
+              if ((data.coins || 0) < total) { errorMsg = 'Недостатньо монет'; return; }
+              data.coins = (data.coins || 0) - total;
+              data.holdings[symbol] = (data.holdings[symbol] || 0) + qty;
+              finalTotal = total;
+            } else {
+              const owned = data.holdings[symbol] || 0;
+              if (owned < qty) { errorMsg = `У вас лише ${owned} ${symbol}`; return; }
+              data.coins = (data.coins || 0) + total;
+              data.holdings[symbol] = owned - qty;
+              finalTotal = total;
+            }
+            success = true;
+            return data;
+          });
+        }
 
         if (!success) { showStatus("❌ " + (errorMsg || "Помилка")); return; }
 
-        if (symbol === 'PLAYERHOM') await recalcPlayerhomPrice();
-
         showStatus(action === 'buy'
-          ? `✅ Куплено ${qty} ${symbol} за ${formatPrice(finalTotal)} 🪙 (комісія 2%)`
-          : `✅ Продано ${qty} ${symbol} за ${formatPrice(finalTotal)} 🪙 (комісія 2%)`);
+          ? `✅ Куплено ${qty} ${symbol} за ${formatPrice(finalTotal)} 🪙`
+          : `✅ Продано ${qty} ${symbol} за ${formatPrice(finalTotal)} 🪙`);
 
         try { tg.HapticFeedback.notificationOccurred('success'); } catch(e) {}
       } catch (err) {
@@ -2146,7 +2187,7 @@
       }
     }
 
-    // === ОБРОБНИК РЕКЛАМИ (ВИПРАВЛЕНО) ===
+    // === ОБРОБНИК РЕКЛАМИ ===
     document.getElementById('btn-watch-ad').addEventListener('click', async () => {
       const btn = document.getElementById('btn-watch-ad');
       btn.disabled = true;
@@ -2154,18 +2195,15 @@
 
       try {
         if (!AdController) {
-          throw new Error("AdController is not initialized. Check Adsgram SDK.");
+          throw new Error("AdController is not initialized.");
         }
         
-        // Показуємо рекламу
         const result = await AdController.show();
         
-        // Перевіряємо, чи гравець додивився відео
         if (!result || !result.done) {
           throw new Error("Ad was skipped or not completed.");
         }
 
-        // Реклама успішно переглянута
         if (currentUid) {
           let newWatchCount = 0;
           
@@ -2178,7 +2216,6 @@
 
           showStatus(`✅ Перегляд зараховано! (${newWatchCount}/100)`);
           
-          // Перевірка нагороди
           if (newWatchCount >= 100) {
             const userSnap = await get(ref(db, 'users/' + currentUid));
             const userData = userSnap.val();
