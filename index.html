@@ -530,7 +530,7 @@
         </div>
 
         <button class="change-skin-btn" id="btn-open-skin-menu">🎨 Змінити скін</button>
-        <button class="ad-btn" id="btn-watch-ad">🎬 Дивитись рекламу (+1000 🪙)</button>
+        <button class="ad-btn" id="btn-watch-ad">🎬 Дивитись рекламу (+1 до прогресу)</button>
       </div>
 
       <div class="prestige-section">
@@ -711,14 +711,8 @@
     const tg = window.Telegram.WebApp;
     try { tg.expand(); tg.ready(); } catch(e) {}
 
-    // === ADSGRAM INIT ===
-    // Ваш blockId: 59759
+    // === ADSGRAM INIT (ВИПРАВЛЕНО) ===
     let AdController = null;
-    try {
-      AdController = window.Adsgram.init({ blockId: "59759" });
-    } catch(e) {
-      console.warn("Adsgram not loaded");
-    }
 
     // === DOM ===
     const authScreen = document.getElementById('auth-screen');
@@ -997,6 +991,19 @@
         authScreen.classList.add('hidden');
         gameScreen.classList.add('visible');
         
+        // === ІНІЦІАЛІЗАЦІЯ РЕКЛАМИ (ВИПРАВЛЕНО) ===
+        // Робимо це ТУТ, коли гра вже завантажена і вікно готове
+        if (typeof window.Adsgram !== 'undefined') {
+          try {
+            AdController = window.Adsgram.init({ blockId: "59759" });
+            console.log("Adsgram initialized");
+          } catch (e) {
+            console.error("Adsgram init error:", e);
+          }
+        } else {
+          console.warn("Adsgram SDK not loaded");
+        }
+
         loadGameData().then(() => {
           initGame(user.uid);
           initCryptoSystem();
@@ -1481,7 +1488,6 @@
     // === Перевірка нагороди за 100 переглядів ===
     function checkAdReward() {
       if (state.adWatches >= 100 && !state.purchasedTitles.includes("Час на вітер")) {
-        // Додаємо титул "Час на вітер"
         update(ref(db, 'users/' + currentUid), {
           purchasedTitles: [...state.purchasedTitles, "Час на вітер"]
         });
@@ -1540,7 +1546,7 @@
 
         // Додаємо титули
         TITLES.forEach(item => {
-          if (item.price <= 0 && item.reqPrestige === 0) return; // Пропускаємо безкоштовні
+          if (item.price <= 0 && item.reqPrestige === 0) return;
           const isOwned = state.purchasedTitles.includes(item.name) || state.prestige >= item.reqPrestige;
 
           const card = document.createElement('div');
@@ -2140,7 +2146,7 @@
       }
     }
 
-    // === ОБРОБНИК РЕКЛАМИ ===
+    // === ОБРОБНИК РЕКЛАМИ (ВИПРАВЛЕНО) ===
     document.getElementById('btn-watch-ad').addEventListener('click', async () => {
       const btn = document.getElementById('btn-watch-ad');
       btn.disabled = true;
@@ -2148,32 +2154,51 @@
 
       try {
         if (!AdController) {
-          // Якщо реклама не завантажилась (немає SDK)
-          await new Promise(r => setTimeout(r, 1000)); // Імітація
-        } else {
-          const result = await AdController.show();
-          if (!result || !result.done) {
-            throw new Error("Ad not completed");
-          }
+          throw new Error("AdController is not initialized. Check Adsgram SDK.");
+        }
+        
+        // Показуємо рекламу
+        const result = await AdController.show();
+        
+        // Перевіряємо, чи гравець додивився відео
+        if (!result || !result.done) {
+          throw new Error("Ad was skipped or not completed.");
         }
 
-        // Нараховуємо нагороду
+        // Реклама успішно переглянута
         if (currentUid) {
+          let newWatchCount = 0;
+          
           await runTransaction(ref(db, 'users/' + currentUid), (data) => {
             if (!data) return data;
-            data.coins = (data.coins || 0) + 1000; // +1000 монет
-            data.adWatches = (data.adWatches || 0) + 1; // +1 перегляд
+            data.adWatches = (data.adWatches || 0) + 1;
+            newWatchCount = data.adWatches;
             return data;
           });
-          showStatus('✅ Ви отримали 1000 монет та +1 перегляд!');
-          try { tg.HapticFeedback.notificationOccurred('success'); } catch(e) {}
+
+          showStatus(`✅ Перегляд зараховано! (${newWatchCount}/100)`);
+          
+          // Перевірка нагороди
+          if (newWatchCount >= 100) {
+            const userSnap = await get(ref(db, 'users/' + currentUid));
+            const userData = userSnap.val();
+            const currentTitles = userData.purchasedTitles || [];
+            
+            if (!currentTitles.includes("Час на вітер")) {
+              await update(ref(db, 'users/' + currentUid), {
+                purchasedTitles: [...currentTitles, "Час на вітер"]
+              });
+              showStatus('🏆 Ви отримали ексклюзивний титул "Час на вітер"!');
+              try { tg.HapticFeedback.notificationOccurred('success'); } catch(e) {}
+            }
+          }
         }
       } catch (e) {
-        console.error(e);
+        console.error("Ad error:", e);
         showStatus('❌ Реклама не завершена. Спробуйте пізніше.');
       } finally {
         btn.disabled = false;
-        btn.innerText = '🎬 Дивитись рекламу (+1000 🪙)';
+        btn.innerText = '🎬 Дивитись рекламу (+1 до прогресу)';
       }
     });
 
