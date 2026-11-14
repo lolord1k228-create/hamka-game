@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Hamka Game</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <!-- AdsGram SDK -->
+  <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     html, body {
@@ -260,6 +262,24 @@
     .profile-stat-val { font-size: 16px; font-weight: 700; color: #f5a623; }
     .profile-stat-lbl { font-size: 10px; color: #888; text-transform: uppercase; }
 
+    .ad-progress-container {
+      margin-top: 12px;
+      background: rgba(0,0,0,0.3);
+      border-radius: 10px;
+      padding: 10px;
+    }
+    .ad-progress-label {
+      display: flex; justify-content: space-between;
+      font-size: 11px; color: #aaa; margin-bottom: 4px;
+    }
+    .ad-progress-bar-wrap {
+      width: 100%; height: 8px; background: #222; border-radius: 4px; overflow: hidden;
+    }
+    .ad-progress-bar {
+      height: 100%; background: linear-gradient(90deg, #8a2be2, #da70d6);
+      width: 0%; transition: width 0.3s;
+    }
+
     .change-skin-btn {
       width: 100%; padding: 10px; margin-top: 12px;
       background: rgba(138, 43, 226, 0.2); border: 1px solid rgba(138, 43, 226, 0.5);
@@ -267,6 +287,16 @@
       cursor: pointer; transition: 0.2s;
     }
     .change-skin-btn:active { transform: scale(0.97); }
+
+    .ad-btn {
+      width: 100%; padding: 12px; margin-top: 12px;
+      background: linear-gradient(90deg, #f39c12, #e67e22);
+      border: none; border-radius: 12px; color: #fff; font-weight: 700; font-size: 14px;
+      cursor: pointer; box-shadow: 0 4px 15px rgba(230, 126, 34, 0.3);
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .ad-btn:active { transform: scale(0.97); }
+    .ad-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
     .prestige-section {
       background: rgba(138, 43, 226, 0.1); border: 1px solid rgba(138, 43, 226, 0.3);
@@ -303,7 +333,6 @@
     .lb-title { 
       display: inline-block; font-size: 9px; padding: 2px 6px; border-radius: 4px;
       color: #fff; margin-top: 2px;
-      /* Колір задається через JS */
     }
     .lb-stats { text-align: right; flex-shrink: 0; }
     .lb-xp { font-size: 13px; font-weight: 700; color: #2ecc71; }
@@ -489,7 +518,19 @@
           </div>
         </div>
 
+        <!-- Прогрес перегляду реклами -->
+        <div class="ad-progress-container">
+          <div class="ad-progress-label">
+            <span>🎬 Переглянуто відео</span>
+            <span id="ad-watch-count">0 / 100</span>
+          </div>
+          <div class="ad-progress-bar-wrap">
+            <div class="ad-progress-bar" id="ad-progress-bar"></div>
+          </div>
+        </div>
+
         <button class="change-skin-btn" id="btn-open-skin-menu">🎨 Змінити скін</button>
+        <button class="ad-btn" id="btn-watch-ad">🎬 Дивитись рекламу (+1000 🪙)</button>
       </div>
 
       <div class="prestige-section">
@@ -629,6 +670,12 @@
         <input type="number" class="admin-input" id="admin-prestige-input" placeholder="Новий престиж">
         <button class="modal-btn confirm" style="width:100%; margin-top:8px;" onclick="adminSetPrestige()">Встановити</button>
       </div>
+      
+      <div class="admin-input-group">
+        <label>Додати перегляди реклами:</label>
+        <input type="number" class="admin-input" id="admin-ad-views-input" placeholder="Кількість">
+        <button class="modal-btn confirm" style="width:100%; margin-top:8px;" onclick="adminAddAdViews()">Нарахувати</button>
+      </div>
 
       <div class="modal-actions">
         <button class="modal-btn cancel" onclick="document.getElementById('modal-admin').classList.remove('show')">Закрити</button>
@@ -663,6 +710,15 @@
 
     const tg = window.Telegram.WebApp;
     try { tg.expand(); tg.ready(); } catch(e) {}
+
+    // === ADSGRAM INIT ===
+    // Ваш blockId: 59759
+    let AdController = null;
+    try {
+      AdController = window.Adsgram.init({ blockId: "59759" });
+    } catch(e) {
+      console.warn("Adsgram not loaded");
+    }
 
     // === DOM ===
     const authScreen = document.getElementById('auth-screen');
@@ -705,6 +761,9 @@
     const profPrestige = document.getElementById('prof-prestige');
     const prestigeInfo = document.getElementById('prestige-info');
     
+    const adWatchCount = document.getElementById('ad-watch-count');
+    const adProgressBar = document.getElementById('ad-progress-bar');
+
     const invTitles = document.getElementById('inv-titles');
     const invAvatars = document.getElementById('inv-avatars');
     const invSkins = document.getElementById('inv-skins');
@@ -743,6 +802,7 @@
       title: 'Початківець', avatar: '🐭', nickname: '', publicId: '',
       activeSkin: 'default', holdings: {},
       purchasedTitles: [], purchasedAvatars: [], purchasedSkins: [],
+      adWatches: 0,
       upgrades: { tapLevel: 0, tapPower: 1, xpPerTap: 1, autoTapRate: 0, autoXpRate: 0, energyRate: 1 }
     };
     let pendingTap = false;
@@ -937,7 +997,6 @@
         authScreen.classList.add('hidden');
         gameScreen.classList.add('visible');
         
-        // Спочатку завантажуємо глобальні дані (титули, аватарки, скіни), потім ініціалізуємо гру
         loadGameData().then(() => {
           initGame(user.uid);
           initCryptoSystem();
@@ -980,7 +1039,6 @@
     // ============================================================
     async function loadGameData() {
       try {
-        // Завантажуємо титули
         const titlesSnap = await get(ref(db, 'game_data/titles'));
         if (titlesSnap.exists()) {
           const data = titlesSnap.val();
@@ -992,7 +1050,6 @@
             reqPrestige: data[id].reqPrestige || 0
           }));
         } else {
-          // Якщо в базі пусто, ставимо дефолтні
           TITLES = [
             { id: 'beg', name: 'Початківець', price: 0, color: 'linear-gradient(90deg, #555, #777)', reqPrestige: 0 },
             { id: 'brnz', name: 'Бронзовий Хом\'як', price: 0, color: 'linear-gradient(90deg, #cd7f32, #8b4513)', reqPrestige: 1 },
@@ -1004,7 +1061,6 @@
           ];
         }
 
-        // Завантажуємо аватарки
         const avatarsSnap = await get(ref(db, 'game_data/avatars'));
         if (avatarsSnap.exists()) {
           const data = avatarsSnap.val();
@@ -1024,7 +1080,6 @@
           ];
         }
 
-        // Завантажуємо скіни
         const skinsSnap = await get(ref(db, 'game_data/skins'));
         if (skinsSnap.exists()) {
           const data = skinsSnap.val();
@@ -1072,11 +1127,9 @@
           const el = document.createElement('div');
           el.className = 'leaderboard-item';
           
-          // Знаходимо колір титулу
           const titleObj = TITLES.find(t => t.name === u.title);
           const titleColor = titleObj ? titleObj.color : 'linear-gradient(90deg, #8a2be2, #da70d6)';
 
-          // Визначаємо аватарку
           let avatarHtml = `<div class="lb-avatar">${u.avatar}</div>`;
           if (u.activeSkin !== 'default') {
             const skinObj = SKINS.find(s => s.id === u.activeSkin);
@@ -1151,7 +1204,6 @@
     btnOpenSkinMenu.addEventListener('click', () => {
       modalSkinsGrid.innerHTML = '';
       
-      // Додаємо дефолтний
       const defEl = document.createElement('div');
       defEl.className = `inventory-item ${state.activeSkin === 'default' ? 'active' : ''}`;
       defEl.innerHTML = `<div class="inventory-item-icon">🐭</div><div class="inventory-item-name">Стандарт</div>`;
@@ -1162,7 +1214,6 @@
       });
       modalSkinsGrid.appendChild(defEl);
 
-      // Додаємо куплені
       state.purchasedSkins.forEach(skinId => {
         const skinObj = SKINS.find(s => s.id === skinId);
         if (!skinObj) return;
@@ -1235,6 +1286,20 @@
       document.getElementById('admin-prestige-input').value = '';
     };
 
+    window.adminAddAdViews = async () => {
+      if (!isAdmin || !currentUid) return;
+      const amount = parseInt(document.getElementById('admin-ad-views-input').value);
+      if (!amount || amount <= 0) { showStatus('❌ Введіть суму'); return; }
+      
+      await runTransaction(ref(db, 'users/' + currentUid), (data) => {
+        if (!data) return data;
+        data.adWatches = (data.adWatches || 0) + amount;
+        return data;
+      });
+      showStatus(`✅ Нараховано ${amount} переглядів`);
+      document.getElementById('admin-ad-views-input').value = '';
+    };
+
     // ============================================================
     // ГРА
     // ============================================================
@@ -1264,6 +1329,7 @@
             tapLevel: 0, tapPower: 1, xpPerTap: 1,
             autoTapRate: 0, autoXpRate: 0, energyRate: 1,
             purchasedTitles: [], purchasedAvatars: [], purchasedSkins: [],
+            adWatches: 0,
             createdAt: Date.now()
           });
         } else if (!snap.val().publicId) {
@@ -1291,6 +1357,7 @@
         state.purchasedAvatars = data.purchasedAvatars || [];
         state.purchasedSkins = data.purchasedSkins || [];
         state.activeSkin = data.activeSkin || 'default';
+        state.adWatches = data.adWatches || 0;
         
         state.upgrades.tapLevel = data.tapLevel || 0;
         state.upgrades.tapPower = data.tapPower || 1;
@@ -1302,6 +1369,7 @@
         renderUI();
         checkAutoPrestige();
         updateHamsterSkin();
+        checkAdReward();
 
         if (document.getElementById('page-shop').classList.contains('active')) renderShop();
         if (document.getElementById('page-profile').classList.contains('active')) renderProfile();
@@ -1410,6 +1478,18 @@
       }
     }
 
+    // === Перевірка нагороди за 100 переглядів ===
+    function checkAdReward() {
+      if (state.adWatches >= 100 && !state.purchasedTitles.includes("Час на вітер")) {
+        // Додаємо титул "Час на вітер"
+        update(ref(db, 'users/' + currentUid), {
+          purchasedTitles: [...state.purchasedTitles, "Час на вітер"]
+        });
+        showStatus('🏆 Ви отримали ексклюзивний титул "Час на вітер"!');
+        try { tg.HapticFeedback.notificationOccurred('success'); } catch(e) {}
+      }
+    }
+
     function getLevelInfo(xp) {
       let currentLvl = LEVELS[0];
       let nextLvl = LEVELS[1];
@@ -1441,6 +1521,10 @@
       
       const lvlProgress = nextLvl.xp === currentLvl.xp ? 100 : ((state.xp - currentLvl.xp) / (nextLvl.xp - currentLvl.xp)) * 100;
       xpBar.style.width = Math.min(100, Math.max(0, lvlProgress)) + '%';
+
+      // Оновлення прогресу реклами
+      adWatchCount.innerText = `${state.adWatches} / 100`;
+      adProgressBar.style.width = Math.min(100, (state.adWatches / 100) * 100) + '%';
     }
 
     // ============================================================
@@ -1456,8 +1540,8 @@
 
         // Додаємо титули
         TITLES.forEach(item => {
-          if (item.price <= 0) return; // Безкоштовні (за престиж) не продаються
-          const isOwned = state.purchasedTitles.includes(item.name);
+          if (item.price <= 0 && item.reqPrestige === 0) return; // Пропускаємо безкоштовні
+          const isOwned = state.purchasedTitles.includes(item.name) || state.prestige >= item.reqPrestige;
 
           const card = document.createElement('div');
           card.className = 'shop-card';
@@ -1465,7 +1549,7 @@
             <div class="grid-preview" style="font-size:24px; background:${item.color};">🏆</div>
             <div class="shop-card-info">
               <div class="shop-card-title" style="background:${item.color}; -webkit-background-clip:text; -webkit-text-fill-color:transparent;">${item.name}</div>
-              <div class="shop-card-price">${formatNumber(item.price)} 🪙</div>
+              <div class="shop-card-price">${item.price > 0 ? formatNumber(item.price) + ' 🪙' : 'За престиж'}</div>
             </div>
             <button class="shop-card-btn" data-title-name="${item.name}" ${isOwned ? 'disabled' : ''}>
               ${isOwned ? 'Куплено' : 'Купити'}
@@ -1738,7 +1822,6 @@
       profNickname.innerText = state.nickname;
       profPublicId.innerText = 'ID: ' + state.publicId;
       
-      // Відображення аватарки (скіна) в профілі
       if (state.activeSkin !== 'default') {
         const skinObj = SKINS.find(s => s.id === state.activeSkin);
         if (skinObj) {
@@ -1753,7 +1836,6 @@
         profAvatar.innerText = state.avatar;
       }
 
-      // Відображення титулу з кольором
       const titleObj = TITLES.find(t => t.name === state.title);
       if (titleObj) {
         profTitle.innerText = titleObj.name;
@@ -1769,13 +1851,16 @@
       } else {
         prestigeInfo.innerText = `Потрібно ${formatNumber(req)} XP (у вас ${formatNumber(state.xp)})`;
       }
+      
+      // Оновлюємо прогрес реклами
+      adWatchCount.innerText = `${state.adWatches} / 100`;
+      adProgressBar.style.width = Math.min(100, (state.adWatches / 100) * 100) + '%';
     }
 
     // ============================================================
     // ІНВЕНТАР
     // ============================================================
     function renderInventory() {
-      // Титули
       const availableTitles = TITLES.filter(t => {
         if (t.reqPrestige > 0) return state.prestige >= t.reqPrestige;
         return state.purchasedTitles.includes(t.name);
@@ -1794,7 +1879,6 @@
         invTitles.appendChild(el);
       });
 
-      // Аватарки
       const availableAvatars = ['🐭', ...state.purchasedAvatars];
       invAvatars.innerHTML = '';
       availableAvatars.forEach(avName => {
@@ -1809,7 +1893,6 @@
         invAvatars.appendChild(el);
       });
 
-      // Скіни
       invSkins.innerHTML = '';
       const defaultEl = document.createElement('div');
       defaultEl.className = `inventory-item ${state.activeSkin === 'default' ? 'active' : ''}`;
@@ -2056,6 +2139,44 @@
         showStatus("❌ Помилка транзакції");
       }
     }
+
+    // === ОБРОБНИК РЕКЛАМИ ===
+    document.getElementById('btn-watch-ad').addEventListener('click', async () => {
+      const btn = document.getElementById('btn-watch-ad');
+      btn.disabled = true;
+      btn.innerText = '⏳ Завантаження реклами...';
+
+      try {
+        if (!AdController) {
+          // Якщо реклама не завантажилась (немає SDK)
+          await new Promise(r => setTimeout(r, 1000)); // Імітація
+        } else {
+          const result = await AdController.show();
+          if (!result || !result.done) {
+            throw new Error("Ad not completed");
+          }
+        }
+
+        // Нараховуємо нагороду
+        if (currentUid) {
+          await runTransaction(ref(db, 'users/' + currentUid), (data) => {
+            if (!data) return data;
+            data.coins = (data.coins || 0) + 1000; // +1000 монет
+            data.adWatches = (data.adWatches || 0) + 1; // +1 перегляд
+            return data;
+          });
+          showStatus('✅ Ви отримали 1000 монет та +1 перегляд!');
+          try { tg.HapticFeedback.notificationOccurred('success'); } catch(e) {}
+        }
+      } catch (e) {
+        console.error(e);
+        showStatus('❌ Реклама не завершена. Спробуйте пізніше.');
+      } finally {
+        btn.disabled = false;
+        btn.innerText = '🎬 Дивитись рекламу (+1000 🪙)';
+      }
+    });
+
   </script>
 </body>
-            </html>
+  </html>
