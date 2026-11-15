@@ -313,6 +313,17 @@
     .inventory-item-icon { font-size: 24px; height: 30px; display: flex; align-items: center; justify-content: center; background-size: cover; background-position: center; }
     .inventory-item-name { font-size: 10px; margin-top: 4px; color: #aaa; }
 
+    .case-item {
+      background: linear-gradient(135deg, #2a1b3d, #1a1a24);
+      border: 2px solid #8a2be2;
+      border-radius: 12px; padding: 15px; text-align: center;
+      cursor: pointer; box-shadow: 0 0 15px rgba(138, 43, 226, 0.3);
+      transition: transform 0.2s;
+    }
+    .case-item:active { transform: scale(0.95); }
+    .case-icon { font-size: 40px; margin-bottom: 5px; }
+    .case-name { font-size: 12px; font-weight: 700; color: #da70d6; }
+
     /* ===== ТОП ===== */
     .leaderboard-item {
       display: flex; align-items: center; gap: 10px;
@@ -359,7 +370,33 @@
     }
     .modal-btn.cancel { background: #333; color: #fff; }
     .modal-btn.confirm { background: #2ecc71; color: #000; }
-    
+
+    /* Анімація відкриття кейса */
+    .case-open-overlay {
+      position: fixed; inset: 0; z-index: 2500; background: rgba(0,0,0,0.95);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity 0.3s;
+    }
+    .case-open-overlay.show { opacity: 1; pointer-events: all; }
+    .case-opening-box {
+      font-size: 100px; animation: shake 0.5s infinite;
+    }
+    @keyframes shake {
+      0% { transform: rotate(0deg) scale(1); }
+      25% { transform: rotate(15deg) scale(1.1); }
+      50% { transform: rotate(-15deg) scale(1.1); }
+      75% { transform: rotate(15deg) scale(1.1); }
+      100% { transform: rotate(0deg) scale(1); }
+    }
+    .case-reward-text {
+      font-size: 24px; font-weight: 900; color: #fff; margin-top: 20px; text-align: center;
+      animation: popIn 0.5s ease-out forwards;
+    }
+    @keyframes popIn {
+      0% { transform: scale(0.5); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
     .admin-input {
       width: 100%; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid #333;
       border-radius: 8px; color: #fff; font-size: 14px; outline: none;
@@ -520,7 +557,7 @@
         <div class="ad-progress-container">
           <div class="ad-progress-label">
             <span>🎬 Переглянуто відео</span>
-            <span id="ad-watch-count">0 / 100</span>
+            <span id="ad-watch-count">0 / 5</span>
           </div>
           <div class="ad-progress-bar-wrap">
             <div class="ad-progress-bar" id="ad-progress-bar"></div>
@@ -539,6 +576,12 @@
 
     <!-- ІНВЕНТАР -->
     <div class="page scroll-page" id="page-inventory">
+      <!-- Кейси -->
+      <div class="inventory-section" id="cases-section" style="display:none;">
+        <div class="inventory-title">📦 Кейси</div>
+        <div class="inventory-grid" id="inv-cases"></div>
+      </div>
+
       <div class="inventory-section">
         <div class="inventory-title">Титули</div>
         <div class="inventory-grid" id="inv-titles"></div>
@@ -581,20 +624,6 @@
   </div>
 
   <div id="status"></div>
-
-  <!-- Модалки -->
-  <div class="modal-overlay" id="modal-buy">
-    <div class="modal-content">
-      <div class="modal-title">Підтвердження покупки</div>
-      <div class="preview-box" id="buy-preview-icon"></div>
-      <div style="text-align:center; font-weight:700; margin-bottom:4px;" id="buy-preview-name"></div>
-      <div style="text-align:center; color:#ffd700; font-weight:700;" id="buy-preview-price"></div>
-      <div class="modal-actions">
-        <button class="modal-btn cancel" id="btn-cancel-buy">Скасувати</button>
-        <button class="modal-btn confirm" id="btn-confirm-buy">Купити</button>
-      </div>
-    </div>
-  </div>
 
   <!-- Модалка перегляду профілю -->
   <div class="modal-overlay" id="modal-view-profile">
@@ -647,6 +676,7 @@
     </div>
   </div>
 
+  <!-- Модалка Адмінки -->
   <div class="modal-overlay" id="modal-admin">
     <div class="modal-content">
       <div class="modal-title">🛠 Адмін Панель</div>
@@ -674,10 +704,24 @@
         <input type="number" class="admin-input" id="admin-ad-views-input" placeholder="Кількість">
         <button class="modal-btn confirm" style="width:100%; margin-top:8px;" onclick="adminAddAdViews()">Нарахувати</button>
       </div>
+      
+      <div class="admin-input-group">
+        <label>Додати кейс:</label>
+        <button class="modal-btn confirm" style="width:100%; margin-top:8px;" onclick="adminAddCase()">Додати кейс</button>
+      </div>
 
       <div class="modal-actions">
         <button class="modal-btn cancel" onclick="document.getElementById('modal-admin').classList.remove('show')">Закрити</button>
       </div>
+    </div>
+  </div>
+
+  <!-- Анімація відкриття кейса -->
+  <div class="case-open-overlay" id="case-open-overlay">
+    <div class="case-opening-box" id="case-opening-box">📦</div>
+    <div class="case-reward-text" id="case-reward-text"></div>
+    <div class="modal-actions" style="width: 100%; max-width: 300px; margin-top: 30px;">
+      <button class="modal-btn confirm" id="btn-close-case">Забрати</button>
     </div>
   </div>
 
@@ -758,13 +802,8 @@
     const invTitles = document.getElementById('inv-titles');
     const invAvatars = document.getElementById('inv-avatars');
     const invSkins = document.getElementById('inv-skins');
-
-    const modalBuy = document.getElementById('modal-buy');
-    const buyPreviewIcon = document.getElementById('buy-preview-icon');
-    const buyPreviewName = document.getElementById('buy-preview-name');
-    const buyPreviewPrice = document.getElementById('buy-preview-price');
-    const btnCancelBuy = document.getElementById('btn-cancel-buy');
-    const btnConfirmBuy = document.getElementById('btn-confirm-buy');
+    const invCases = document.getElementById('inv-cases');
+    const casesSection = document.getElementById('cases-section');
 
     const modalViewProfile = document.getElementById('modal-view-profile');
     const viewProfAvatar = document.getElementById('view-prof-avatar');
@@ -786,6 +825,11 @@
     const prestigeOverlay = document.getElementById('prestige-overlay');
     const prestigeText = document.getElementById('prestige-text');
 
+    const caseOpenOverlay = document.getElementById('case-open-overlay');
+    const caseOpeningBox = document.getElementById('case-opening-box');
+    const caseRewardText = document.getElementById('case-reward-text');
+    const btnCloseCase = document.getElementById('btn-close-case');
+
     // === Стан ===
     let isLoginMode = true;
     let state = { 
@@ -793,6 +837,7 @@
       title: 'Початківець', avatar: '🐭', nickname: '', publicId: '',
       activeSkin: 'default', holdings: {},
       purchasedTitles: [], purchasedAvatars: [], purchasedSkins: [],
+      cases: [],
       adWatches: 0,
       upgrades: { tapLevel: 0, tapPower: 1, xpPerTap: 1, autoTapRate: 0, autoXpRate: 0, energyRate: 1 }
     };
@@ -802,14 +847,22 @@
     let cryptoInterval = null;
     let currentUid = null;
     let currentShopTab = 'auto';
-    let pendingCosmeticBuy = null;
     let isAdmin = false;
 
     const GITHUB_RAW = "https://raw.githubusercontent.com/lolord1k228-create/Hamkatest/main/skins/";
 
+    // === Дані ===
     let TITLES = [];
     let AVATARS = [];
     let SKINS = [];
+
+    // Ексклюзивні титули з кейсів
+    const CASE_TITLES = [
+      { name: 'Легенда Кейсів', color: 'linear-gradient(90deg, #ff0000, #ff8c00)' },
+      { name: 'Король Лутбоксів', color: 'linear-gradient(90deg, #00ff00, #00bfff)' },
+      { name: 'Обраний', color: 'linear-gradient(90deg, #ffffff, #ffd700)' },
+      { name: 'Тіньовий', color: 'linear-gradient(90deg, #2f4f4f, #000000)' }
+    ];
 
     const LEVELS = [
       { name: '0 початківець', xp: 0 },
@@ -956,7 +1009,7 @@
       }
       
       const email = `tg_${tgUser.id}@hamka.test`;
-      const password = `Tg_${tgUser.id}_SecurePass!`;
+      const password = `Tg_${tgUser.id}_SecurePass_2026!`;
 
       tgLoginBtn.disabled = true;
       authError.innerText = '';
@@ -1124,7 +1177,7 @@
           const el = document.createElement('div');
           el.className = 'leaderboard-item';
           
-          const titleObj = TITLES.find(t => t.name === u.title);
+          const titleObj = TITLES.find(t => t.name === u.title) || CASE_TITLES.find(t => t.name === u.title);
           const titleColor = titleObj ? titleObj.color : 'linear-gradient(90deg, #8a2be2, #da70d6)';
 
           let avatarHtml = `<div class="lb-avatar">${u.avatar}</div>`;
@@ -1296,6 +1349,17 @@
       showStatus(`✅ Нараховано ${amount} переглядів`);
       document.getElementById('admin-ad-views-input').value = '';
     };
+    
+    window.adminAddCase = async () => {
+      if (!isAdmin || !currentUid) return;
+      await runTransaction(ref(db, 'users/' + currentUid), (data) => {
+        if (!data) return data;
+        if (!data.cases) data.cases = [];
+        data.cases.push({ type: 'basic', name: 'Базовий кейс' });
+        return data;
+      });
+      showStatus('✅ Кейс додано');
+    };
 
     // ============================================================
     // ГРА
@@ -1326,6 +1390,7 @@
             tapLevel: 0, tapPower: 1, xpPerTap: 1,
             autoTapRate: 0, autoXpRate: 0, energyRate: 1,
             purchasedTitles: [], purchasedAvatars: [], purchasedSkins: [],
+            cases: [],
             adWatches: 0,
             createdAt: Date.now()
           });
@@ -1353,6 +1418,7 @@
         state.purchasedTitles = data.purchasedTitles || [];
         state.purchasedAvatars = data.purchasedAvatars || [];
         state.purchasedSkins = data.purchasedSkins || [];
+        state.cases = data.cases || [];
         state.activeSkin = data.activeSkin || 'default';
         state.adWatches = data.adWatches || 0;
         
@@ -1475,12 +1541,21 @@
       }
     }
 
-    function checkAdReward() {
-      if (state.adWatches >= 100 && !state.purchasedTitles.includes("Час на вітер")) {
-        update(ref(db, 'users/' + currentUid), {
-          purchasedTitles: [...state.purchasedTitles, "Час на вітер"]
+    // === Нагорода за 5 переглядів (Кейс) ===
+    async function checkAdReward() {
+      // Якщо набралось 5 переглядів і в інвентарі немає кейса (щоб не спамило)
+      if (state.adWatches >= 5 && state.cases.length === 0 && currentUid) {
+        // Перевіряємо, чи вже видавали (щоб не дублювати)
+        const userSnap = await get(ref(db, 'users/' + currentUid));
+        const data = userSnap.val();
+        
+        // Скидаємо лічильник і додаємо кейс
+        await update(ref(db, 'users/' + currentUid), {
+          adWatches: 0,
+          cases: [...(data.cases || []), { type: 'basic', name: 'Базовий кейс' }]
         });
-        showStatus('🏆 Ви отримали ексклюзивний титул "Час на вітер"!');
+        
+        showStatus('📦 Ви отримали кейс за 5 переглядів!');
         try { tg.HapticFeedback.notificationOccurred('success'); } catch(e) {}
       }
     }
@@ -1517,8 +1592,8 @@
       const lvlProgress = nextLvl.xp === currentLvl.xp ? 100 : ((state.xp - currentLvl.xp) / (nextLvl.xp - currentLvl.xp)) * 100;
       xpBar.style.width = Math.min(100, Math.max(0, lvlProgress)) + '%';
 
-      adWatchCount.innerText = `${state.adWatches} / 100`;
-      adProgressBar.style.width = Math.min(100, (state.adWatches / 100) * 100) + '%';
+      adWatchCount.innerText = `${state.adWatches} / 5`;
+      adProgressBar.style.width = Math.min(100, (state.adWatches / 5) * 100) + '%';
     }
 
     // ============================================================
@@ -1534,7 +1609,7 @@
 
         // Титули (тільки ті, що купуються за монети)
         TITLES.forEach(item => {
-          if (item.price <= 0) return; // Пропускаємо ті, що за престиж
+          if (item.price <= 0) return;
           const isOwned = state.purchasedTitles.includes(item.name);
 
           const card = document.createElement('div');
@@ -1641,55 +1716,31 @@
     function openBuyTitleModal(titleName) {
       const item = TITLES.find(t => t.name === titleName);
       if (!item) return;
-      pendingCosmeticBuy = { ...item, type: 'title' };
+      // Зберігаємо в тимчасовій змінній
+      window._pendingTitleBuy = item;
       
-      buyPreviewIcon.style.backgroundImage = 'none';
-      buyPreviewIcon.innerText = '🏆';
-      buyPreviewName.innerHTML = `<span style="background:${item.color}; -webkit-background-clip:text; -webkit-text-fill-color:transparent;">${item.name}</span>`;
-      buyPreviewPrice.innerText = formatNumber(item.price) + ' 🪙';
-      modalBuy.classList.add('show');
+      if (confirm(`Купити титул "${item.name}" за ${formatNumber(item.price)} монет?`)) {
+        buyCosmetic({ ...item, type: 'title' });
+      }
     }
 
     function openBuyAvatarModal(avatarName) {
       const item = AVATARS.find(a => a.name === avatarName);
       if (!item) return;
-      pendingCosmeticBuy = { ...item, type: 'avatar' };
       
-      buyPreviewIcon.style.backgroundImage = 'none';
-      buyPreviewIcon.innerText = item.name;
-      buyPreviewName.innerText = 'Аватарка';
-      buyPreviewPrice.innerText = formatNumber(item.price) + ' 🪙';
-      modalBuy.classList.add('show');
+      if (confirm(`Купити аватарку ${item.name} за ${formatNumber(item.price)} монет?`)) {
+        buyCosmetic({ ...item, type: 'avatar' });
+      }
     }
 
     function openBuySkinModal(skinId) {
       const item = SKINS.find(s => s.id === skinId);
       if (!item) return;
-      pendingCosmeticBuy = { ...item, type: 'skin' };
       
-      buyPreviewIcon.style.backgroundImage = `url('${GITHUB_RAW}${item.file}')`;
-      buyPreviewIcon.innerText = '';
-      buyPreviewName.innerText = `Скін: ${item.name}`;
-      buyPreviewPrice.innerText = formatNumber(item.price) + ' 🪙';
-      modalBuy.classList.add('show');
-    }
-
-    btnCancelBuy.addEventListener('click', () => {
-      modalBuy.classList.remove('show');
-      pendingCosmeticBuy = null;
-    });
-
-    btnConfirmBuy.addEventListener('click', async () => {
-      if (!pendingCosmeticBuy || !currentUid) return;
-      modalBuy.classList.remove('show');
-      
-      if (pendingCosmeticBuy.type === 'skin') {
-        await buySkin(pendingCosmeticBuy);
-      } else {
-        await buyCosmetic(pendingCosmeticBuy);
+      if (confirm(`Купити скін "${item.name}" за ${formatNumber(item.price)} монет?`)) {
+        buySkin(item);
       }
-      pendingCosmeticBuy = null;
-    });
+    }
 
     async function buyUpgrade(itemId) {
       if (!currentUid) return;
@@ -1830,7 +1881,8 @@
         profAvatar.innerText = state.avatar;
       }
 
-      const titleObj = TITLES.find(t => t.name === state.title);
+      // Шукаємо титул в основному списку або в кейсах
+      const titleObj = TITLES.find(t => t.name === state.title) || CASE_TITLES.find(t => t.name === state.title);
       if (titleObj) {
         profTitle.innerText = titleObj.name;
         profTitleBadge.style.background = titleObj.color;
@@ -1846,18 +1898,41 @@
         prestigeInfo.innerText = `Потрібно ${formatNumber(req)} XP (у вас ${formatNumber(state.xp)})`;
       }
       
-      adWatchCount.innerText = `${state.adWatches} / 100`;
-      adProgressBar.style.width = Math.min(100, (state.adWatches / 100) * 100) + '%';
+      adWatchCount.innerText = `${state.adWatches} / 5`;
+      adProgressBar.style.width = Math.min(100, (state.adWatches / 5) * 100) + '%';
     }
 
     // ============================================================
     // ІНВЕНТАР
     // ============================================================
     function renderInventory() {
-      const availableTitles = TITLES.filter(t => {
-        if (t.reqPrestige > 0) return state.prestige >= t.reqPrestige;
-        return state.purchasedTitles.includes(t.name);
-      });
+      // 1. Кейси
+      if (state.cases && state.cases.length > 0) {
+        casesSection.style.display = 'block';
+        invCases.innerHTML = '';
+        
+        state.cases.forEach((caseItem, index) => {
+          const el = document.createElement('div');
+          el.className = 'case-item';
+          el.innerHTML = `
+            <div class="case-icon">📦</div>
+            <div class="case-name">${caseItem.name}</div>
+          `;
+          el.addEventListener('click', () => openCase(index));
+          invCases.appendChild(el);
+        });
+      } else {
+        casesSection.style.display = 'none';
+      }
+
+      // 2. Титули (включаючи ті, що з кейсів)
+      const availableTitles = [
+        ...TITLES.filter(t => {
+          if (t.reqPrestige > 0) return state.prestige >= t.reqPrestige;
+          return state.purchasedTitles.includes(t.name);
+        }),
+        ...CASE_TITLES.filter(t => state.purchasedTitles.includes(t.name))
+      ];
 
       invTitles.innerHTML = '';
       availableTitles.forEach(tItem => {
@@ -1872,6 +1947,7 @@
         invTitles.appendChild(el);
       });
 
+      // 3. Аватарки
       const availableAvatars = ['🐭', ...state.purchasedAvatars];
       invAvatars.innerHTML = '';
       availableAvatars.forEach(avName => {
@@ -1886,6 +1962,7 @@
         invAvatars.appendChild(el);
       });
 
+      // 4. Скіни
       invSkins.innerHTML = '';
       const defaultEl = document.createElement('div');
       defaultEl.className = `inventory-item ${state.activeSkin === 'default' ? 'active' : ''}`;
@@ -1910,6 +1987,92 @@
         invSkins.appendChild(el);
       });
     }
+
+    // === ВІДКРИТТЯ КЕЙСА ===
+    async function openCase(index) {
+      if (!currentUid) return;
+      
+      const caseItem = state.cases[index];
+      if (!caseItem) return;
+      
+      // Видаляємо кейс з інвентаря
+      const newCases = [...state.cases];
+      newCases.splice(index, 1);
+      
+      caseOpenOverlay.classList.add('show');
+      caseOpeningBox.style.display = 'block';
+      caseRewardText.innerText = '';
+      btnCloseCase.style.display = 'none';
+
+      // Анімація
+      setTimeout(async () => {
+        caseOpeningBox.style.display = 'none';
+        
+        // Генеруємо нагороду
+        const rand = Math.random() * 100;
+        let rewardText = '';
+        let updateData = {
+          cases: newCases,
+          purchasedTitles: state.purchasedTitles,
+          purchasedAvatars: state.purchasedAvatars,
+          purchasedSkins: state.purchasedSkins,
+          xp: state.xp
+        };
+
+        if (rand < 5) {
+          // 5% - Кейс рівнем вище
+          updateData.cases.push({ type: 'epic', name: 'Епічний кейс' });
+          rewardText = '📦 Епічний кейс!';
+        } else if (rand < 20) {
+          // 15% - Випадковий скін
+          if (SKINS.length > 0) {
+            const randomSkin = SKINS[Math.floor(Math.random() * SKINS.length)];
+            if (!updateData.purchasedSkins.includes(randomSkin.id)) {
+              updateData.purchasedSkins.push(randomSkin.id);
+            }
+            rewardText = `🎨 Скін: ${randomSkin.name}`;
+          } else {
+            updateData.xp += 10000;
+            rewardText = '⭐ +10,000 XP';
+          }
+        } else if (rand < 40) {
+          // 20% - Випадкова іконка
+          if (AVATARS.length > 0) {
+            const randomAvatar = AVATARS[Math.floor(Math.random() * AVATARS.length)];
+            if (!updateData.purchasedAvatars.includes(randomAvatar.name)) {
+              updateData.purchasedAvatars.push(randomAvatar.name);
+            }
+            rewardText = `🖼️ Іконка: ${randomAvatar.name}`;
+          } else {
+            updateData.xp += 10000;
+            rewardText = '⭐ +10,000 XP';
+          }
+        } else if (rand < 60) {
+          // 20% - Ексклюзивний титул
+          const randomTitle = CASE_TITLES[Math.floor(Math.random() * CASE_TITLES.length)];
+          if (!updateData.purchasedTitles.includes(randomTitle.name)) {
+            updateData.purchasedTitles.push(randomTitle.name);
+          }
+          rewardText = `🏆 Титул: ${randomTitle.name}`;
+        } else {
+          // 40% - XP
+          const xpReward = Math.floor(Math.random() * 49000) + 1000;
+          updateData.xp += xpReward;
+          rewardText = `⭐ +${formatNumber(xpReward)} XP`;
+        }
+
+        await update(ref(db, 'users/' + currentUid), updateData);
+        
+        caseRewardText.innerText = rewardText;
+        btnCloseCase.style.display = 'block';
+        
+        try { tg.HapticFeedback.notificationOccurred('success'); } catch(e) {}
+      }, 2000);
+    }
+
+    btnCloseCase.addEventListener('click', () => {
+      caseOpenOverlay.classList.remove('show');
+    });
 
     // ============================================================
     // КРИПТА
@@ -2205,30 +2368,16 @@
         }
 
         if (currentUid) {
-          let newWatchCount = 0;
-          
           await runTransaction(ref(db, 'users/' + currentUid), (data) => {
             if (!data) return data;
             data.adWatches = (data.adWatches || 0) + 1;
-            newWatchCount = data.adWatches;
             return data;
           });
 
-          showStatus(`✅ Перегляд зараховано! (${newWatchCount}/100)`);
+          const newWatchCount = state.adWatches + 1;
+          showStatus(`✅ Перегляд зараховано! (${newWatchCount}/5)`);
           
-          if (newWatchCount >= 100) {
-            const userSnap = await get(ref(db, 'users/' + currentUid));
-            const userData = userSnap.val();
-            const currentTitles = userData.purchasedTitles || [];
-            
-            if (!currentTitles.includes("Час на вітер")) {
-              await update(ref(db, 'users/' + currentUid), {
-                purchasedTitles: [...currentTitles, "Час на вітер"]
-              });
-              showStatus('🏆 Ви отримали ексклюзивний титул "Час на вітер"!');
-              try { tg.HapticFeedback.notificationOccurred('success'); } catch(e) {}
-            }
-          }
+          try { tg.HapticFeedback.notificationOccurred('success'); } catch(e) {}
         }
       } catch (e) {
         console.error("Ad error:", e);
