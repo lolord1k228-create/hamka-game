@@ -17,10 +17,10 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 BOT_TOKEN = "8644240070:AAGSuoSgppI-LpvB2r5oX3xsymr-N6bWgNw"
 
 # Ваш токен з кабінету AdsGram (у профілі праворуч вгорі)
-ADSGRAM_TOKEN = "77399"
+ADSGRAM_TOKEN = "ab5d3577509a4e248cf5b1a52f1c5869"
 
 # Ваш Block ID (числа без префіксів, наприклад 59907)
-ADSGRAM_BLOCK_ID = "56522" 
+ADSGRAM_BLOCK_ID = "59907" 
 
 # Список промокодів, які додаються до реклами
 PROMO_CODES = ["ads", "ads+", "freecoins"]
