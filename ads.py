@@ -85,7 +85,7 @@ async def main():
     logging.basicConfig(level=logging.INFO)
     
     scheduler = AsyncIOScheduler(timezone=pytz.timezone('Europe/Kyiv'))
-    scheduler.add_job(send_ad_broadcast, 'interval', hours=22)
+    scheduler.add_job(send_ad_broadcast, 'interval', hours=14)
     scheduler.start()
     
     await dp.start_polling(bot)
