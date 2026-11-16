@@ -1001,7 +1001,11 @@
       }
     });
 
+    // === ВИПРАВЛЕНО: ВХІД ЧЕРЕЗ TELEGRAM ===
     tgLoginBtn.addEventListener('click', async () => {
+      // Очищаємо попередні помилки
+      authError.innerText = '';
+      
       const tgUser = tg.initDataUnsafe?.user;
       if (!tgUser) {
         authError.innerText = 'Відкрийте гру через Telegram-бота';
@@ -1012,21 +1016,22 @@
       const password = `Tg_${tgUser.id}_SecurePass_2026!`;
 
       tgLoginBtn.disabled = true;
-      authError.innerText = '';
       
       try {
+        // 1. Намагаємося увійти
         await signInWithEmailAndPassword(auth, email, password);
       } catch (e) {
+        // 2. Якщо акаунта немає — створюємо
         if (e.code === 'auth/user-not-found' || e.code === 'auth/invalid-credential' || e.code === 'auth/invalid-login-credentials') {
           try {
             await createUserWithEmailAndPassword(auth, email, password);
           } catch (createErr) {
-            console.error(createErr);
-            authError.innerText = getAuthErrorMessage(createErr);
+            console.error("Помилка створення:", createErr);
+            authError.innerText = "Помилка створення акаунту Telegram. Спробуйте пізніше.";
           }
         } else {
-          console.error(e);
-          authError.innerText = getAuthErrorMessage(e);
+          console.error("Помилка входу:", e);
+          authError.innerText = "Помилка входу через Telegram.";
         }
       } finally {
         tgLoginBtn.disabled = false;
@@ -1543,20 +1548,22 @@
 
     // === Нагорода за 5 переглядів (Кейс) ===
     async function checkAdReward() {
-      // Якщо набралось 5 переглядів і в інвентарі немає кейса (щоб не спамило)
-      if (state.adWatches >= 5 && state.cases.length === 0 && currentUid) {
-        // Перевіряємо, чи вже видавали (щоб не дублювати)
+      if (state.adWatches >= 5 && currentUid) {
+        // Перевіряємо, чи є вже кейс, щоб не дублювати
         const userSnap = await get(ref(db, 'users/' + currentUid));
         const data = userSnap.val();
+        const currentCases = data.cases || [];
         
-        // Скидаємо лічильник і додаємо кейс
-        await update(ref(db, 'users/' + currentUid), {
-          adWatches: 0,
-          cases: [...(data.cases || []), { type: 'basic', name: 'Базовий кейс' }]
-        });
-        
-        showStatus('📦 Ви отримали кейс за 5 переглядів!');
-        try { tg.HapticFeedback.notificationOccurred('success'); } catch(e) {}
+        // Якщо кейсів менше 1, додаємо (щоб не спамило)
+        if (currentCases.length === 0) {
+          await update(ref(db, 'users/' + currentUid), {
+            adWatches: 0,
+            cases: [...currentCases, { type: 'basic', name: 'Базовий кейс' }]
+          });
+          
+          showStatus('📦 Ви отримали кейс за 5 переглядів!');
+          try { tg.HapticFeedback.notificationOccurred('success'); } catch(e) {}
+        }
       }
     }
 
@@ -1716,8 +1723,6 @@
     function openBuyTitleModal(titleName) {
       const item = TITLES.find(t => t.name === titleName);
       if (!item) return;
-      // Зберігаємо в тимчасовій змінній
-      window._pendingTitleBuy = item;
       
       if (confirm(`Купити титул "${item.name}" за ${formatNumber(item.price)} монет?`)) {
         buyCosmetic({ ...item, type: 'title' });
@@ -1881,7 +1886,6 @@
         profAvatar.innerText = state.avatar;
       }
 
-      // Шукаємо титул в основному списку або в кейсах
       const titleObj = TITLES.find(t => t.name === state.title) || CASE_TITLES.find(t => t.name === state.title);
       if (titleObj) {
         profTitle.innerText = titleObj.name;
@@ -1925,7 +1929,7 @@
         casesSection.style.display = 'none';
       }
 
-      // 2. Титули (включаючи ті, що з кейсів)
+      // 2. Титули
       const availableTitles = [
         ...TITLES.filter(t => {
           if (t.reqPrestige > 0) return state.prestige >= t.reqPrestige;
@@ -1995,7 +1999,6 @@
       const caseItem = state.cases[index];
       if (!caseItem) return;
       
-      // Видаляємо кейс з інвентаря
       const newCases = [...state.cases];
       newCases.splice(index, 1);
       
@@ -2004,11 +2007,9 @@
       caseRewardText.innerText = '';
       btnCloseCase.style.display = 'none';
 
-      // Анімація
       setTimeout(async () => {
         caseOpeningBox.style.display = 'none';
         
-        // Генеруємо нагороду
         const rand = Math.random() * 100;
         let rewardText = '';
         let updateData = {
@@ -2020,11 +2021,9 @@
         };
 
         if (rand < 5) {
-          // 5% - Кейс рівнем вище
           updateData.cases.push({ type: 'epic', name: 'Епічний кейс' });
           rewardText = '📦 Епічний кейс!';
         } else if (rand < 20) {
-          // 15% - Випадковий скін
           if (SKINS.length > 0) {
             const randomSkin = SKINS[Math.floor(Math.random() * SKINS.length)];
             if (!updateData.purchasedSkins.includes(randomSkin.id)) {
@@ -2036,7 +2035,6 @@
             rewardText = '⭐ +10,000 XP';
           }
         } else if (rand < 40) {
-          // 20% - Випадкова іконка
           if (AVATARS.length > 0) {
             const randomAvatar = AVATARS[Math.floor(Math.random() * AVATARS.length)];
             if (!updateData.purchasedAvatars.includes(randomAvatar.name)) {
@@ -2048,14 +2046,12 @@
             rewardText = '⭐ +10,000 XP';
           }
         } else if (rand < 60) {
-          // 20% - Ексклюзивний титул
           const randomTitle = CASE_TITLES[Math.floor(Math.random() * CASE_TITLES.length)];
           if (!updateData.purchasedTitles.includes(randomTitle.name)) {
             updateData.purchasedTitles.push(randomTitle.name);
           }
           rewardText = `🏆 Титул: ${randomTitle.name}`;
         } else {
-          // 40% - XP
           const xpReward = Math.floor(Math.random() * 49000) + 1000;
           updateData.xp += xpReward;
           rewardText = `⭐ +${formatNumber(xpReward)} XP`;
@@ -2256,9 +2252,7 @@
         let finalTotal = 0;
         let newPrice = 0;
 
-        // Для PLAYERHOM використовуємо спеціальну логіку
         if (symbol === 'PLAYERHOM') {
-          // Отримуємо всіх користувачів
           const usersSnap = await get(ref(db, 'users'));
           const allUsers = usersSnap.val() || {};
           let globalHoldings = 0;
@@ -2266,25 +2260,23 @@
             globalHoldings += allUsers[u]?.holdings?.PLAYERHOM || 0;
           }
 
-          // Розраховуємо нову ціну для кожної монети
           let currentPrice = PLAYERHOM_BASE + globalHoldings * PLAYERHOM_PER_UNIT;
           
           if (action === 'buy') {
             for (let i = 0; i < qty; i++) {
               finalTotal += currentPrice * (1 + CRYPTO_FEE);
-              currentPrice += PLAYERHOM_PER_UNIT; // Наступна монета дорожча
+              currentPrice += PLAYERHOM_PER_UNIT;
             }
           } else {
             for (let i = 0; i < qty; i++) {
               finalTotal += currentPrice * (1 - CRYPTO_FEE);
-              currentPrice -= PLAYERHOM_PER_UNIT; // Наступна монета дешевша
+              currentPrice -= PLAYERHOM_PER_UNIT;
               if (currentPrice < PLAYERHOM_BASE) currentPrice = PLAYERHOM_BASE;
             }
           }
 
           newPrice = currentPrice;
 
-          // Виконуємо транзакцію
           await runTransaction(userRef, (data) => {
             if (!data) return data;
             if (!data.holdings) data.holdings = {};
@@ -2304,7 +2296,6 @@
           });
 
           if (success) {
-            // Оновлюємо ціну PLAYERHOM у базі
             await update(ref(db, 'crypto/PLAYERHOM'), {
               price: newPrice,
               history: [...(cryptoState.PLAYERHOM?.history || []), { t: Date.now(), p: newPrice }].slice(-30)
@@ -2312,7 +2303,6 @@
           }
 
         } else {
-          // Для інших монет звичайна логіка (фіксована ціна)
           const price = info.price;
           const total = price * qty;
 
