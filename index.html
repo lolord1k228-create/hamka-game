@@ -31,7 +31,7 @@
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     .loading-text { font-size: 16px; font-weight: 600; color: #fff; }
 
-    /* ===== АВТОРИЗАЦІЯ ===== */
+    /* ===== АВТОРИЗАЦІЯ (Тільки для браузера) ===== */
     #auth-screen {
       position: fixed; inset: 0; z-index: 1000; background: #0a0a0a;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -208,7 +208,7 @@
       margin: 0 auto 6px; background-size: cover; background-position: center;
     }
 
-    /* ===== КРИПТА (МІНІ-ІГРИ) ===== */
+    /* ===== КРИПТА / МІНІ-ІГРИ ===== */
     .crypto-page { padding: 8px 12px 100px; }
     .crypto-card {
       background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08);
@@ -569,6 +569,7 @@
     <div class="main-menu">
       <div class="menu-item active" data-page="tap"><div class="menu-icon-wrap">🐭</div><span>Гра</span></div>
       <div class="menu-item" data-page="shop"><div class="menu-icon-wrap">🛒</div><span>Магазин</span></div>
+      <div class="menu-item" data-page="crypto"><div class="menu-icon-wrap">₿</div><span>Крипта</span></div>
       <div class="menu-item" data-page="minigames"><div class="menu-icon-wrap">🎲</div><span>Міні-ігри</span></div>
       <div class="menu-item" data-page="profile"><div class="menu-icon-wrap">👤</div><span>Профіль</span></div>
       <div class="menu-item" data-page="inventory"><div class="menu-icon-wrap">🎒</div><span>Інвентар</span></div>
@@ -602,11 +603,16 @@
       </div>
     </div>
 
-    <!-- МІНІ-ІГРИ (Рулетка + Крипта) -->
+    <!-- КРИПТА -->
+    <div class="page crypto-page" id="page-crypto">
+      <div id="crypto-list"></div>
+    </div>
+
+    <!-- МІНІ-ІГРИ (Рулетка) -->
     <div class="page crypto-page" id="page-minigames">
       <div class="inventory-title" style="text-align:center; font-size: 20px; margin-bottom: 16px;">🎲 Міні-ігри</div>
       
-      <div class="crypto-card" style="text-align: center; margin-bottom: 20px;">
+      <div class="crypto-card" style="text-align: center;">
         <div style="font-size: 18px; font-weight: 700; color: #f5a623; margin-bottom: 8px;">Рулетка за рекламу</div>
         <div style="font-size: 12px; color: #aaa; margin-bottom: 16px;">Крути та отримуй монети, XP, Хоми або ексклюзивні предмети!</div>
         
@@ -619,10 +625,6 @@
 
         <button class="ad-btn" id="btn-spin-roulette">🎬 Крутити за рекламу</button>
       </div>
-
-      <!-- Крипта -->
-      <div class="inventory-title" style="text-align:center; font-size: 20px; margin-bottom: 16px;">💹 Крипта</div>
-      <div id="crypto-list"></div>
     </div>
 
     <!-- ПРОФІЛЬ -->
@@ -1382,7 +1384,7 @@
         const arr = [];
         for (const uid in users) {
           const u = users[uid];
-          if (u.hideFromTop) continue;
+          if (u.hideFromTop) continue; // Пропускаємо тих, хто приховався
           
           arr.push({ 
             uid: uid,
@@ -1404,6 +1406,7 @@
           const el = document.createElement('div');
           el.className = 'leaderboard-item';
           
+          // Видача титулів за топ
           if (i < 3 && u.uid === currentUid) {
             const topTitle = TOP_TITLES[i].name;
             if (!state.purchasedTitles.includes(topTitle)) {
@@ -1696,6 +1699,7 @@
         checkAdReward();
         checkAutoCase();
 
+        // Оновлюємо активні сторінки в реальному часі
         if (document.getElementById('page-shop').classList.contains('active')) renderShop();
         if (document.getElementById('page-profile').classList.contains('active')) renderProfile();
         if (document.getElementById('page-inventory').classList.contains('active')) renderInventory();
@@ -1804,6 +1808,7 @@
       }
     }
 
+    // === Нагорода за 5 переглядів (Кейс) ===
     async function checkAdReward() {
       if (state.adWatches >= 5 && currentUid) {
         await update(ref(db, 'users/' + currentUid), {
@@ -1816,6 +1821,7 @@
       }
     }
 
+    // === Авто-фарм кейсів ===
     function checkAutoCase() {
       if (state.upgrades.autoCaseLevel > 0 && currentUid) {
         const chance = state.upgrades.autoCaseLevel * 0.01; 
@@ -2253,6 +2259,7 @@
         casesSection.style.display = 'block';
         invCases.innerHTML = '';
         
+        // Групуємо однакові кейси
         const caseCounts = {};
         state.cases.forEach(c => {
           const key = c.name;
@@ -2285,6 +2292,7 @@
         ...TOP_TITLES.filter(t => state.purchasedTitles.includes(t.name))
       ];
 
+      // Групуємо титули
       const titleCounts = {};
       state.purchasedTitles.forEach(name => {
         titleCounts[name] = (titleCounts[name] || 0) + 1;
@@ -2711,6 +2719,7 @@
     // === РУЛЕТКА ===
     function initRoulette() {
       rouletteStrip.innerHTML = '';
+      // Заповнюємо стрічку випадковими призами
       for (let i = 0; i < 20; i++) {
         const rand = Math.random();
         let text = '🪙';
@@ -2736,17 +2745,20 @@
         const result = await AdController.show();
         if (!result || !result.done) throw new Error("Ad not watched");
 
+        // Анімація обертання
         const itemWidth = 60;
         const randomIndex = Math.floor(Math.random() * 20);
         const offset = -(randomIndex * itemWidth) + (rouletteStrip.clientWidth / 2) - (itemWidth / 2);
         rouletteStrip.style.transform = `translateX(${offset}px)`;
 
         setTimeout(async () => {
+          // Логіка призу
           const rand = Math.random() * 100;
           let rewardText = '';
           let updateData = {};
 
           if (rand < 2) {
+            // 2% - Ексклюзивний титул/скім
             if (Math.random() < 0.5 && SKINS.length > 0) {
               const randomSkin = SKINS[Math.floor(Math.random() * SKINS.length)];
               updateData.purchasedSkins = [...state.purchasedSkins, randomSkin.id];
@@ -2757,14 +2769,17 @@
               rewardText = `🏆 Титул: ${randomTitle.name}`;
             }
           } else if (rand < 30) {
+            // 28% - Хоми
             const homs = Math.floor(Math.random() * 50) + 10;
             updateData.homs = state.homs + homs;
             rewardText = `🐹 +${homs} Хомів`;
           } else if (rand < 60) {
+            // 30% - XP
             const xp = Math.floor(Math.random() * 5000) + 1000;
             updateData.xp = state.xp + xp;
             rewardText = `⭐ +${formatNumber(xp)} XP`;
           } else {
+            // 40% - Монети
             const coins = Math.floor(Math.random() * 10000) + 1000;
             updateData.coins = state.coins + coins;
             rewardText = `🪙 +${formatNumber(coins)} монет`;
@@ -2773,6 +2788,7 @@
           await update(ref(db, 'users/' + currentUid), updateData);
           showStatus(`🎰 Ви виграли: ${rewardText}`);
           
+          // Скидаємо анімацію
           setTimeout(() => {
             rouletteStrip.style.transition = 'none';
             rouletteStrip.style.transform = 'translateX(0)';
