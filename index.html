@@ -208,7 +208,7 @@
       margin: 0 auto 6px; background-size: cover; background-position: center;
     }
 
-    /* ===== КРИПТА / МІНІ-ІГРИ ===== */
+    /* ===== КРИПТА / МІНІ-ІГРИ / РИНОК ===== */
     .crypto-page { padding: 8px 12px 100px; }
     .crypto-card {
       background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08);
@@ -298,16 +298,6 @@
       cursor: pointer; transition: 0.2s;
     }
     .change-skin-btn:active { transform: scale(0.97); }
-
-    .ad-btn {
-      width: 100%; padding: 12px; margin-top: 12px;
-      background: linear-gradient(90deg, #f39c12, #e67e22);
-      border: none; border-radius: 12px; color: #fff; font-weight: 700; font-size: 14px;
-      cursor: pointer; box-shadow: 0 4px 15px rgba(230, 126, 34, 0.3);
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-    }
-    .ad-btn:active { transform: scale(0.97); }
-    .ad-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
     .prestige-section {
       background: rgba(138, 43, 226, 0.1); border: 1px solid rgba(138, 43, 226, 0.3);
@@ -543,7 +533,6 @@
     <div class="main-menu">
       <div class="menu-item active" data-page="tap"><div class="menu-icon-wrap">🐭</div><span>Гра</span></div>
       <div class="menu-item" data-page="shop"><div class="menu-icon-wrap">🛒</div><span>Магазин</span></div>
-      <div class="menu-item" data-page="crypto"><div class="menu-icon-wrap">₿</div><span>Крипта</span></div>
       <div class="menu-item" data-page="minigames"><div class="menu-icon-wrap">🎲</div><span>Міні-ігри</span></div>
       <div class="menu-item" data-page="profile"><div class="menu-icon-wrap">👤</div><span>Профіль</span></div>
       <div class="menu-item" data-page="inventory"><div class="menu-icon-wrap">🎒</div><span>Інвентар</span></div>
@@ -576,27 +565,42 @@
       </div>
     </div>
 
-    <!-- КРИПТА -->
-    <div class="page crypto-page" id="page-crypto">
-      <div id="crypto-list"></div>
-    </div>
-
-    <!-- МІНІ-ІГРИ (Рулетка) -->
+    <!-- МІНІ-ІГРИ (Крипта, Рулетка, Ринок) -->
     <div class="page crypto-page" id="page-minigames">
       <div class="inventory-title" style="text-align:center; font-size: 20px; margin-bottom: 16px;">🎲 Міні-ігри</div>
       
-      <div class="crypto-card" style="text-align: center;">
-        <div style="font-size: 18px; font-weight: 700; color: #f5a623; margin-bottom: 8px;">Рулетка за рекламу</div>
-        <div style="font-size: 12px; color: #aaa; margin-bottom: 16px;">Крути та отримуй монети, XP, Хоми або ексклюзивні предмети!</div>
-        
-        <div class="roulette-container" style="margin-bottom: 16px;">
-          <div class="roulette-pointer"></div>
-          <div class="roulette-strip" id="roulette-strip">
-            <!-- Стрічка генерується в JS -->
-          </div>
-        </div>
+      <div class="shop-tabs" style="margin-bottom: 16px;">
+        <div class="shop-tab active" id="minitab-crypto">₿ Крипта</div>
+        <div class="shop-tab" id="minitab-roulette">🎰 Рулетка</div>
+        <div class="shop-tab" id="minitab-market">🏪 Ринок</div>
+      </div>
 
-        <button class="ad-btn" id="btn-spin-roulette">🎬 Крутити за рекламу</button>
+      <!-- Крипта -->
+      <div id="mini-content-crypto">
+        <div id="crypto-list"></div>
+      </div>
+
+      <!-- Рулетка -->
+      <div id="mini-content-roulette" style="display:none; text-align: center;">
+        <div class="crypto-card">
+          <div style="font-size: 18px; font-weight: 700; color: #f5a623; margin-bottom: 8px;">Рулетка за рекламу</div>
+          <div style="font-size: 12px; color: #aaa; margin-bottom: 16px;">Крути та отримуй монети, XP, Хоми або ексклюзивні предмети!</div>
+          
+          <div class="roulette-container" style="margin-bottom: 16px;">
+            <div class="roulette-pointer"></div>
+            <div class="roulette-strip" id="roulette-strip">
+              <!-- Стрічка генерується в JS -->
+            </div>
+          </div>
+
+          <button class="ad-btn" id="btn-spin-roulette">🎬 Крутити за рекламу</button>
+        </div>
+      </div>
+
+      <!-- Ринок -->
+      <div id="mini-content-market" style="display:none;">
+        <div class="inventory-title" style="text-align:center; font-size: 16px; margin-bottom: 12px;">🏪 Ринок (за Хоми)</div>
+        <div id="market-list"></div>
       </div>
     </div>
 
@@ -648,7 +652,6 @@
         </div>
 
         <button class="change-skin-btn" id="btn-open-skin-menu">🎨 Змінити скін</button>
-        <button class="ad-btn" id="btn-watch-ad">🎬 Дивитись рекламу (+1 до прогресу)</button>
       </div>
 
       <div class="prestige-section">
@@ -870,6 +873,7 @@
     const cryptoListEl = document.getElementById('crypto-list');
     const shopListEl = document.getElementById('shop-list');
     const leaderboardList = document.getElementById('leaderboard-list');
+    const marketListEl = document.getElementById('market-list');
     
     const xpDisplay = document.getElementById('xp-display');
     const xpNext = document.getElementById('xp-next');
@@ -925,6 +929,14 @@
     const btnSpinRoulette = document.getElementById('btn-spin-roulette');
     const rouletteStrip = document.getElementById('roulette-strip');
 
+    // Міні-ігри перемикання
+    const minitabCrypto = document.getElementById('minitab-crypto');
+    const minitabRoulette = document.getElementById('minitab-roulette');
+    const minitabMarket = document.getElementById('minitab-market');
+    const miniContentCrypto = document.getElementById('mini-content-crypto');
+    const miniContentRoulette = document.getElementById('mini-content-roulette');
+    const miniContentMarket = document.getElementById('mini-content-market');
+
     // === Стан ===
     let isLoginMode = true;
     let state = { 
@@ -941,8 +953,7 @@
         autoTapRate: 0, 
         autoXpRate: 0, 
         energyRate: 1, 
-        caseChance: 0,
-        autoCaseLevel: 0 // Нова прокачка для авто-фарму кейсів
+        caseChance: 0
       }
     };
     let pendingTap = false;
@@ -1000,8 +1011,6 @@
 
     const SHOP_ITEMS = {
       auto: [
-        { id: 'autoCase', title: 'Авто-фарм кейсів', desc: 'Шанс отримати кейс щохвилини', basePrice: 100, multiplier: 5, maxLevel: 5, isHoms: true }, // Перша покупка за Хоми
-        { id: 'caseChance', title: 'Покращення кейсів', desc: '+1% до шансу на x2 баланс', basePrice: 5000, multiplier: 5, maxLevel: 5, requires: 'autoCase' },
         { id: 'autoTap', title: 'Авто тап', desc: '+1 монета/сек', basePrice: 200, multiplier: 2, maxLevel: 999 },
         { id: 'autoXp', title: 'Авто XP', desc: '+1 XP/сек', basePrice: 1500, multiplier: 2, maxLevel: 999 },
         { id: 'energyRate', title: '+Енергія', desc: '+1 енергія/сек', basePrice: 1000, multiplier: 10, maxLevel: 999 },
@@ -1017,10 +1026,6 @@
       const allItems = [...SHOP_ITEMS.auto, ...SHOP_ITEMS.upgrade];
       const item = allItems.find(i => i.id === itemId);
       if (!item) return 0;
-      if (item.isHoms) {
-        // Для авто-фарму ціна завжди в Хомах, і вона зростає
-        return Math.floor(item.basePrice * Math.pow(item.multiplier, level));
-      }
       if (item.prices && level < item.prices.length) return item.prices[level];
       if (item.prices && level >= item.prices.length) return Infinity;
       return Math.floor(item.basePrice * Math.pow(item.multiplier, level));
@@ -1230,7 +1235,45 @@
         if (item.dataset.page === 'profile') renderProfile();
         if (item.dataset.page === 'inventory') renderInventory();
         if (item.dataset.page === 'top') loadLeaderboard();
+        if (item.dataset.page === 'minigames') {
+          // За замовчуванням показуємо крипту
+          minitabCrypto.classList.add('active');
+          minitabRoulette.classList.remove('active');
+          minitabMarket.classList.remove('active');
+          miniContentCrypto.style.display = 'block';
+          miniContentRoulette.style.display = 'none';
+          miniContentMarket.style.display = 'none';
+        }
       });
+    });
+
+    // Перемикання міні-ігор
+    minitabCrypto.addEventListener('click', () => {
+      minitabCrypto.classList.add('active');
+      minitabRoulette.classList.remove('active');
+      minitabMarket.classList.remove('active');
+      miniContentCrypto.style.display = 'block';
+      miniContentRoulette.style.display = 'none';
+      miniContentMarket.style.display = 'none';
+    });
+
+    minitabRoulette.addEventListener('click', () => {
+      minitabCrypto.classList.remove('active');
+      minitabRoulette.classList.add('active');
+      minitabMarket.classList.remove('active');
+      miniContentCrypto.style.display = 'none';
+      miniContentRoulette.style.display = 'block';
+      miniContentMarket.style.display = 'none';
+    });
+
+    minitabMarket.addEventListener('click', () => {
+      minitabCrypto.classList.remove('active');
+      minitabRoulette.classList.remove('active');
+      minitabMarket.classList.add('active');
+      miniContentCrypto.style.display = 'none';
+      miniContentRoulette.style.display = 'none';
+      miniContentMarket.style.display = 'block';
+      renderMarket();
     });
 
     document.querySelectorAll('.shop-tab').forEach(tab => {
@@ -1343,7 +1386,6 @@
           
           // Перевірка на титули топу
           if (i < 3 && u.uid === currentUid) {
-            // Якщо гравець в топ-3, автоматично видаємо титул
             const topTitle = TOP_TITLES[i].name;
             if (!state.purchasedTitles.includes(topTitle)) {
               update(ref(db, 'users/' + currentUid), {
@@ -1581,7 +1623,6 @@
             tapLevel: 0, tapPower: 1, xpPerTap: 1,
             autoTapRate: 0, autoXpRate: 0, energyRate: 1,
             caseChance: 0,
-            autoCaseLevel: 0,
             purchasedTitles: [], purchasedAvatars: [], purchasedSkins: [],
             cases: [],
             adWatches: 0,
@@ -1625,13 +1666,11 @@
         state.upgrades.autoXpRate = data.autoXpRate || 0;
         state.upgrades.energyRate = data.energyRate || 1;
         state.upgrades.caseChance = data.caseChance || 0;
-        state.upgrades.autoCaseLevel = data.autoCaseLevel || 0;
 
         renderUI();
         checkAutoPrestige();
         updateHamsterSkin();
         checkAdReward();
-        checkAutoCase(); // Перевірка авто-фарму кейсів
 
         if (document.getElementById('page-shop').classList.contains('active')) renderShop();
         if (document.getElementById('page-profile').classList.contains('active')) renderProfile();
@@ -1750,23 +1789,6 @@
         
         showStatus('📦 Ви отримали кейс за 5 переглядів!');
         try { tg.HapticFeedback.notificationOccurred('success'); } catch(e) {}
-      }
-    }
-
-    // === Авто-фарм кейсів ===
-    function checkAutoCase() {
-      if (state.upgrades.autoCaseLevel > 0 && currentUid) {
-        // Шанс 1% за рівень щосекунди (можна змінити)
-        const chance = state.upgrades.autoCaseLevel * 0.01; 
-        if (Math.random() < chance) {
-          runTransaction(ref(db, 'users/' + currentUid), (data) => {
-            if (!data) return data;
-            if (!data.cases) data.cases = [];
-            data.cases.push({ type: 'basic', name: 'Авто-кейс' });
-            return data;
-          });
-          // showStatus('📦 Авто-кейс отримано!'); // Можна вимкнути, щоб не спамило
-        }
       }
     }
 
@@ -1955,29 +1977,10 @@
         else if (item.id === 'xpTap') currentLevel = state.upgrades.xpPerTap - 1;
         else if (item.id === 'maxEnergy') currentLevel = (state.maxEnergy - 200) / 50;
         else if (item.id === 'caseChance') currentLevel = state.upgrades.caseChance;
-        else if (item.id === 'autoCase') currentLevel = state.upgrades.autoCaseLevel;
-
-        // Перевірка на вимогу попереднього апгрейду
-        if (item.requires && state.upgrades[item.requires] === 0) {
-          return; // Не показуємо, якщо не куплено попереднє
-        }
 
         const price = getShopPrice(item.id, currentLevel);
         const isMaxed = currentLevel >= item.maxLevel || price === Infinity;
-        
-        let canAfford;
-        if (item.isHoms) {
-          canAfford = state.homs >= price;
-        } else {
-          canAfford = state.coins >= price;
-        }
-
-        let priceText;
-        if (item.isHoms) {
-          priceText = formatNumber(price) + ' 🐹';
-        } else {
-          priceText = formatNumber(price) + ' 🪙';
-        }
+        const canAfford = state.coins >= price;
 
         const card = document.createElement('div');
         card.className = 'shop-card';
@@ -1985,7 +1988,7 @@
           <div class="shop-card-info">
             <div class="shop-card-title">${item.title} <span style="font-size:10px; color:#888;">(Рів. ${currentLevel}${item.maxLevel < 999 ? '/' + item.maxLevel : ''})</span></div>
             <div class="shop-card-desc">${item.desc}</div>
-            ${!isMaxed ? `<div class="shop-card-price">${priceText}</div>` : '<div class="shop-card-price" style="color:#2ecc71;">МАКСИМУМ</div>'}
+            ${!isMaxed ? `<div class="shop-card-price">${formatNumber(price)} 🪙</div>` : '<div class="shop-card-price" style="color:#2ecc71;">МАКСИМУМ</div>'}
           </div>
           <button class="shop-card-btn" data-id="${item.id}" ${isMaxed || !canAfford ? 'disabled' : ''}>
             ${isMaxed ? 'Макс' : 'Купити'}
@@ -2040,7 +2043,6 @@
       else if (itemId === 'xpTap') currentLevel = state.upgrades.xpPerTap - 1;
       else if (itemId === 'maxEnergy') currentLevel = (state.maxEnergy - 200) / 50;
       else if (itemId === 'caseChance') currentLevel = state.upgrades.caseChance;
-      else if (itemId === 'autoCase') currentLevel = state.upgrades.autoCaseLevel;
 
       const price = getShopPrice(itemId, currentLevel);
       const userRef = ref(db, 'users/' + currentUid);
@@ -2051,14 +2053,9 @@
 
         await runTransaction(userRef, (data) => {
           if (!data) return data;
-          
-          if (item.isHoms) {
-            if ((data.homs || 0) < price) { errorMsg = 'Недостатньо Хомів'; return; }
-            data.homs = (data.homs || 0) - price;
-          } else {
-            if ((data.coins || 0) < price) { errorMsg = 'Недостатньо монет'; return; }
-            data.coins = (data.coins || 0) - price;
-          }
+          if ((data.coins || 0) < price) { errorMsg = 'Недостатньо монет'; return; }
+
+          data.coins = (data.coins || 0) - price;
 
           if (itemId === 'autoTap') data.autoTapRate = (data.autoTapRate || 0) + 1;
           else if (itemId === 'autoXp') data.autoXpRate = (data.autoXpRate || 0) + 1;
@@ -2070,7 +2067,6 @@
           else if (itemId === 'xpTap') data.xpPerTap = (data.xpPerTap || 1) + 1;
           else if (itemId === 'maxEnergy') data.maxEnergy = (data.maxEnergy || 200) + 50;
           else if (itemId === 'caseChance') data.caseChance = (data.caseChance || 0) + 1;
-          else if (itemId === 'autoCase') data.autoCaseLevel = (data.autoCaseLevel || 0) + 1;
 
           success = true;
           return data;
@@ -2672,4 +2668,4 @@
 
   </script>
 </body>
-                                                                                </html>
+  </html>
