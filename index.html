@@ -273,24 +273,6 @@
     .profile-stat-val { font-size: 16px; font-weight: 700; color: #f5a623; }
     .profile-stat-lbl { font-size: 10px; color: #888; text-transform: uppercase; }
 
-    .ad-progress-container {
-      margin-top: 12px;
-      background: rgba(0,0,0,0.3);
-      border-radius: 10px;
-      padding: 10px;
-    }
-    .ad-progress-label {
-      display: flex; justify-content: space-between;
-      font-size: 11px; color: #aaa; margin-bottom: 4px;
-    }
-    .ad-progress-bar-wrap {
-      width: 100%; height: 8px; background: #222; border-radius: 4px; overflow: hidden;
-    }
-    .ad-progress-bar {
-      height: 100%; background: linear-gradient(90deg, #8a2be2, #da70d6);
-      width: 0%; transition: width 0.3s;
-    }
-
     .change-skin-btn {
       width: 100%; padding: 10px; margin-top: 12px;
       background: rgba(138, 43, 226, 0.2); border: 1px solid rgba(138, 43, 226, 0.5);
@@ -640,17 +622,6 @@
           </div>
         </div>
 
-        <!-- Прогрес перегляду реклами -->
-        <div class="ad-progress-container">
-          <div class="ad-progress-label">
-            <span>🎬 Переглянуто відео</span>
-            <span id="ad-watch-count">0 / 5</span>
-          </div>
-          <div class="ad-progress-bar-wrap">
-            <div class="ad-progress-bar" id="ad-progress-bar"></div>
-          </div>
-        </div>
-
         <button class="change-skin-btn" id="btn-open-skin-menu">🎨 Змінити скін</button>
       </div>
 
@@ -964,12 +935,20 @@
     let currentShopTab = 'auto';
     let isAdmin = false;
 
+    // ============================================================
+    // СКІНИ ТЕПЕР ЗАВАНТАЖУЮТЬСЯ З HTML (ВИПРАВЛЕНО)
+    // ============================================================
     const GITHUB_RAW = "https://raw.githubusercontent.com/lolord1k228-create/hamka-game/main/skins/";
+    
+    // Дані про скіни перенесені сюди
+    const SKINS = [
+      { id: 'skin_ai', name: 'AIHamster', file: 'ai_hamster.png', price: 50000 },
+      { id: 'skin_neon', name: 'Neon Hamster', file: 'hamster.png', price: 5000000 }
+    ];
 
     // === Дані ===
     let TITLES = [];
     let AVATARS = [];
-    let SKINS = [];
 
     // Ексклюзивні титули з кейсів
     const CASE_TITLES = [
@@ -1213,6 +1192,8 @@
           initCryptoSystem();
           checkAdminStatus(user.uid);
           initRoulette();
+          // Встановлюємо початкове значення для лічильника переглядів
+          adWatchCount.innerText = `0 / 5`;
         });
       } else {
         currentUid = null;
@@ -1331,22 +1312,7 @@
           ];
         }
 
-        const skinsSnap = await get(ref(db, 'game_data/skins'));
-        if (skinsSnap.exists()) {
-          const data = skinsSnap.val();
-          SKINS = Object.keys(data).map(id => {
-            const item = data[id];
-            if (typeof item === 'object' && item.file) {
-              return {
-                id: id,
-                name: item.name || 'Скін',
-                file: item.file,
-                price: item.price || 0
-              };
-            }
-            return null;
-          }).filter(s => s !== null);
-        }
+        // Скіни тепер завантажуються з HTML, тому тут їх не чіпаємо
       } catch (err) {
         console.error("Load game data error:", err);
       }
@@ -1827,6 +1793,7 @@
       const lvlProgress = nextLvl.xp === currentLvl.xp ? 100 : ((state.xp - currentLvl.xp) / (nextLvl.xp - currentLvl.xp)) * 100;
       xpBar.style.width = Math.min(100, Math.max(0, lvlProgress)) + '%';
 
+      // Оновлюємо лічильник переглядів реклами
       adWatchCount.innerText = `${state.adWatches} / 5`;
       adProgressBar.style.width = Math.min(100, (state.adWatches / 5) * 100) + '%';
     }
@@ -1949,19 +1916,36 @@
           <div class="grid-preview" style="font-size:40px;">🎬</div>
           <div class="shop-card-info">
             <div class="shop-card-title">Кейс за рекламу</div>
-            <div class="shop-card-price">Потрібно 5 переглядів</div>
+            <div class="shop-card-price">Прогрес: ${state.adWatches} / 5</div>
           </div>
-          <button class="shop-card-btn" id="btn-buy-case-ad">Отримати</button>
+          <button class="shop-card-btn" id="btn-buy-case-ad">${state.adWatches >= 5 ? 'Забрати' : 'Дивитись'}</button>
         `;
         shopListEl.appendChild(adCaseCard);
         
+        // Логіка кнопки кейса за рекламу
         document.getElementById('btn-buy-case-ad').addEventListener('click', async () => {
-          if (state.adWatches < 5) {
-            showStatus(`❌ Потрібно переглянути ще ${5 - state.adWatches} реклам`);
-            return;
+          if (state.adWatches >= 5) {
+            // Якщо вже 5 переглядів - забираємо кейс
+            await update(ref(db, 'users/' + currentUid), {
+              adWatches: 0,
+              cases: [...(state.cases || []), { type: 'basic', name: 'Базовий кейс' }]
+            });
+            showStatus('✅ Кейс отримано!');
+          } else {
+            // Інакше показуємо рекламу
+            if (!AdController) { showStatus('❌ Реклама недоступна'); return; }
+            try {
+              const result = await AdController.show();
+              if (result && result.done) {
+                await runTransaction(ref(db, 'users/' + currentUid), (data) => {
+                  if (!data) return data;
+                  data.adWatches = (data.adWatches || 0) + 1;
+                  return data;
+                });
+                showStatus(`✅ Перегляд зараховано! (${state.adWatches + 1}/5)`);
+              }
+            } catch(e) { showStatus('❌ Реклама не завершена'); }
           }
-          // Логіка вже спрацює в checkAdReward, але для певності
-          showStatus('✅ Кейс отримано!');
         });
         
         return;
@@ -2188,9 +2172,6 @@
       } else {
         prestigeInfo.innerText = `Потрібно ${formatNumber(req)} XP (у вас ${formatNumber(state.xp)})`;
       }
-      
-      adWatchCount.innerText = `${state.adWatches} / 5`;
-      adProgressBar.style.width = Math.min(100, (state.adWatches / 5) * 100) + '%';
     }
 
     // ============================================================
@@ -2628,43 +2609,9 @@
       }
     }
 
-    // === ОБРОБНИК РЕКЛАМИ ===
-    document.getElementById('btn-watch-ad').addEventListener('click', async () => {
-      const btn = document.getElementById('btn-watch-ad');
-      btn.disabled = true;
-      btn.innerText = '⏳ Завантаження реклами...';
-
-      try {
-        if (!AdController) {
-          throw new Error("AdController is not initialized.");
-        }
-        
-        const result = await AdController.show();
-        
-        if (!result || !result.done) {
-          throw new Error("Ad was skipped or not completed.");
-        }
-
-        if (currentUid) {
-          await runTransaction(ref(db, 'users/' + currentUid), (data) => {
-            if (!data) return data;
-            data.adWatches = (data.adWatches || 0) + 1;
-            return data;
-          });
-
-          const newWatchCount = state.adWatches + 1;
-          showStatus(`✅ Перегляд зараховано! (${newWatchCount}/5)`);
-          
-          try { tg.HapticFeedback.notificationOccurred('success'); } catch(e) {}
-        }
-      } catch (e) {
-        console.error("Ad error:", e);
-        showStatus('❌ Реклама не завершена. Спробуйте пізніше.');
-      } finally {
-        btn.disabled = false;
-        btn.innerText = '🎬 Дивитись рекламу (+1 до прогресу)';
-      }
-    });
+    // === ОБРОБНИК РЕКЛАМИ (В МАГАЗИНІ) ===
+    // Цей обробник тепер знаходиться в renderShop для кнопки "Дивитись"
+    // і в функції initRoulette для рулетки
 
   </script>
 </body>
