@@ -1001,9 +1001,8 @@
       }
     });
 
-    // === ВИПРАВЛЕНО: ВХІД ЧЕРЕЗ TELEGRAM ===
+    // === ВХІД ЧЕРЕЗ TELEGRAM ===
     tgLoginBtn.addEventListener('click', async () => {
-      // Очищаємо попередні помилки
       authError.innerText = '';
       
       const tgUser = tg.initDataUnsafe?.user;
@@ -1018,10 +1017,8 @@
       tgLoginBtn.disabled = true;
       
       try {
-        // 1. Намагаємося увійти
         await signInWithEmailAndPassword(auth, email, password);
       } catch (e) {
-        // 2. Якщо акаунта немає — створюємо
         if (e.code === 'auth/user-not-found' || e.code === 'auth/invalid-credential' || e.code === 'auth/invalid-login-credentials') {
           try {
             await createUserWithEmailAndPassword(auth, email, password);
@@ -1549,12 +1546,10 @@
     // === Нагорода за 5 переглядів (Кейс) ===
     async function checkAdReward() {
       if (state.adWatches >= 5 && currentUid) {
-        // Перевіряємо, чи є вже кейс, щоб не дублювати
         const userSnap = await get(ref(db, 'users/' + currentUid));
         const data = userSnap.val();
         const currentCases = data.cases || [];
         
-        // Якщо кейсів менше 1, додаємо (щоб не спамило)
         if (currentCases.length === 0) {
           await update(ref(db, 'users/' + currentUid), {
             adWatches: 0,
@@ -1614,7 +1609,6 @@
         const grid = document.createElement('div');
         grid.className = 'shop-grid';
 
-        // Титули (тільки ті, що купуються за монети)
         TITLES.forEach(item => {
           if (item.price <= 0) return;
           const isOwned = state.purchasedTitles.includes(item.name);
@@ -1634,7 +1628,6 @@
           grid.appendChild(card);
         });
 
-        // Аватарки
         AVATARS.forEach(item => {
           const isOwned = state.purchasedAvatars.includes(item.name);
 
@@ -1653,7 +1646,6 @@
           grid.appendChild(card);
         });
 
-        // Скіни
         SKINS.forEach(item => {
           const isOwned = state.purchasedSkins.includes(item.id);
 
