@@ -597,7 +597,6 @@
           <div class="shop-tab" data-shop-tab="upgrade">Прокачка</div>
           <div class="shop-tab" data-shop-tab="cases">Кейси</div>
           <div class="shop-tab" data-shop-tab="cosmetics">Косметика</div>
-          <div class="shop-tab" data-shop-tab="market">Ринок</div>
         </div>
         <div class="shop-list" id="shop-list"></div>
       </div>
@@ -1997,51 +1996,6 @@
         return;
       }
 
-      if (currentShopTab === 'market') {
-        // Ринок: продаж своїх предметів
-        const invItems = [
-          ...state.purchasedTitles.map(t => ({ type: 'title', name: t, price: 1000, icon: '🏆' })),
-          ...state.purchasedAvatars.map(a => ({ type: 'avatar', name: a, price: 500, icon: a })),
-          ...state.purchasedSkins.map(id => {
-            const s = SKINS.find(x => x.id === id);
-            return s ? { type: 'skin', id: id, name: s.name, price: s.price / 2, icon: '🎨' } : null;
-          }).filter(Boolean)
-        ];
-
-        if (invItems.length === 0) {
-          shopListEl.innerHTML = '<div style="text-align:center; padding:20px; color:#888;">У вас немає предметів для продажу</div>';
-          return;
-        }
-
-        invItems.forEach(item => {
-          const card = document.createElement('div');
-          card.className = 'shop-card';
-          card.innerHTML = `
-            <div class="grid-preview" style="font-size:24px;">${item.icon}</div>
-            <div class="shop-card-info">
-              <div class="shop-card-title">${item.name}</div>
-              <div class="shop-card-desc">Продати за ${formatNumber(item.price)} 🪙</div>
-            </div>
-            <button class="shop-card-btn" style="background:#ff5252; color:#fff;" data-sell-type="${item.type}" data-sell-name="${item.name}" data-sell-price="${item.price}">Продати</button>
-          `;
-          shopListEl.appendChild(card);
-        });
-
-        shopListEl.querySelectorAll('.shop-card-btn').forEach(btn => {
-          btn.addEventListener('click', async () => {
-            const type = btn.dataset.sellType;
-            const name = btn.dataset.sellName;
-            const price = parseInt(btn.dataset.sellPrice);
-            
-            if (!confirm(`Продати "${name}" за ${formatNumber(price)} монет?`)) return;
-            
-            await sellItem(type, name, price);
-          });
-        });
-        
-        return;
-      }
-
       const items = SHOP_ITEMS[currentShopTab] || [];
       items.forEach(item => {
         let currentLevel = 0;
@@ -2093,38 +2047,6 @@
       shopListEl.querySelectorAll('.shop-card-btn').forEach(btn => {
         btn.addEventListener('click', () => buyUpgrade(btn.dataset.id));
       });
-    }
-
-    async function sellItem(type, name, price) {
-      if (!currentUid) return;
-      
-      // Анімація продажу
-      const anim = document.createElement('div');
-      anim.className = 'sell-animation';
-      anim.innerText = `+${formatNumber(price)} 🪙`;
-      document.body.appendChild(anim);
-      setTimeout(() => anim.remove(), 1500);
-
-      await runTransaction(ref(db, 'users/' + currentUid), (data) => {
-        if (!data) return data;
-        
-        if (type === 'title') {
-          const idx = data.purchasedTitles.indexOf(name);
-          if (idx > -1) data.purchasedTitles.splice(idx, 1);
-        } else if (type === 'avatar') {
-          const idx = data.purchasedAvatars.indexOf(name);
-          if (idx > -1) data.purchasedAvatars.splice(idx, 1);
-        } else if (type === 'skin') {
-          const idx = data.purchasedSkins.indexOf(name);
-          if (idx > -1) data.purchasedSkins.splice(idx, 1);
-        }
-        
-        data.coins = (data.coins || 0) + price;
-        return data;
-      });
-      
-      showStatus(`✅ Продано за ${formatNumber(price)} монет`);
-      renderShop();
     }
 
     function openBuyTitleModal(titleName) {
@@ -2904,4 +2826,4 @@
 
   </script>
 </body>
-        </html>
+  </html>
