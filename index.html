@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="uk">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -457,38 +457,38 @@
   <!-- Екран завантаження -->
   <div id="loading-screen">
     <div class="loader"></div>
-    <div class="loading-text" data-i18n="loading">Loading...</div>
+    <div class="loading-text" data-i18n="loading">Завантаження...</div>
   </div>
 
   <!-- ===== АВТОРИЗАЦІЯ ===== -->
   <div id="auth-screen" class="hidden">
     <div class="auth-logo-img">🐭</div>
     <div class="auth-title">Hamka</div>
-    <div class="auth-subtitle" data-i18n="auth_subtitle">Crypto clicker with upgrades</div>
+    <div class="auth-subtitle" data-i18n="auth_subtitle">Крипто-клікер з апгрейдами</div>
 
     <div class="auth-tabs">
-      <div class="auth-tab active" id="tab-login" data-i18n="login">Login</div>
-      <div class="auth-tab" id="tab-register" data-i18n="register">Register</div>
+      <div class="auth-tab active" id="tab-login" data-i18n="login">Вхід</div>
+      <div class="auth-tab" id="tab-register" data-i18n="register">Реєстрація</div>
     </div>
 
-    <div class="auth-hint-top" data-i18n="auth_hint">🔒 Choose login method</div>
+    <div class="auth-hint-top" data-i18n="auth_hint">🔒 Виберіть спосіб входу</div>
 
     <div class="auth-form">
       <div class="input-wrap">
         <span class="input-icon">👤</span>
-        <input type="text" id="auth-nickname" class="auth-input" placeholder="Nickname (latin)" autocomplete="username">
+        <input type="text" id="auth-nickname" class="auth-input" placeholder="Нікнейм (латиниця)" autocomplete="username">
       </div>
       <div class="input-wrap">
         <span class="input-icon">🔑</span>
-        <input type="password" id="auth-password" class="auth-input" placeholder="Password (min. 6)" autocomplete="current-password">
+        <input type="password" id="auth-password" class="auth-input" placeholder="Пароль (мін. 6)" autocomplete="current-password">
       </div>
       
       <div class="auth-error" id="auth-error"></div>
 
-      <button class="auth-btn btn-green" id="auth-submit" data-i18n="btn_login">👉 Login</button>
+      <button class="auth-btn btn-green" id="auth-submit" data-i18n="btn_login">👉 Увійти</button>
       
-      <div class="auth-divider" data-i18n="or">or</div>
-      <button class="auth-btn btn-blue" id="tg-login-btn" data-i18n="btn_tg">📱 Login via Telegram</button>
+      <div class="auth-divider" data-i18n="or">або</div>
+      <button class="auth-btn btn-blue" id="tg-login-btn" data-i18n="btn_tg">📱 Увійти через Telegram</button>
     </div>
   </div>
 
@@ -500,19 +500,19 @@
         <div class="stat-pill"><span class="icon">🐹</span> <span id="top-homs">0</span></div>
       </div>
       <div style="display:flex; gap:8px; align-items:center;">
-        <div class="admin-btn-badge" id="admin-btn-badge" onclick="document.getElementById('modal-admin').classList.add('show')">🛠 Admin</div>
-        <div class="season-badge" data-i18n="season">🏆 Season 1</div>
+        <div class="admin-btn-badge" id="admin-btn-badge" onclick="document.getElementById('modal-admin').classList.add('show')">🛠 Адмін</div>
+        <div class="season-badge" data-i18n="season">🏆 Сезон 1</div>
       </div>
     </div>
 
     <div class="main-menu">
-      <div class="menu-item active" data-page="tap"><div class="menu-icon-wrap">🐭</div><span data-i18n="menu_tap">Tap</span></div>
-      <div class="menu-item" data-page="shop"><div class="menu-icon-wrap">🛒</div><span data-i18n="menu_shop">Shop</span></div>
-      <div class="menu-item" data-page="minigames"><div class="menu-icon-wrap">🎲</div><span data-i18n="menu_games">Games</span></div>
-      <div class="menu-item" data-page="profile"><div class="menu-icon-wrap">👤</div><span data-i18n="menu_profile">Profile</span></div>
-      <div class="menu-item" data-page="inventory"><div class="menu-icon-wrap">🎒</div><span data-i18n="menu_inventory">Inventory</span></div>
-      <div class="menu-item" data-page="top"><div class="menu-icon-wrap">🏆</div><span data-i18n="menu_top">Top</span></div>
-      <div class="menu-item" data-page="settings"><div class="menu-icon-wrap">⚙️</div><span data-i18n="menu_settings">Settings</span></div>
+      <div class="menu-item active" data-page="tap"><div class="menu-icon-wrap">🐭</div><span data-i18n="menu_tap">Гра</span></div>
+      <div class="menu-item" data-page="shop"><div class="menu-icon-wrap">🛒</div><span data-i18n="menu_shop">Магазин</span></div>
+      <div class="menu-item" data-page="minigames"><div class="menu-icon-wrap">🎲</div><span data-i18n="menu_games">Ігри</span></div>
+      <div class="menu-item" data-page="profile"><div class="menu-icon-wrap">👤</div><span data-i18n="menu_profile">Профіль</span></div>
+      <div class="menu-item" data-page="inventory"><div class="menu-icon-wrap">🎒</div><span data-i18n="menu_inventory">Інвентар</span></div>
+      <div class="menu-item" data-page="top"><div class="menu-icon-wrap">🏆</div><span data-i18n="menu_top">Топ</span></div>
+      <div class="menu-item" data-page="settings"><div class="menu-icon-wrap">⚙️</div><span data-i18n="menu_settings">Налаштування</span></div>
     </div>
 
     <!-- ТАП -->
@@ -532,10 +532,10 @@
     <div class="page" id="page-shop">
       <div class="shop-container">
         <div class="shop-tabs">
-          <div class="shop-tab active" data-shop-tab="auto" data-i18n="shop_auto">Auto</div>
-          <div class="shop-tab" data-shop-tab="upgrade" data-i18n="shop_upgrade">Upgrades</div>
-          <div class="shop-tab" data-shop-tab="cases" data-i18n="shop_cases">Cases</div>
-          <div class="shop-tab" data-shop-tab="cosmetics" data-i18n="shop_cosmetics">Cosmetics</div>
+          <div class="shop-tab active" data-shop-tab="auto" data-i18n="shop_auto">Авто</div>
+          <div class="shop-tab" data-shop-tab="upgrade" data-i18n="shop_upgrade">Прокачка</div>
+          <div class="shop-tab" data-shop-tab="cases" data-i18n="shop_cases">Кейси</div>
+          <div class="shop-tab" data-shop-tab="cosmetics" data-i18n="shop_cosmetics">Косметика</div>
         </div>
         <div class="shop-list" id="shop-list"></div>
       </div>
@@ -543,11 +543,11 @@
 
     <!-- МІНІ-ІГРИ (Крипта та Рулетка) -->
     <div class="page crypto-page" id="page-minigames">
-      <div class="inventory-title" style="text-align:center; font-size: 20px; margin-bottom: 16px;" data-i18n="menu_games">🎲 Mini-games</div>
+      <div class="inventory-title" style="text-align:center; font-size: 20px; margin-bottom: 16px;" data-i18n="menu_games">🎲 Міні-ігри</div>
       
       <div class="shop-tabs" style="margin-bottom: 16px;">
-        <div class="shop-tab active" id="minitab-crypto">₿ Crypto</div>
-        <div class="shop-tab" id="minitab-roulette" data-i18n="roulette">🎰 Roulette</div>
+        <div class="shop-tab active" id="minitab-crypto">₿ Крипта</div>
+        <div class="shop-tab" id="minitab-roulette" data-i18n="roulette">🎰 Рулетка</div>
       </div>
 
       <!-- Крипта -->
@@ -558,15 +558,15 @@
       <!-- Рулетка -->
       <div id="mini-content-roulette" style="display:none; text-align: center;">
         <div class="crypto-card">
-          <div style="font-size: 18px; font-weight: 700; color: #f5a623; margin-bottom: 8px;" data-i18n="roulette_title">Roulette for Ad</div>
-          <div style="font-size: 12px; color: #aaa; margin-bottom: 16px;" data-i18n="roulette_desc">Spin and get coins, XP, Homs or exclusive items!</div>
+          <div style="font-size: 18px; font-weight: 700; color: #f5a623; margin-bottom: 8px;" data-i18n="roulette_title">Рулетка за рекламу</div>
+          <div style="font-size: 12px; color: #aaa; margin-bottom: 16px;" data-i18n="roulette_desc">Крути та отримуй монети, XP, Хоми або ексклюзиви!</div>
           
           <div class="roulette-container" style="margin-bottom: 16px;">
             <div class="roulette-pointer"></div>
             <div class="roulette-strip" id="roulette-strip"></div>
           </div>
 
-          <button class="auth-btn btn-green" id="btn-spin-roulette" style="width:100%;" data-i18n="spin_btn">🎬 Spin for Ad</button>
+          <button class="auth-btn btn-green" id="btn-spin-roulette" style="width:100%;" data-i18n="spin_btn">🎬 Крутити за рекламу</button>
         </div>
       </div>
     </div>
@@ -579,23 +579,23 @@
         </div>
         
         <div class="profile-name-wrap">
-          <div class="profile-name" id="prof-nickname">Player</div>
+          <div class="profile-name" id="prof-nickname">Гравець</div>
           <button class="edit-name-btn" id="btn-change-nickname">✏️</button>
         </div>
         <div class="profile-id" id="prof-public-id">ID: 000000</div>
 
         <div class="profile-title-badge" id="prof-title-badge">
-          <span id="prof-title">Beginner</span>
+          <span id="prof-title">Початківець</span>
         </div>
         
         <div class="profile-stats">
           <div class="profile-stat-item">
             <div class="profile-stat-val" id="prof-coins">0</div>
-            <div class="profile-stat-lbl" data-i18n="coins">Coins</div>
+            <div class="profile-stat-lbl" data-i18n="coins">Монети</div>
           </div>
           <div class="profile-stat-item">
             <div class="profile-stat-val" id="prof-homs">0</div>
-            <div class="profile-stat-lbl" data-i18n="homs">Homs</div>
+            <div class="profile-stat-lbl" data-i18n="homs">Хоми</div>
           </div>
           <div class="profile-stat-item">
             <div class="profile-stat-val" id="prof-xp">0</div>
@@ -603,60 +603,60 @@
           </div>
           <div class="profile-stat-item">
             <div class="profile-stat-val" id="prof-prestige">0</div>
-            <div class="profile-stat-lbl" data-i18n="prestige">Prestige</div>
+            <div class="profile-stat-lbl" data-i18n="prestige">Престиж</div>
           </div>
         </div>
       </div>
 
       <div class="prestige-section">
-        <div style="font-size: 18px; font-weight: 800; color: #da70d6;" data-i18n="prestige_title">🌟 Prestige</div>
-        <div style="font-size: 12px; color: #aaa; margin-top: 4px;" id="prestige-info">Required 1,000,000 XP</div>
+        <div style="font-size: 18px; font-weight: 800; color: #da70d6;" data-i18n="prestige_title">🌟 Престиж</div>
+        <div style="font-size: 12px; color: #aaa; margin-top: 4px;" id="prestige-info">Потрібно 1,000,000 XP</div>
       </div>
     </div>
 
     <!-- ІНВЕНТАР -->
     <div class="page scroll-page" id="page-inventory">
       <div class="inventory-section" id="cases-section" style="display:none;">
-        <div class="inventory-title" data-i18n="cases_title">📦 Cases</div>
+        <div class="inventory-title" data-i18n="cases_title">📦 Кейси</div>
         <div class="inventory-grid" id="inv-cases"></div>
       </div>
 
       <div class="inventory-section">
-        <div class="inventory-title" data-i18n="titles_title">Titles</div>
+        <div class="inventory-title" data-i18n="titles_title">Титули</div>
         <div class="inventory-grid" id="inv-titles"></div>
       </div>
       <div class="inventory-section">
-        <div class="inventory-title" data-i18n="avatars_title">Avatars</div>
+        <div class="inventory-title" data-i18n="avatars_title">Аватарки</div>
         <div class="inventory-grid" id="inv-avatars"></div>
       </div>
       <div class="inventory-section">
-        <div class="inventory-title" data-i18n="skins_title">Skins</div>
+        <div class="inventory-title" data-i18n="skins_title">Скіни</div>
         <div class="inventory-grid" id="inv-skins"></div>
       </div>
     </div>
 
     <!-- ТОП -->
     <div class="page scroll-page" id="page-top">
-      <div class="inventory-title" style="text-align:center; font-size: 20px; margin-bottom: 12px;" data-i18n="top_title">🏆 Leaderboard</div>
+      <div class="inventory-title" style="text-align:center; font-size: 20px; margin-bottom: 12px;" data-i18n="top_title">🏆 Топ гравців</div>
       <div id="leaderboard-list"></div>
     </div>
 
     <!-- НАЛАШТУВАННЯ -->
     <div class="page scroll-page" id="page-settings">
-      <div class="inventory-title" style="text-align:center; font-size: 20px; margin-bottom: 16px;" data-i18n="settings_title">⚙️ Settings</div>
+      <div class="inventory-title" style="text-align:center; font-size: 20px; margin-bottom: 16px;" data-i18n="settings_title">⚙️ Налаштування</div>
       
       <div class="settings-group">
-        <span class="settings-label" data-i18n="lang_label">Language / Мова / Язык</span>
+        <span class="settings-label" data-i18n="lang_label">Мова / Language / Язык</span>
         <select class="settings-select" id="language-select">
-          <option value="en">English</option>
           <option value="uk">Українська</option>
+          <option value="en">English</option>
           <option value="ru">Русский</option>
         </select>
       </div>
 
       <div class="settings-group">
         <div class="settings-toggle-row">
-          <span class="settings-label" style="margin-bottom:0;" data-i18n="hide_top_label">Hide me from Leaderboard</span>
+          <span class="settings-label" style="margin-bottom:0;" data-i18n="hide_top_label">Не показувати мене в топі</span>
           <label class="toggle-switch">
             <input type="checkbox" id="hide-top-toggle">
             <span class="toggle-slider"></span>
@@ -665,7 +665,7 @@
       </div>
 
       <div class="settings-group">
-        <button class="settings-btn" id="btn-logout" style="background: #ff5252; color: #fff; font-weight: 700;" data-i18n="logout_btn">🚪 Log out</button>
+        <button class="settings-btn" id="btn-logout" style="background: #ff5252; color: #fff; font-weight: 700;" data-i18n="logout_btn">🚪 Вийти з акаунта</button>
       </div>
     </div>
 
@@ -673,17 +673,17 @@
     <div class="bottom-panel">
       <div class="bottom-stats">
         <span>⚡ <span id="energy-label-text">200/200</span></span>
-        <span>+1 ⚡/s</span>
-        <span>+<span id="auto-tap-label">0</span> 🪙/s</span>
+        <span>+1 ⚡/сек</span>
+        <span>+<span id="auto-tap-label">0</span> 🪙/сек</span>
         <span>🪙 <span id="bottom-coins">0</span></span>
       </div>
       <div class="energy-bar-wrap"><div class="energy-bar" id="energy-bar" style="width: 100%;"></div></div>
       <div class="energy-labels">
-        <span data-i18n="energy">Energy</span>
+        <span data-i18n="energy">Енергія</span>
         <span id="energy-label-bottom">200/200</span>
       </div>
       <div class="xp-row">
-        <span id="level-name">0 beginner</span>
+        <span id="level-name">0 початківець</span>
         <span><span id="xp-display">0</span> / <span id="xp-next">50</span> XP</span>
       </div>
       <div class="xp-bar-wrap"><div class="xp-bar" id="xp-bar"></div></div>
@@ -695,16 +695,16 @@
   <!-- Модалка вибору кількості кейсів -->
   <div class="modal-overlay" id="modal-case-qty">
     <div class="modal-content">
-      <div class="modal-title" id="case-modal-title">Open Case</div>
-      <div style="font-size: 14px; color: #aaa; margin-bottom: 16px;" id="case-modal-count">Available: 0</div>
+      <div class="modal-title" id="case-modal-title" data-i18n="open_case">Відкрити кейс</div>
+      <div style="font-size: 14px; color: #aaa; margin-bottom: 16px;" id="case-modal-count">Доступно: 0</div>
       <div style="display:flex; gap:8px; margin-bottom:12px;">
         <button class="modal-btn confirm" onclick="openCasesBatch(1)">1</button>
         <button class="modal-btn confirm" onclick="openCasesBatch(5)">5</button>
         <button class="modal-btn confirm" onclick="openCasesBatch(10)">10</button>
-        <button class="modal-btn confirm" onclick="openCasesBatch('all')" data-i18n="all">All</button>
+        <button class="modal-btn confirm" onclick="openCasesBatch('all')" data-i18n="all">Всі</button>
       </div>
       <div class="modal-actions">
-        <button class="modal-btn cancel" onclick="document.getElementById('modal-case-qty').classList.remove('show')" data-i18n="cancel">Cancel</button>
+        <button class="modal-btn cancel" onclick="document.getElementById('modal-case-qty').classList.remove('show')" data-i18n="cancel">Скасувати</button>
       </div>
     </div>
   </div>
@@ -712,13 +712,13 @@
   <!-- Модалка перегляду профілю -->
   <div class="modal-overlay" id="modal-view-profile">
     <div class="modal-content">
-      <div class="modal-title" data-i18n="player_profile">Player Profile</div>
+      <div class="modal-title" data-i18n="player_profile">Профіль гравця</div>
       <div class="preview-box" id="view-prof-avatar" style="font-size: 50px;">🐭</div>
-      <div style="text-align:center; font-size: 20px; font-weight: 800; margin-bottom: 4px;" id="view-prof-nick">Player</div>
+      <div style="text-align:center; font-size: 20px; font-weight: 800; margin-bottom: 4px;" id="view-prof-nick">Гравець</div>
       <div style="text-align:center; font-size: 12px; color: #666; margin-bottom: 8px;" id="view-prof-id">ID: 000000</div>
       
       <div style="text-align:center; margin-bottom:12px;">
-        <span class="profile-title-badge" id="view-prof-title" style="margin-top:0;">Beginner</span>
+        <span class="profile-title-badge" id="view-prof-title" style="margin-top:0;">Початківець</span>
       </div>
 
       <div style="display:flex; justify-content:space-around; background:rgba(255,255,255,0.05); padding:10px; border-radius:10px; margin-bottom:12px;">
@@ -728,23 +728,23 @@
         </div>
         <div style="text-align:center;">
           <div style="font-weight:700; color:#da70d6;" id="view-prof-prestige">0</div>
-          <div style="font-size:10px; color:#888;" data-i18n="prestige">Prestige</div>
+          <div style="font-size:10px; color:#888;" data-i18n="prestige">Престиж</div>
         </div>
       </div>
 
       <div class="modal-actions">
-        <button class="modal-btn cancel" onclick="document.getElementById('modal-view-profile').classList.remove('show')" data-i18n="close">Close</button>
+        <button class="modal-btn cancel" onclick="document.getElementById('modal-view-profile').classList.remove('show')" data-i18n="close">Закрити</button>
       </div>
     </div>
   </div>
 
   <div class="modal-overlay" id="modal-nickname">
     <div class="modal-content">
-      <div class="modal-title" data-i18n="change_nickname">Change Nickname</div>
-      <input type="text" class="admin-input" id="new-nickname-input" placeholder="New nickname">
+      <div class="modal-title" data-i18n="change_nickname">Змінити нікнейм</div>
+      <input type="text" class="admin-input" id="new-nickname-input" placeholder="Новий нікнейм">
       <div class="modal-actions">
-        <button class="modal-btn cancel" onclick="document.getElementById('modal-nickname').classList.remove('show')" data-i18n="cancel">Cancel</button>
-        <button class="modal-btn confirm" id="btn-save-nickname" data-i18n="save">Save</button>
+        <button class="modal-btn cancel" onclick="document.getElementById('modal-nickname').classList.remove('show')" data-i18n="cancel">Скасувати</button>
+        <button class="modal-btn confirm" id="btn-save-nickname" data-i18n="save">Зберегти</button>
       </div>
     </div>
   </div>
@@ -752,20 +752,20 @@
   <!-- Модалка Адмінки -->
   <div class="modal-overlay" id="modal-admin">
     <div class="modal-content">
-      <div class="modal-title">🛠 Admin Panel</div>
-      <input type="number" class="admin-input" id="admin-coins-input" placeholder="Coins amount">
-      <button class="modal-btn confirm" style="width:100%; margin-bottom:10px;" onclick="adminAddCoins()">Add Coins</button>
+      <div class="modal-title">🛠 Адмін Панель</div>
+      <input type="number" class="admin-input" id="admin-coins-input" placeholder="Кількість монет">
+      <button class="modal-btn confirm" style="width:100%; margin-bottom:10px;" onclick="adminAddCoins()">Додати монети</button>
 
-      <input type="number" class="admin-input" id="admin-homs-input" placeholder="Homs amount">
-      <button class="modal-btn confirm" style="width:100%; margin-bottom:10px;" onclick="adminAddHoms()">Add Homs</button>
+      <input type="number" class="admin-input" id="admin-homs-input" placeholder="Кількість Хомів">
+      <button class="modal-btn confirm" style="width:100%; margin-bottom:10px;" onclick="adminAddHoms()">Додати Хоми</button>
 
-      <input type="number" class="admin-input" id="admin-xp-input" placeholder="XP amount">
-      <button class="modal-btn confirm" style="width:100%; margin-bottom:10px;" onclick="adminAddXp()">Add XP</button>
+      <input type="number" class="admin-input" id="admin-xp-input" placeholder="Кількість XP">
+      <button class="modal-btn confirm" style="width:100%; margin-bottom:10px;" onclick="adminAddXp()">Додати XP</button>
 
-      <button class="modal-btn confirm" style="width:100%; margin-bottom:10px;" onclick="adminAddCase()">Add Case</button>
+      <button class="modal-btn confirm" style="width:100%; margin-bottom:10px;" onclick="adminAddCase()">Додати кейс</button>
 
       <div class="modal-actions">
-        <button class="modal-btn cancel" onclick="document.getElementById('modal-admin').classList.remove('show')">Close</button>
+        <button class="modal-btn cancel" onclick="document.getElementById('modal-admin').classList.remove('show')">Закрити</button>
       </div>
     </div>
   </div>
@@ -775,7 +775,7 @@
     <div class="case-opening-box" id="case-opening-box">📦</div>
     <div class="case-reward-text" id="case-reward-text"></div>
     <div class="modal-actions" style="width: 100%; max-width: 300px; margin-top: 30px;">
-      <button class="modal-btn confirm" id="btn-close-case" data-i18n="take">Take</button>
+      <button class="modal-btn confirm" id="btn-close-case" data-i18n="take">Забрати</button>
     </div>
   </div>
 
@@ -809,55 +809,8 @@
 
     let AdController = null;
 
-    // === ЛОКАЛІЗАЦІЯ (Базова - англійська) ===
+    // === ЛОКАЛІЗАЦІЯ (За замовчуванням — українська) ===
     const translations = {
-      en: {
-        loading: "Loading...",
-        auth_subtitle: "Crypto clicker with upgrades",
-        login: "Login",
-        register: "Register",
-        auth_hint: "🔒 Choose login method",
-        btn_login: "👉 Login",
-        or: "or",
-        btn_tg: "📱 Login via Telegram",
-        season: "🏆 Season 1",
-        menu_tap: "Tap",
-        menu_shop: "Shop",
-        menu_games: "Games",
-        menu_profile: "Profile",
-        menu_inventory: "Inventory",
-        menu_top: "Top",
-        menu_settings: "Settings",
-        shop_auto: "Auto",
-        shop_upgrade: "Upgrades",
-        shop_cases: "Cases",
-        shop_cosmetics: "Cosmetics",
-        roulette: "🎰 Roulette",
-        roulette_title: "Roulette for Ad",
-        roulette_desc: "Spin and get coins, XP, Homs or exclusive items!",
-        spin_btn: "🎬 Spin for Ad",
-        coins: "Coins",
-        homs: "Homs",
-        prestige: "Prestige",
-        prestige_title: "🌟 Prestige",
-        cases_title: "📦 Cases",
-        titles_title: "Titles",
-        avatars_title: "Avatars",
-        skins_title: "Skins",
-        top_title: "🏆 Leaderboard",
-        settings_title: "⚙️ Settings",
-        lang_label: "Language / Мова / Язык",
-        hide_top_label: "Hide me from Leaderboard",
-        logout_btn: "🚪 Log out",
-        all: "All",
-        cancel: "Cancel",
-        close: "Close",
-        player_profile: "Player Profile",
-        change_nickname: "Change Nickname",
-        save: "Save",
-        take: "Take",
-        energy: "Energy"
-      },
       uk: {
         loading: "Завантаження...",
         auth_subtitle: "Крипто-клікер з апгрейдами",
@@ -903,7 +856,64 @@
         change_nickname: "Змінити нікнейм",
         save: "Зберегти",
         take: "Забрати",
-        energy: "Енергія"
+        energy: "Енергія",
+        buy: "Купити",
+        sell: "Продати",
+        owned: "Куплено",
+        max: "МАКС",
+        open_case: "Відкрити кейс"
+      },
+      en: {
+        loading: "Loading...",
+        auth_subtitle: "Crypto clicker with upgrades",
+        login: "Login",
+        register: "Register",
+        auth_hint: "🔒 Choose login method",
+        btn_login: "👉 Login",
+        or: "or",
+        btn_tg: "📱 Login via Telegram",
+        season: "🏆 Season 1",
+        menu_tap: "Tap",
+        menu_shop: "Shop",
+        menu_games: "Games",
+        menu_profile: "Profile",
+        menu_inventory: "Inventory",
+        menu_top: "Top",
+        menu_settings: "Settings",
+        shop_auto: "Auto",
+        shop_upgrade: "Upgrades",
+        shop_cases: "Cases",
+        shop_cosmetics: "Cosmetics",
+        roulette: "🎰 Roulette",
+        roulette_title: "Roulette for Ad",
+        roulette_desc: "Spin and get coins, XP, Homs or exclusive items!",
+        spin_btn: "🎬 Spin for Ad",
+        coins: "Coins",
+        homs: "Homs",
+        prestige: "Prestige",
+        prestige_title: "🌟 Prestige",
+        cases_title: "📦 Cases",
+        titles_title: "Titles",
+        avatars_title: "Avatars",
+        skins_title: "Skins",
+        top_title: "🏆 Leaderboard",
+        settings_title: "⚙️ Settings",
+        lang_label: "Language / Мова / Язык",
+        hide_top_label: "Hide me from Leaderboard",
+        logout_btn: "🚪 Log out",
+        all: "All",
+        cancel: "Cancel",
+        close: "Close",
+        player_profile: "Player Profile",
+        change_nickname: "Change Nickname",
+        save: "Save",
+        take: "Take",
+        energy: "Energy",
+        buy: "Buy",
+        sell: "Sell",
+        owned: "Owned",
+        max: "MAX",
+        open_case: "Open Case"
       },
       ru: {
         loading: "Загрузка...",
@@ -950,14 +960,19 @@
         change_nickname: "Изменить никнейм",
         save: "Сохранить",
         take: "Забрать",
-        energy: "Энергия"
+        energy: "Энергия",
+        buy: "Купить",
+        sell: "Продать",
+        owned: "Куплено",
+        max: "МАКС",
+        open_case: "Открыть кейс"
       }
     };
 
-    let currentLang = 'en';
+    let currentLang = localStorage.getItem('hamka_lang') || 'uk';
 
     function setLanguage(lang) {
-      if (!translations[lang]) lang = 'en';
+      if (!translations[lang]) lang = 'uk';
       currentLang = lang;
       localStorage.setItem('hamka_lang', lang);
       
@@ -1059,10 +1074,10 @@
     let isLoginMode = true;
     let state = { 
       coins: 0, homs: 0, energy: 200, maxEnergy: 200, xp: 0, prestige: 0,
-      title: 'Beginner', avatar: '🐭', nickname: '', publicId: '',
+      title: 'Початківець', avatar: '🐭', nickname: '', publicId: '',
       activeSkin: 'default', holdings: {},
       purchasedTitles: [], purchasedAvatars: [], purchasedSkins: [],
-      cases: {}, // об'єкт для стакування кейсів: { basic: 3, epic: 1 }
+      cases: {}, 
       adWatches: 0,
       hideFromTop: false,
       upgrades: { 
@@ -1089,24 +1104,24 @@
     let AVATARS = [];
 
     const CASE_TITLES = [
-      { name: 'Case Legend', color: 'linear-gradient(90deg, #ff0000, #ff8c00)' },
-      { name: 'Lootbox King', color: 'linear-gradient(90deg, #00ff00, #00bfff)' },
-      { name: 'Chosen', color: 'linear-gradient(90deg, #ffffff, #ffd700)' },
-      { name: 'Shadow', color: 'linear-gradient(90deg, #2f4f4f, #000000)' }
+      { name: 'Легенда Кейсів', color: 'linear-gradient(90deg, #ff0000, #ff8c00)' },
+      { name: 'Король Лутбоксів', color: 'linear-gradient(90deg, #00ff00, #00bfff)' },
+      { name: 'Обраний', color: 'linear-gradient(90deg, #ffffff, #ffd700)' },
+      { name: 'Тіньовий', color: 'linear-gradient(90deg, #2f4f4f, #000000)' }
     ];
 
     const TOP_TITLES = [
-      { name: '🥇 Top 1', color: 'linear-gradient(90deg, #ffd700, #ff8c00)' },
-      { name: '🥈 Top 2', color: 'linear-gradient(90deg, #c0c0c0, #808080)' },
-      { name: '🥉 Top 3', color: 'linear-gradient(90deg, #cd7f32, #8b4513)' }
+      { name: '🥇 Топ 1', color: 'linear-gradient(90deg, #ffd700, #ff8c00)' },
+      { name: '🥈 Топ 2', color: 'linear-gradient(90deg, #c0c0c0, #808080)' },
+      { name: '🥉 Топ 3', color: 'linear-gradient(90deg, #cd7f32, #8b4513)' }
     ];
 
     const LEVELS = [
-      { name: '0 beginner', xp: 0 },
-      { name: '1 beginner', xp: 50 },
-      { name: '2 beginner', xp: 200 },
-      { name: '3 beginner', xp: 500 },
-      { name: '4 beginner', xp: 1500 },
+      { name: '0 початківець', xp: 0 },
+      { name: '1 початківець', xp: 50 },
+      { name: '2 початківець', xp: 200 },
+      { name: '3 початківець', xp: 500 },
+      { name: '4 початківець', xp: 1500 },
       { name: 'bronze 1', xp: 5000 },
       { name: 'bronze 2', xp: 10000 },
       { name: 'bronze 3', xp: 15000 },
@@ -1124,14 +1139,14 @@
 
     const SHOP_ITEMS = {
       auto: [
-        { id: 'autoTap', title: 'Auto Tap', desc: '+1 coin/sec', basePrice: 200, multiplier: 2, maxLevel: 999 },
-        { id: 'autoXp', title: 'Auto XP', desc: '+1 XP/sec', basePrice: 1500, multiplier: 2, maxLevel: 999 },
-        { id: 'energyRate', title: '+Energy Regen', desc: '+1 energy/sec', basePrice: 1000, multiplier: 10, maxLevel: 999 },
+        { id: 'autoTap', title: 'Авто тап', desc: '+1 монета/сек', basePrice: 200, multiplier: 2, maxLevel: 999 },
+        { id: 'autoXp', title: 'Авто XP', desc: '+1 XP/сек', basePrice: 1500, multiplier: 2, maxLevel: 999 },
+        { id: 'energyRate', title: '+Регенерація енергії', desc: '+1 енергія/сек', basePrice: 1000, multiplier: 10, maxLevel: 999 },
       ],
       upgrade: [
-        { id: 'tap', title: 'Tap Power', desc: '+1 coin per tap', basePrice: 50, multiplier: 10, maxLevel: 9, prices: [50, 200, 2000, 5000, 20000, 50000, 150000, 500000, 2000000] },
-        { id: 'xpTap', title: 'XP Tap', desc: '+1 XP per tap', basePrice: 50000, multiplier: 10, maxLevel: 999, prices: [50000, 500000, 5000000, 50000000, 500000000] },
-        { id: 'maxEnergy', title: 'Max Energy', desc: '+50 max energy', basePrice: 50000, multiplier: 10, maxLevel: 999, prices: [50000, 500000, 5000000, 50000000, 500000000] },
+        { id: 'tap', title: 'Сила тапу', desc: '+1 монета за тап', basePrice: 50, multiplier: 10, maxLevel: 9, prices: [50, 200, 2000, 5000, 20000, 50000, 150000, 500000, 2000000] },
+        { id: 'xpTap', title: 'XP за тап', desc: '+1 XP за тап', basePrice: 50000, multiplier: 10, maxLevel: 999, prices: [50000, 500000, 5000000, 50000000, 500000000] },
+        { id: 'maxEnergy', title: 'Макс. енергія', desc: '+50 до макс. енергії', basePrice: 50000, multiplier: 10, maxLevel: 999, prices: [50000, 500000, 5000000, 50000000, 500000000] },
       ]
     };
 
@@ -1170,7 +1185,6 @@
       return p.toFixed(2);
     }
 
-    // Зміна мови в налаштуваннях
     languageSelect.addEventListener('change', (e) => {
       setLanguage(e.target.value);
       if (currentUid) {
@@ -1178,21 +1192,19 @@
       }
     });
 
-    // Налаштування приховування з топу
     hideTopToggle.addEventListener('change', async (e) => {
       const val = e.target.checked;
       state.hideFromTop = val;
       if (currentUid) {
         await update(ref(db, 'users/' + currentUid), { hideFromTop: val });
-        showStatus('✅ Updated settings');
+        showStatus('✅ Налаштування оновлено');
       }
     });
 
-    // Вихід з акаунта
     btnLogout.addEventListener('click', async () => {
       try {
         await signOut(auth);
-        showStatus('Logged out');
+        showStatus('Вийшли з акаунта');
       } catch(e) {}
     });
 
@@ -1202,11 +1214,11 @@
       if (loginMode) {
         tabLogin.classList.add('active');
         tabRegister.classList.remove('active');
-        authSubmit.innerHTML = '👉 Login';
+        authSubmit.innerHTML = '👉 Увійти';
       } else {
         tabRegister.classList.add('active');
         tabLogin.classList.remove('active');
-        authSubmit.innerHTML = '📝 Register';
+        authSubmit.innerHTML = '📝 Зареєструватися';
       }
       authError.innerText = '';
     }
@@ -1246,10 +1258,10 @@
     authSubmit.addEventListener('click', async () => {
       const nick = authNickname.value.trim();
       const password = authPassword.value;
-      if (!nick) { authError.innerText = 'Enter nickname'; return; }
-      if (password.length < 6) { authError.innerText = 'Password min 6 chars'; return; }
+      if (!nick) { authError.innerText = 'Введіть нікнейм'; return; }
+      if (password.length < 6) { authError.innerText = 'Пароль мін. 6 символів'; return; }
       const email = nickToEmail(nick);
-      if (!email) { authError.innerText = 'Invalid nickname'; return; }
+      if (!email) { authError.innerText = 'Невірний нікнейм'; return; }
 
       authSubmit.disabled = true;
       try {
@@ -1264,7 +1276,7 @@
 
     tgLoginBtn.addEventListener('click', async () => {
       const tgUser = tg?.initDataUnsafe?.user;
-      if (!tgUser) { authError.innerText = 'Open via Telegram bot'; return; }
+      if (!tgUser) { authError.innerText = 'Відкрийте через Telegram бот'; return; }
       try {
         await signInWithEmailAndPassword(auth, `tg_${tgUser.id}@hamka.test`, `Tg_${tgUser.id}_SecurePass_2026!`);
       } catch (e) {
@@ -1351,12 +1363,12 @@
           TITLES = Object.keys(titlesSnap.val()).map(id => ({ id, ...titlesSnap.val()[id] }));
         } else {
           TITLES = [
-            { id: 'beg', name: 'Beginner', price: 0, color: 'linear-gradient(90deg, #555, #777)', reqPrestige: 0 },
-            { id: 'brnz', name: 'Bronze Hamster', price: 0, color: 'linear-gradient(90deg, #cd7f32, #8b4513)', reqPrestige: 1 },
-            { id: 'slvr', name: 'Silver Hamster', price: 0, color: 'linear-gradient(90deg, #c0c0c0, #808080)', reqPrestige: 2 },
-            { id: 'gld', name: 'Gold Hamster', price: 0, color: 'linear-gradient(90deg, #ffd700, #b8860b)', reqPrestige: 3 },
-            { id: 'crypto_baron', name: 'Crypto Baron', price: 10000, color: 'linear-gradient(90deg, #ff9800, #ff5722)', reqPrestige: 0 },
-            { id: 'tap_god', name: 'Tap God', price: 50000, color: 'linear-gradient(90deg, #00bcd4, #2196f3)', reqPrestige: 0 }
+            { id: 'beg', name: 'Початківець', price: 0, color: 'linear-gradient(90deg, #555, #777)', reqPrestige: 0 },
+            { id: 'brnz', name: 'Бронзовий Хом\'як', price: 0, color: 'linear-gradient(90deg, #cd7f32, #8b4513)', reqPrestige: 1 },
+            { id: 'slvr', name: 'Срібний Хом\'як', price: 0, color: 'linear-gradient(90deg, #c0c0c0, #808080)', reqPrestige: 2 },
+            { id: 'gld', name: 'Золотий Хом\'як', price: 0, color: 'linear-gradient(90deg, #ffd700, #b8860b)', reqPrestige: 3 },
+            { id: 'crypto_baron', name: 'Крипто-Барон', price: 10000, color: 'linear-gradient(90deg, #ff9800, #ff5722)', reqPrestige: 0 },
+            { id: 'tap_god', name: 'Бог Тапів', price: 50000, color: 'linear-gradient(90deg, #00bcd4, #2196f3)', reqPrestige: 0 }
           ];
         }
 
@@ -1376,17 +1388,17 @@
     }
 
     async function loadLeaderboard() {
-      leaderboardList.innerHTML = '<div style="text-align:center; padding:20px; color:#888;">Loading...</div>';
+      leaderboardList.innerHTML = '<div style="text-align:center; padding:20px; color:#888;">Завантаження...</div>';
       try {
         const snap = await get(ref(db, 'users'));
         const users = snap.val() || {};
         const arr = [];
         for (const uid in users) {
           const u = users[uid];
-          if (u.hideFromTop) continue; // Не показувати якщо увімкнено
+          if (u.hideFromTop) continue;
           arr.push({ 
-            uid, nickname: u.nickname || 'Player', avatar: u.avatar || '🐭',
-            title: u.title || 'Beginner', activeSkin: u.activeSkin || 'default',
+            uid, nickname: u.nickname || 'Гравець', avatar: u.avatar || '🐭',
+            title: u.title || 'Початківець', activeSkin: u.activeSkin || 'default',
             publicId: u.publicId || '000000', xp: u.xp || 0, prestige: u.prestige || 0
           });
         }
@@ -1447,10 +1459,10 @@
 
     btnSaveNickname.addEventListener('click', async () => {
       const newNick = newNicknameInput.value.trim();
-      if (newNick.length < 3) { showStatus('❌ Too short'); return; }
+      if (newNick.length < 3) { showStatus('❌ Занадто короткий'); return; }
       await update(ref(db, 'users/' + currentUid), { nickname: newNick });
       modalNickname.classList.remove('show');
-      showStatus('✅ Saved!');
+      showStatus('✅ Збережено!');
     });
 
     async function checkAdminStatus(uid) {
@@ -1467,19 +1479,19 @@
       if (!isAdmin || !currentUid) return;
       const amount = parseInt(document.getElementById('admin-coins-input').value) || 0;
       await runTransaction(ref(db, 'users/' + currentUid), d => { if (d) d.coins = (d.coins || 0) + amount; return d; });
-      showStatus('✅ Added coins');
+      showStatus('✅ Монети додано');
     };
     window.adminAddHoms = async () => {
       if (!isAdmin || !currentUid) return;
       const amount = parseInt(document.getElementById('admin-homs-input').value) || 0;
       await runTransaction(ref(db, 'users/' + currentUid), d => { if (d) d.homs = (d.homs || 0) + amount; return d; });
-      showStatus('✅ Added Homs');
+      showStatus('✅ Хоми додано');
     };
     window.adminAddXp = async () => {
       if (!isAdmin || !currentUid) return;
       const amount = parseInt(document.getElementById('admin-xp-input').value) || 0;
       await runTransaction(ref(db, 'users/' + currentUid), d => { if (d) d.xp = (d.xp || 0) + amount; return d; });
-      showStatus('✅ Added XP');
+      showStatus('✅ XP додано');
     };
     window.adminAddCase = async () => {
       if (!isAdmin || !currentUid) return;
@@ -1489,7 +1501,7 @@
         d.cases.basic = (d.cases.basic || 0) + 1;
         return d;
       });
-      showStatus('✅ Case added');
+      showStatus('✅ Кейс додано');
     };
 
     function initGame(uid) {
@@ -1499,15 +1511,15 @@
         if (!snap.exists()) {
           const tgUser = tg?.initDataUnsafe?.user;
           const generatedId = tgUser ? 'tg_' + tgUser.id : Math.floor(100000 + Math.random() * 900000).toString();
-          const defaultNick = tgUser ? (tgUser.username || tgUser.first_name) : 'Player_' + generatedId;
+          const defaultNick = tgUser ? (tgUser.username || tgUser.first_name) : 'Гравець_' + generatedId;
 
           set(userRef, { 
             coins: 0, homs: 0, energy: 200, maxEnergy: 200, xp: 0, prestige: 0, 
-            title: 'Beginner', avatar: '🐭', holdings: {},
+            title: 'Початківець', avatar: '🐭', holdings: {},
             nickname: defaultNick, publicId: generatedId, activeSkin: 'default',
             tapLevel: 0, tapPower: 1, xpPerTap: 1, autoTapRate: 0, autoXpRate: 0, energyRate: 1,
             purchasedTitles: [], purchasedAvatars: [], purchasedSkins: [],
-            cases: { basic: 1 }, adWatches: 0, hideFromTop: false, language: 'en',
+            cases: { basic: 1 }, adWatches: 0, hideFromTop: false, language: 'uk',
             createdAt: Date.now()
           });
         }
@@ -1524,9 +1536,9 @@
         state.maxEnergy = data.maxEnergy ?? 200;
         state.xp = data.xp || 0;
         state.prestige = data.prestige || 0;
-        state.title = data.title || 'Beginner';
+        state.title = data.title || 'Початківець';
         state.avatar = data.avatar || '🐭';
-        state.nickname = data.nickname || 'Player';
+        state.nickname = data.nickname || 'Гравець';
         state.publicId = data.publicId || '000000';
         state.holdings = data.holdings || {};
         state.purchasedTitles = data.purchasedTitles || [];
@@ -1539,6 +1551,8 @@
         
         if (data.language && data.language !== currentLang) {
           setLanguage(data.language);
+        } else {
+          setLanguage(currentLang);
         }
 
         state.upgrades.tapLevel = data.tapLevel || 0;
@@ -1582,7 +1596,7 @@
       }, 1000);
 
       hamster.onclick = async (e) => {
-        if (state.energy < 1) { showStatus("❌ No energy!"); return; }
+        if (state.energy < 1) { showStatus("❌ Немає енергії!"); return; }
         const tapPower = state.upgrades.tapPower;
         const xpPerTap = state.upgrades.xpPerTap;
 
@@ -1714,7 +1728,7 @@
               <div class="shop-card-title" style="background:${item.color}; -webkit-background-clip:text; -webkit-text-fill-color:transparent;">${item.name}</div>
               <div class="shop-card-price">${formatNumber(item.price)} 🪙</div>
             </div>
-            <button class="shop-card-btn" data-title-name="${item.name}" ${isOwned ? 'disabled' : ''}>${isOwned ? 'Owned' : 'Buy'}</button>
+            <button class="shop-card-btn" data-title-name="${item.name}" ${isOwned ? 'disabled' : ''}>${isOwned ? (translations[currentLang].owned || 'Куплено') : (translations[currentLang].buy || 'Купити')}</button>
           `;
           grid.appendChild(card);
         });
@@ -1726,10 +1740,10 @@
           card.innerHTML = `
             <div class="grid-preview">${item.name}</div>
             <div class="shop-card-info">
-              <div class="shop-card-title">Avatar</div>
+              <div class="shop-card-title">Аватарка</div>
               <div class="shop-card-price">${formatNumber(item.price)} 🪙</div>
             </div>
-            <button class="shop-card-btn" data-avatar-name="${item.name}" ${isOwned ? 'disabled' : ''}>${isOwned ? 'Owned' : 'Buy'}</button>
+            <button class="shop-card-btn" data-avatar-name="${item.name}" ${isOwned ? 'disabled' : ''}>${isOwned ? (translations[currentLang].owned || 'Куплено') : (translations[currentLang].buy || 'Купити')}</button>
           `;
           grid.appendChild(card);
         });
@@ -1742,10 +1756,10 @@
           card.innerHTML = `
             <div class="grid-preview" style="background-image: url('${GITHUB_RAW}${item.file}');"></div>
             <div class="shop-card-info">
-              <div class="shop-card-title">Skin: ${item.name}</div>
+              <div class="shop-card-title">Скін: ${item.name}</div>
               <div class="shop-card-price">${formatNumber(item.price)} 🪙</div>
             </div>
-            <button class="shop-card-btn" data-skin-id="${item.id}" ${isOwned ? 'disabled' : ''}>${isOwned ? 'Owned' : 'Buy'}</button>
+            <button class="shop-card-btn" data-skin-id="${item.id}" ${isOwned ? 'disabled' : ''}>${isOwned ? (translations[currentLang].owned || 'Куплено') : (translations[currentLang].buy || 'Купити')}</button>
           `;
           grid.appendChild(card);
         });
@@ -1761,20 +1775,21 @@
       }
 
       if (currentShopTab === 'cases') {
+        // Покупка кейса за Хоми
         const caseCard = document.createElement('div');
         caseCard.className = 'shop-card';
         caseCard.innerHTML = `
           <div class="grid-preview" style="font-size:40px;">📦</div>
           <div class="shop-card-info">
-            <div class="shop-card-title">Basic Case</div>
+            <div class="shop-card-title">Базовий кейс</div>
             <div class="shop-card-price">100 🐹</div>
           </div>
-          <button class="shop-card-btn" id="btn-buy-case-homs">Buy</button>
+          <button class="shop-card-btn" id="btn-buy-case-homs">${translations[currentLang].buy || 'Купити'}</button>
         `;
         shopListEl.appendChild(caseCard);
         
         document.getElementById('btn-buy-case-homs').addEventListener('click', async () => {
-          if (state.homs < 100) { showStatus('❌ Not enough Homs'); return; }
+          if (state.homs < 100) { showStatus('❌ Недостатньо Хомів'); return; }
           await runTransaction(ref(db, 'users/' + currentUid), (data) => {
             if (!data || (data.homs || 0) < 100) return;
             data.homs -= 100;
@@ -1782,7 +1797,43 @@
             data.cases.basic = (data.cases.basic || 0) + 1;
             return data;
           });
-          showStatus('✅ Case purchased!');
+          showStatus('✅ Кейс куплено!');
+        });
+
+        // Кейс за рекламу
+        const adCaseCard = document.createElement('div');
+        adCaseCard.className = 'shop-card';
+        adCaseCard.innerHTML = `
+          <div class="grid-preview" style="font-size:40px;">🎬</div>
+          <div class="shop-card-info">
+            <div class="shop-card-title">Кейс за рекламу</div>
+            <div class="shop-card-price">Прогрес: ${state.adWatches} / 5</div>
+          </div>
+          <button class="shop-card-btn" id="btn-buy-case-ad">${state.adWatches >= 5 ? 'Забрати' : 'Дивитись'}</button>
+        `;
+        shopListEl.appendChild(adCaseCard);
+
+        document.getElementById('btn-buy-case-ad').addEventListener('click', async () => {
+          if (state.adWatches >= 5) {
+            await update(ref(db, 'users/' + currentUid), {
+              adWatches: 0,
+              cases: { ...state.cases, basic: (state.cases.basic || 0) + 1 }
+            });
+            showStatus('✅ Кейс отримано!');
+          } else {
+            if (!AdController) { showStatus('❌ Реклама недоступна'); return; }
+            try {
+              const result = await AdController.show();
+              if (result && result.done) {
+                await runTransaction(ref(db, 'users/' + currentUid), (data) => {
+                  if (!data) return data;
+                  data.adWatches = (data.adWatches || 0) + 1;
+                  return data;
+                });
+                showStatus(`✅ Перегляд зараховано! (${state.adWatches + 1}/5)`);
+              }
+            } catch(e) { showStatus('❌ Реклама не завершена'); }
+          }
         });
         return;
       }
@@ -1805,11 +1856,11 @@
         card.className = 'shop-card';
         card.innerHTML = `
           <div class="shop-card-info">
-            <div class="shop-card-title">${item.title} <span style="font-size:10px; color:#888;">(Lvl ${currentLevel})</span></div>
+            <div class="shop-card-title">${item.title} <span style="font-size:10px; color:#888;">(Рів. ${currentLevel})</span></div>
             <div class="shop-card-desc">${item.desc}</div>
-            ${!isMaxed ? `<div class="shop-card-price">${formatNumber(price)} 🪙</div>` : '<div class="shop-card-price" style="color:#2ecc71;">MAX</div>'}
+            ${!isMaxed ? `<div class="shop-card-price">${formatNumber(price)} 🪙</div>` : `<div class="shop-card-price" style="color:#2ecc71;">${translations[currentLang].max || 'МАКС'}</div>`}
           </div>
-          <button class="shop-card-btn" data-id="${item.id}" ${isMaxed || !canAfford ? 'disabled' : ''}>${isMaxed ? 'Max' : 'Buy'}</button>
+          <button class="shop-card-btn" data-id="${item.id}" ${isMaxed || !canAfford ? 'disabled' : ''}>${isMaxed ? (translations[currentLang].max || 'Макс') : (translations[currentLang].buy || 'Купити')}</button>
         `;
         shopListEl.appendChild(card);
       });
@@ -1845,7 +1896,7 @@
         else if (itemId === 'maxEnergy') data.maxEnergy = (data.maxEnergy || 200) + 50;
         return data;
       });
-      showStatus('✅ Upgrade purchased!');
+      showStatus('✅ Покращення куплено!');
     }
 
     async function buySkin(item) {
@@ -1856,7 +1907,7 @@
         if (!data.purchasedSkins.includes(item.id)) data.purchasedSkins.push(item.id);
         return data;
       });
-      showStatus('✅ Skin bought!');
+      showStatus('✅ Скін куплено!');
       renderShop();
     }
 
@@ -1873,7 +1924,7 @@
         }
         return data;
       });
-      showStatus('✅ Purchased!');
+      showStatus('✅ Успішно!');
       renderShop();
     }
 
@@ -1906,10 +1957,9 @@
       }
 
       const req = getPrestigeReq(state.prestige);
-      prestigeInfo.innerText = state.xp >= req ? 'Ready!' : `Required ${formatNumber(req)} XP`;
+      prestigeInfo.innerText = state.xp >= req ? 'Доступно!' : `Потрібно ${formatNumber(req)} XP`;
     }
 
-    // === ІНВЕНТАР ТА СТАКУВАННЯ КЕЙСІВ ===
     function renderInventory() {
       const cases = state.cases || {};
       const hasCases = Object.keys(cases).some(k => cases[k] > 0);
@@ -1925,7 +1975,7 @@
           el.innerHTML = `
             <div class="case-count-badge">${count}</div>
             <div class="case-icon">📦</div>
-            <div class="case-name">Basic Case</div>
+            <div class="case-name">Базовий кейс</div>
           `;
           el.addEventListener('click', () => openCaseModal(type, count));
           invCases.appendChild(el);
@@ -1934,7 +1984,6 @@
         casesSection.style.display = 'none';
       }
 
-      // Титули
       const availableTitles = [
         ...TITLES.filter(t => t.reqPrestige === 0 || state.prestige >= t.reqPrestige),
         ...CASE_TITLES.filter(t => state.purchasedTitles.includes(t.name)),
@@ -1947,12 +1996,11 @@
         el.innerHTML = `<div class="inventory-item-icon">🏆</div><div class="inventory-item-name" style="background:${tItem.color}; -webkit-background-clip:text; -webkit-text-fill-color:transparent;">${tItem.name}</div>`;
         el.addEventListener('click', async () => {
           await update(ref(db, 'users/' + currentUid), { title: tItem.name });
-          showStatus('✅ Title equipped!');
+          showStatus('✅ Титул вдягнуто!');
         });
         invTitles.appendChild(el);
       });
 
-      // Аватарки
       const availableAvatars = ['🐭', ...state.purchasedAvatars];
       invAvatars.innerHTML = '';
       availableAvatars.forEach(avName => {
@@ -1961,19 +2009,18 @@
         el.innerHTML = `<div class="inventory-item-icon">${avName}</div>`;
         el.addEventListener('click', async () => {
           await update(ref(db, 'users/' + currentUid), { avatar: avName });
-          showStatus('✅ Avatar changed!');
+          showStatus('✅ Аватарку змінено!');
         });
         invAvatars.appendChild(el);
       });
 
-      // Скіни
       invSkins.innerHTML = '';
       const defaultEl = document.createElement('div');
       defaultEl.className = `inventory-item ${state.activeSkin === 'default' ? 'active' : ''}`;
-      defaultEl.innerHTML = `<div class="inventory-item-icon">🐭</div><div class="inventory-item-name">Default</div>`;
+      defaultEl.innerHTML = `<div class="inventory-item-icon">🐭</div><div class="inventory-item-name">Стандарт</div>`;
       defaultEl.addEventListener('click', async () => {
         await update(ref(db, 'users/' + currentUid), { activeSkin: 'default' });
-        showStatus('✅ Skin changed!');
+        showStatus('✅ Скін змінено!');
       });
       invSkins.appendChild(defaultEl);
 
@@ -1985,7 +2032,7 @@
         el.innerHTML = `<div class="inventory-item-icon" style="background-image: url('${GITHUB_RAW}${skinObj.file}'); background-size: cover; border-radius:4px;"></div><div class="inventory-item-name">${skinObj.name}</div>`;
         el.addEventListener('click', async () => {
           await update(ref(db, 'users/' + currentUid), { activeSkin: skinId });
-          showStatus('✅ Skin changed!');
+          showStatus('✅ Скін змінено!');
         });
         invSkins.appendChild(el);
       });
@@ -1993,12 +2040,11 @@
 
     function openCaseModal(type, count) {
       selectedCaseTypeToOpen = type;
-      document.getElementById('case-modal-title').innerText = 'Open Case';
-      document.getElementById('case-modal-count').innerText = `Available: ${count}`;
+      document.getElementById('case-modal-title').innerText = translations[currentLang].open_case || 'Відкрити кейс';
+      document.getElementById('case-modal-count').innerText = `Доступно: ${count}`;
       document.getElementById('modal-case-qty').classList.add('show');
     }
 
-    // === ВІДКРИТТЯ КЕЙСІВ ПАЧКОЮ + ПОВТОРКИ ДАЮТЬ ПО 10 ХОМ ===
     window.openCasesBatch = async function(qty) {
       document.getElementById('modal-case-qty').classList.remove('show');
       if (!currentUid || !selectedCaseTypeToOpen) return;
@@ -2016,8 +2062,6 @@
       setTimeout(async () => {
         caseOpeningBox.style.display = 'none';
         
-        let totalXp = 0;
-        let totalHoms = 0;
         let summaryRewards = [];
 
         await runTransaction(ref(db, 'users/' + currentUid), (data) => {
@@ -2036,36 +2080,32 @@
               const randomSkin = SKINS[Math.floor(Math.random() * SKINS.length)];
               if (data.purchasedSkins.includes(randomSkin.id)) {
                 data.homs = (data.homs || 0) + 10;
-                totalHoms += 10;
-                summaryRewards.push(`+10 Homs (Skin Duplicate)`);
+                summaryRewards.push(`+10 Хомів (Дублікат скіна)`);
               } else {
                 data.purchasedSkins.push(randomSkin.id);
-                summaryRewards.push(`Skin: ${randomSkin.name}`);
+                summaryRewards.push(`Скін: ${randomSkin.name}`);
               }
             } else if (rand < 45) {
               const randomAvatar = AVATARS[Math.floor(Math.random() * AVATARS.length)];
               if (data.purchasedAvatars.includes(randomAvatar.name)) {
                 data.homs = (data.homs || 0) + 10;
-                totalHoms += 10;
-                summaryRewards.push(`+10 Homs (Avatar Duplicate)`);
+                summaryRewards.push(`+10 Хомів (Дублікат аватарки)`);
               } else {
                 data.purchasedAvatars.push(randomAvatar.name);
-                summaryRewards.push(`Avatar: ${randomAvatar.name}`);
+                summaryRewards.push(`Аватарка: ${randomAvatar.name}`);
               }
             } else if (rand < 70) {
               const randomTitle = CASE_TITLES[Math.floor(Math.random() * CASE_TITLES.length)];
               if (data.purchasedTitles.includes(randomTitle.name)) {
                 data.homs = (data.homs || 0) + 10;
-                totalHoms += 10;
-                summaryRewards.push(`+10 Homs (Title Duplicate)`);
+                summaryRewards.push(`+10 Хомів (Дублікат титулу)`);
               } else {
                 data.purchasedTitles.push(randomTitle.name);
-                summaryRewards.push(`Title: ${randomTitle.name}`);
+                summaryRewards.push(`Титул: ${randomTitle.name}`);
               }
             } else {
               const xpReward = Math.floor(Math.random() * 49000) + 1000;
               data.xp = (data.xp || 0) + xpReward;
-              totalXp += xpReward;
               summaryRewards.push(`+${formatNumber(xpReward)} XP`);
             }
           }
@@ -2151,10 +2191,10 @@
           <canvas class="crypto-chart" id="chart-${symbol}" width="300" height="60"></canvas>
           <div class="crypto-actions">
             <input type="number" min="1" value="${qty}" class="crypto-input" id="qty-${symbol}" data-symbol="${symbol}">
-            <button class="crypto-btn buy" data-symbol="${symbol}" data-action="buy">Buy</button>
-            <button class="crypto-btn sell" data-symbol="${symbol}" data-action="sell">Sell</button>
+            <button class="crypto-btn buy" data-symbol="${symbol}" data-action="buy">${translations[currentLang].buy || 'Купити'}</button>
+            <button class="crypto-btn sell" data-symbol="${symbol}" data-action="sell">${translations[currentLang].sell || 'Продати'}</button>
           </div>
-          <div class="crypto-holdings">You have: <span>${holding}</span> ${symbol}</div>
+          <div class="crypto-holdings">У вас: <span>${holding}</span> ${symbol}</div>
         `;
         cryptoListEl.appendChild(card);
         drawChart(document.getElementById('chart-' + symbol), history, isUp);
@@ -2222,14 +2262,15 @@
         }
         return data;
       });
-      showStatus('✅ Trade successful!');
+      showStatus('✅ Успішна операція!');
     }
 
+    // === РУЛЕТКА З АНІМАЦІЄЮ ТА НАГОРОДАМИ ===
     function initRoulette() {
       if (!rouletteStrip) return;
       rouletteStrip.innerHTML = '';
       const items = ['🪙', '⭐', '📦', '🐹', '🪙', '⭐', '🪙', '🐹'];
-      for (let i = 0; i < 30; i++) {
+      for (let i = 0; i < 40; i++) {
         const div = document.createElement('div');
         div.className = 'roulette-item';
         div.innerText = items[i % items.length];
@@ -2238,27 +2279,44 @@
     }
 
     btnSpinRoulette.addEventListener('click', async () => {
-      if (!AdController) { showStatus('❌ Ad not available'); return; }
+      if (!AdController) { showStatus('❌ Реклама недоступна'); return; }
       try {
         const result = await AdController.show();
         if (result && result.done) {
-          const rewards = [
-            { type: 'coins', val: 1000, text: '+1,000 Coins' },
-            { type: 'xp', val: 500, text: '+500 XP' },
-            { type: 'homs', val: 10, text: '+10 Homs' }
-          ];
-          const reward = rewards[Math.floor(Math.random() * rewards.length)];
-          
-          await runTransaction(ref(db, 'users/' + currentUid), (data) => {
-            if (!data) return data;
-            if (reward.type === 'coins') data.coins = (data.coins || 0) + reward.val;
-            if (reward.type === 'xp') data.xp = (data.xp || 0) + reward.val;
-            if (reward.type === 'homs') data.homs = (data.homs || 0) + reward.val;
-            return data;
-          });
-          showStatus(`🎁 Reward: ${reward.text}`);
+          // Анімація рулетки
+          const randomOffset = Math.floor(Math.random() * 15) * 60 + 900;
+          rouletteStrip.style.transition = 'transform 3s cubic-bezier(0.1, 0.8, 0.2, 1)';
+          rouletteStrip.style.transform = `translateX(-${randomOffset}px)`;
+
+          setTimeout(async () => {
+            rouletteStrip.style.transition = 'none';
+            rouletteStrip.style.transform = 'translateX(0)';
+
+            const rewards = [
+              { type: 'coins', val: 1000, text: '+1,000 Монет' },
+              { type: 'xp', val: 500, text: '+500 XP' },
+              { type: 'homs', val: 10, text: '+10 Хомів' },
+              { type: 'case', val: 1, text: '+1 Базовий кейс' }
+            ];
+            const reward = rewards[Math.floor(Math.random() * rewards.length)];
+
+            await runTransaction(ref(db, 'users/' + currentUid), (data) => {
+              if (!data) return data;
+              if (reward.type === 'coins') data.coins = (data.coins || 0) + reward.val;
+              if (reward.type === 'xp') data.xp = (data.xp || 0) + reward.val;
+              if (reward.type === 'homs') data.homs = (data.homs || 0) + reward.val;
+              if (reward.type === 'case') {
+                if (!data.cases) data.cases = {};
+                data.cases.basic = (data.cases.basic || 0) + 1;
+              }
+              return data;
+            });
+
+            showStatus(`🎁 Виграш: ${reward.text}`);
+            try { tg?.HapticFeedback?.notificationOccurred('success'); } catch(e) {}
+          }, 3100);
         }
-      } catch(e) { showStatus('❌ Ad not completed'); }
+      } catch(e) { showStatus('❌ Реклама не завершена'); }
     });
   </script>
 </body>
