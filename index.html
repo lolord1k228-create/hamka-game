@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -31,7 +31,7 @@
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     .loading-text { font-size: 16px; font-weight: 600; color: #fff; }
 
-    /* ===== АВТОРИЗАЦІЯ (Тільки для браузера) ===== */
+    /* ===== АВТОРИЗАЦІЯ ===== */
     #auth-screen {
       position: fixed; inset: 0; z-index: 1000; background: #0a0a0a;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -273,48 +273,10 @@
     .profile-stat-val { font-size: 16px; font-weight: 700; color: #f5a623; }
     .profile-stat-lbl { font-size: 10px; color: #888; text-transform: uppercase; }
 
-    .change-skin-btn {
-      width: 100%; padding: 10px; margin-top: 12px;
-      background: rgba(138, 43, 226, 0.2); border: 1px solid rgba(138, 43, 226, 0.5);
-      border-radius: 12px; color: #da70d6; font-weight: 700; font-size: 13px;
-      cursor: pointer; transition: 0.2s;
-    }
-    .change-skin-btn:active { transform: scale(0.97); }
-
-    .ad-btn {
-      width: 100%; padding: 12px; margin-top: 12px;
-      background: linear-gradient(90deg, #f39c12, #e67e22);
-      border: none; border-radius: 12px; color: #fff; font-weight: 700; font-size: 14px;
-      cursor: pointer; box-shadow: 0 4px 15px rgba(230, 126, 34, 0.3);
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-    }
-    .ad-btn:active { transform: scale(0.97); }
-    .ad-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
     .prestige-section {
       background: rgba(138, 43, 226, 0.1); border: 1px solid rgba(138, 43, 226, 0.3);
       border-radius: 14px; padding: 16px; text-align: center; margin-bottom: 16px;
     }
-
-    /* ===== НАЛАШТУВАННЯ ===== */
-    .settings-card {
-      background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 14px; padding: 16px; margin-bottom: 10px;
-    }
-    .settings-title { font-size: 16px; font-weight: 700; margin-bottom: 12px; color: #fff; }
-    .settings-row {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
-    }
-    .settings-row:last-child { border-bottom: none; }
-    .settings-label { font-size: 14px; color: #ccc; }
-    .settings-btn {
-      padding: 8px 12px; border: none; border-radius: 8px; font-size: 12px; font-weight: 700;
-      cursor: pointer;
-    }
-    .settings-btn.red { background: #ff5252; color: #fff; }
-    .settings-btn.green { background: #2ecc71; color: #000; }
-    .settings-btn.gray { background: #333; color: #fff; }
 
     /* ===== ІНВЕНТАР ===== */
     .inventory-section { margin-bottom: 16px; }
@@ -327,11 +289,6 @@
     .inventory-item.active { border-color: #2ecc71; background: rgba(46, 204, 113, 0.1); }
     .inventory-item-icon { font-size: 24px; height: 30px; display: flex; align-items: center; justify-content: center; background-size: cover; background-position: center; }
     .inventory-item-name { font-size: 10px; margin-top: 4px; color: #aaa; }
-    .inventory-item-count {
-      position: absolute; top: -5px; right: -5px;
-      background: #ff5252; color: #fff; border-radius: 10px;
-      padding: 2px 6px; font-size: 10px; font-weight: 700;
-    }
 
     .case-item {
       background: linear-gradient(135deg, #2a1b3d, #1a1a24);
@@ -343,6 +300,10 @@
     .case-item:active { transform: scale(0.95); }
     .case-icon { font-size: 40px; margin-bottom: 5px; }
     .case-name { font-size: 12px; font-weight: 700; color: #da70d6; }
+    .case-count-badge {
+      position: absolute; top: 6px; right: 6px; background: #8a2be2; color: #fff;
+      font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 10px;
+    }
 
     /* ===== ТОП ===== */
     .leaderboard-item {
@@ -367,6 +328,32 @@
     .lb-xp { font-size: 13px; font-weight: 700; color: #2ecc71; }
     .lb-prestige { font-size: 11px; font-weight: 700; color: #da70d6; }
 
+    /* ===== НАЛАШТУВАННЯ ===== */
+    .settings-group {
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px; padding: 14px; margin-bottom: 12px;
+    }
+    .settings-label { font-size: 14px; font-weight: 700; margin-bottom: 8px; display: block; color: #fff; }
+    .settings-select, .settings-btn {
+      width: 100%; padding: 12px; background: #1a1a1a; border: 1px solid #333;
+      border-radius: 10px; color: #fff; font-size: 14px; outline: none; cursor: pointer;
+    }
+    .settings-toggle-row { display: flex; justify-content: space-between; align-items: center; }
+    .toggle-switch {
+      position: relative; display: inline-block; width: 50px; height: 26px;
+    }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute; cursor: pointer; inset: 0; background-color: #333;
+      transition: .3s; border-radius: 26px;
+    }
+    .toggle-slider:before {
+      position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px;
+      background-color: white; transition: .3s; border-radius: 50%;
+    }
+    input:checked + .toggle-slider { background-color: #2ecc71; }
+    input:checked + .toggle-slider:before { transform: translateX(24px); }
+
     /* ===== МОДАЛКИ ===== */
     .modal-overlay {
       position: fixed; inset: 0; z-index: 1500; background: rgba(0,0,0,0.8);
@@ -376,9 +363,9 @@
     .modal-overlay.show { opacity: 1; pointer-events: all; }
     .modal-content {
       background: #1a1a1a; border: 1px solid #333; border-radius: 16px;
-      padding: 20px; width: 100%; max-width: 340px;
+      padding: 20px; width: 100%; max-width: 340px; text-align: center;
     }
-    .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 12px; text-align: center; }
+    .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 12px; }
     .preview-box {
       width: 100px; height: 100px; border-radius: 20px; background: rgba(255,255,255,0.1);
       display: flex; align-items: center; justify-content: center; font-size: 60px;
@@ -391,16 +378,14 @@
     .modal-btn.cancel { background: #333; color: #fff; }
     .modal-btn.confirm { background: #2ecc71; color: #000; }
 
-    /* Анімація відкриття кейса / рулетки */
+    /* Кейс відкриття */
     .case-open-overlay {
       position: fixed; inset: 0; z-index: 2500; background: rgba(0,0,0,0.95);
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       opacity: 0; pointer-events: none; transition: opacity 0.3s;
     }
     .case-open-overlay.show { opacity: 1; pointer-events: all; }
-    .case-opening-box {
-      font-size: 100px; animation: shake 0.5s infinite;
-    }
+    .case-opening-box { font-size: 100px; animation: shake 0.5s infinite; }
     @keyframes shake {
       0% { transform: rotate(0deg) scale(1); }
       25% { transform: rotate(15deg) scale(1.1); }
@@ -409,8 +394,8 @@
       100% { transform: rotate(0deg) scale(1); }
     }
     .case-reward-text {
-      font-size: 24px; font-weight: 900; color: #fff; margin-top: 20px; text-align: center;
-      animation: popIn 0.5s ease-out forwards;
+      font-size: 20px; font-weight: 800; color: #fff; margin-top: 20px; text-align: center; max-height: 200px; overflow-y: auto;
+      animation: popIn 0.5s ease-out forwards; padding: 0 10px;
     }
     @keyframes popIn {
       0% { transform: scale(0.5); opacity: 0; }
@@ -419,64 +404,20 @@
 
     /* Рулетка */
     .roulette-container {
-      width: 100%;
-      overflow: hidden;
-      background: #222;
-      border-radius: 10px;
-      margin-top: 15px;
-      position: relative;
-      height: 60px;
+      width: 100%; overflow: hidden; background: #222; border-radius: 10px;
+      margin-top: 15px; position: relative; height: 60px;
     }
-    .roulette-strip {
-      display: flex;
-      align-items: center;
-      height: 100%;
-      transition: transform 3s cubic-bezier(0.2, 0.8, 0.3, 1);
-    }
-    .roulette-item {
-      min-width: 60px;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 24px;
-      border-right: 1px solid #333;
-    }
+    .roulette-strip { display: flex; align-items: center; height: 100%; transition: transform 3s cubic-bezier(0.2, 0.8, 0.3, 1); }
+    .roulette-item { min-width: 60px; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 24px; border-right: 1px solid #333; }
     .roulette-pointer {
-      position: absolute;
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 0;
-      height: 0;
-      border-left: 10px solid transparent;
-      border-right: 10px solid transparent;
-      border-top: 15px solid #2ecc71;
-      z-index: 10;
-    }
-
-    /* Анімація продажу */
-    .sell-animation {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 48px;
-      font-weight: 900;
-      color: #ffd700;
-      pointer-events: none;
-      z-index: 3000;
-      animation: sellPop 1.5s ease-out forwards;
-    }
-    @keyframes sellPop {
-      0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
-      30% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
-      100% { opacity: 0; transform: translate(-50%, -150%) scale(1); }
+      position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+      width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent;
+      border-top: 15px solid #2ecc71; z-index: 10;
     }
 
     .admin-input {
       width: 100%; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid #333;
-      border-radius: 8px; color: #fff; font-size: 14px; outline: none;
+      border-radius: 8px; color: #fff; font-size: 14px; outline: none; margin-bottom: 8px;
     }
 
     /* ===== НИЖНЯ ПАНЕЛЬ ===== */
@@ -485,9 +426,8 @@
     .energy-bar-wrap { width: 100%; height: 10px; background: #222; border-radius: 5px; overflow: hidden; position: relative; }
     .energy-bar { height: 100%; background: linear-gradient(90deg, #f5a623, #ffd700); width: 100%; transition: width 0.3s; }
     .energy-labels { display: flex; justify-content: space-between; font-size: 10px; color: #666; margin-top: 2px; }
-    .coin-bottom { text-align: center; font-size: 14px; font-weight: 700; color: #ffd700; margin: 6px 0; }
-    .xp-row { display: flex; justify-content: space-between; font-size: 11px; color: #666; margin-bottom: 4px; }
-    .xp-bar-wrap { width: 100%; height: 8px; background: #222; border-radius: 4px; overflow: hidden; margin-bottom: 6px; }
+    .xp-row { display: flex; justify-content: space-between; font-size: 11px; color: #666; margin-bottom: 4px; margin-top: 4px; }
+    .xp-bar-wrap { width: 100%; height: 8px; background: #222; border-radius: 4px; overflow: hidden; margin-bottom: 2px; }
     .xp-bar { height: 100%; background: linear-gradient(90deg, #00bcd4, #2196f3); width: 0%; transition: width 0.3s; }
 
     #status {
@@ -498,7 +438,6 @@
     }
     #status.show { opacity: 1; }
 
-    /* Анімація престижу */
     .prestige-overlay {
       position: fixed; inset: 0; z-index: 2000; background: rgba(0,0,0,0.9);
       display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -518,38 +457,38 @@
   <!-- Екран завантаження -->
   <div id="loading-screen">
     <div class="loader"></div>
-    <div class="loading-text">Завантаження...</div>
+    <div class="loading-text" data-i18n="loading">Loading...</div>
   </div>
 
-  <!-- ===== АВТОРИЗАЦІЯ (Тільки для браузера) ===== -->
+  <!-- ===== АВТОРИЗАЦІЯ ===== -->
   <div id="auth-screen" class="hidden">
     <div class="auth-logo-img">🐭</div>
     <div class="auth-title">Hamka</div>
-    <div class="auth-subtitle">Крипто-клікер з апгрейдами</div>
+    <div class="auth-subtitle" data-i18n="auth_subtitle">Crypto clicker with upgrades</div>
 
     <div class="auth-tabs">
-      <div class="auth-tab active" id="tab-login">Вхід</div>
-      <div class="auth-tab" id="tab-register">Реєстрація</div>
+      <div class="auth-tab active" id="tab-login" data-i18n="login">Login</div>
+      <div class="auth-tab" id="tab-register" data-i18n="register">Register</div>
     </div>
 
-    <div class="auth-hint-top">🔒 Виберіть спосіб входу</div>
+    <div class="auth-hint-top" data-i18n="auth_hint">🔒 Choose login method</div>
 
     <div class="auth-form">
       <div class="input-wrap">
         <span class="input-icon">👤</span>
-        <input type="text" id="auth-nickname" class="auth-input" placeholder="Нікнейм (латиниця)" autocomplete="username">
+        <input type="text" id="auth-nickname" class="auth-input" placeholder="Nickname (latin)" autocomplete="username">
       </div>
       <div class="input-wrap">
         <span class="input-icon">🔑</span>
-        <input type="password" id="auth-password" class="auth-input" placeholder="Пароль (мін. 6)" autocomplete="current-password">
+        <input type="password" id="auth-password" class="auth-input" placeholder="Password (min. 6)" autocomplete="current-password">
       </div>
       
       <div class="auth-error" id="auth-error"></div>
 
-      <button class="auth-btn btn-green" id="auth-submit">👉 Увійти</button>
+      <button class="auth-btn btn-green" id="auth-submit" data-i18n="btn_login">👉 Login</button>
       
-      <div class="auth-divider">або</div>
-      <button class="auth-btn btn-blue" id="tg-login-btn">📱 Увійти через Telegram</button>
+      <div class="auth-divider" data-i18n="or">or</div>
+      <button class="auth-btn btn-blue" id="tg-login-btn" data-i18n="btn_tg">📱 Login via Telegram</button>
     </div>
   </div>
 
@@ -561,20 +500,19 @@
         <div class="stat-pill"><span class="icon">🐹</span> <span id="top-homs">0</span></div>
       </div>
       <div style="display:flex; gap:8px; align-items:center;">
-        <div class="admin-btn-badge" id="admin-btn-badge" onclick="document.getElementById('modal-admin').classList.add('show')">🛠 Адмін</div>
-        <div class="season-badge">🏆 Сезон 1</div>
+        <div class="admin-btn-badge" id="admin-btn-badge" onclick="document.getElementById('modal-admin').classList.add('show')">🛠 Admin</div>
+        <div class="season-badge" data-i18n="season">🏆 Season 1</div>
       </div>
     </div>
 
     <div class="main-menu">
-      <div class="menu-item active" data-page="tap"><div class="menu-icon-wrap">🐭</div><span>Гра</span></div>
-      <div class="menu-item" data-page="shop"><div class="menu-icon-wrap">🛒</div><span>Магазин</span></div>
-      <div class="menu-item" data-page="crypto"><div class="menu-icon-wrap">₿</div><span>Крипта</span></div>
-      <div class="menu-item" data-page="minigames"><div class="menu-icon-wrap">🎲</div><span>Міні-ігри</span></div>
-      <div class="menu-item" data-page="profile"><div class="menu-icon-wrap">👤</div><span>Профіль</span></div>
-      <div class="menu-item" data-page="inventory"><div class="menu-icon-wrap">🎒</div><span>Інвентар</span></div>
-      <div class="menu-item" data-page="top"><div class="menu-icon-wrap">🏆</div><span>Топ</span></div>
-      <div class="menu-item" data-page="settings"><div class="menu-icon-wrap">⚙️</div><span>Налаштування</span></div>
+      <div class="menu-item active" data-page="tap"><div class="menu-icon-wrap">🐭</div><span data-i18n="menu_tap">Tap</span></div>
+      <div class="menu-item" data-page="shop"><div class="menu-icon-wrap">🛒</div><span data-i18n="menu_shop">Shop</span></div>
+      <div class="menu-item" data-page="minigames"><div class="menu-icon-wrap">🎲</div><span data-i18n="menu_games">Games</span></div>
+      <div class="menu-item" data-page="profile"><div class="menu-icon-wrap">👤</div><span data-i18n="menu_profile">Profile</span></div>
+      <div class="menu-item" data-page="inventory"><div class="menu-icon-wrap">🎒</div><span data-i18n="menu_inventory">Inventory</span></div>
+      <div class="menu-item" data-page="top"><div class="menu-icon-wrap">🏆</div><span data-i18n="menu_top">Top</span></div>
+      <div class="menu-item" data-page="settings"><div class="menu-icon-wrap">⚙️</div><span data-i18n="menu_settings">Settings</span></div>
     </div>
 
     <!-- ТАП -->
@@ -594,36 +532,42 @@
     <div class="page" id="page-shop">
       <div class="shop-container">
         <div class="shop-tabs">
-          <div class="shop-tab active" data-shop-tab="auto">Авто</div>
-          <div class="shop-tab" data-shop-tab="upgrade">Прокачка</div>
-          <div class="shop-tab" data-shop-tab="cases">Кейси</div>
-          <div class="shop-tab" data-shop-tab="cosmetics">Косметика</div>
+          <div class="shop-tab active" data-shop-tab="auto" data-i18n="shop_auto">Auto</div>
+          <div class="shop-tab" data-shop-tab="upgrade" data-i18n="shop_upgrade">Upgrades</div>
+          <div class="shop-tab" data-shop-tab="cases" data-i18n="shop_cases">Cases</div>
+          <div class="shop-tab" data-shop-tab="cosmetics" data-i18n="shop_cosmetics">Cosmetics</div>
         </div>
         <div class="shop-list" id="shop-list"></div>
       </div>
     </div>
 
-    <!-- КРИПТА -->
-    <div class="page crypto-page" id="page-crypto">
-      <div id="crypto-list"></div>
-    </div>
-
-    <!-- МІНІ-ІГРИ (Рулетка) -->
+    <!-- МІНІ-ІГРИ (Крипта та Рулетка) -->
     <div class="page crypto-page" id="page-minigames">
-      <div class="inventory-title" style="text-align:center; font-size: 20px; margin-bottom: 16px;">🎲 Міні-ігри</div>
+      <div class="inventory-title" style="text-align:center; font-size: 20px; margin-bottom: 16px;" data-i18n="menu_games">🎲 Mini-games</div>
       
-      <div class="crypto-card" style="text-align: center;">
-        <div style="font-size: 18px; font-weight: 700; color: #f5a623; margin-bottom: 8px;">Рулетка за рекламу</div>
-        <div style="font-size: 12px; color: #aaa; margin-bottom: 16px;">Крути та отримуй монети, XP, Хоми або ексклюзивні предмети!</div>
-        
-        <div class="roulette-container" style="margin-bottom: 16px;">
-          <div class="roulette-pointer"></div>
-          <div class="roulette-strip" id="roulette-strip">
-            <!-- Стрічка генерується в JS -->
-          </div>
-        </div>
+      <div class="shop-tabs" style="margin-bottom: 16px;">
+        <div class="shop-tab active" id="minitab-crypto">₿ Crypto</div>
+        <div class="shop-tab" id="minitab-roulette" data-i18n="roulette">🎰 Roulette</div>
+      </div>
 
-        <button class="ad-btn" id="btn-spin-roulette">🎬 Крутити за рекламу</button>
+      <!-- Крипта -->
+      <div id="mini-content-crypto">
+        <div id="crypto-list"></div>
+      </div>
+
+      <!-- Рулетка -->
+      <div id="mini-content-roulette" style="display:none; text-align: center;">
+        <div class="crypto-card">
+          <div style="font-size: 18px; font-weight: 700; color: #f5a623; margin-bottom: 8px;" data-i18n="roulette_title">Roulette for Ad</div>
+          <div style="font-size: 12px; color: #aaa; margin-bottom: 16px;" data-i18n="roulette_desc">Spin and get coins, XP, Homs or exclusive items!</div>
+          
+          <div class="roulette-container" style="margin-bottom: 16px;">
+            <div class="roulette-pointer"></div>
+            <div class="roulette-strip" id="roulette-strip"></div>
+          </div>
+
+          <button class="auth-btn btn-green" id="btn-spin-roulette" style="width:100%;" data-i18n="spin_btn">🎬 Spin for Ad</button>
+        </div>
       </div>
     </div>
 
@@ -635,23 +579,23 @@
         </div>
         
         <div class="profile-name-wrap">
-          <div class="profile-name" id="prof-nickname">Гравець</div>
+          <div class="profile-name" id="prof-nickname">Player</div>
           <button class="edit-name-btn" id="btn-change-nickname">✏️</button>
         </div>
         <div class="profile-id" id="prof-public-id">ID: 000000</div>
 
         <div class="profile-title-badge" id="prof-title-badge">
-          <span id="prof-title">Початківець</span>
+          <span id="prof-title">Beginner</span>
         </div>
         
         <div class="profile-stats">
           <div class="profile-stat-item">
             <div class="profile-stat-val" id="prof-coins">0</div>
-            <div class="profile-stat-lbl">Монети</div>
+            <div class="profile-stat-lbl" data-i18n="coins">Coins</div>
           </div>
           <div class="profile-stat-item">
             <div class="profile-stat-val" id="prof-homs">0</div>
-            <div class="profile-stat-lbl">Хоми</div>
+            <div class="profile-stat-lbl" data-i18n="homs">Homs</div>
           </div>
           <div class="profile-stat-item">
             <div class="profile-stat-val" id="prof-xp">0</div>
@@ -659,69 +603,69 @@
           </div>
           <div class="profile-stat-item">
             <div class="profile-stat-val" id="prof-prestige">0</div>
-            <div class="profile-stat-lbl">Престиж</div>
+            <div class="profile-stat-lbl" data-i18n="prestige">Prestige</div>
           </div>
         </div>
-
-        <button class="change-skin-btn" id="btn-open-skin-menu">🎨 Змінити скін</button>
       </div>
 
       <div class="prestige-section">
-        <div style="font-size: 18px; font-weight: 800; color: #da70d6;">🌟 Престиж</div>
-        <div style="font-size: 12px; color: #aaa; margin-top: 4px;" id="prestige-info">Потрібно 1,000,000 XP</div>
+        <div style="font-size: 18px; font-weight: 800; color: #da70d6;" data-i18n="prestige_title">🌟 Prestige</div>
+        <div style="font-size: 12px; color: #aaa; margin-top: 4px;" id="prestige-info">Required 1,000,000 XP</div>
       </div>
     </div>
 
     <!-- ІНВЕНТАР -->
     <div class="page scroll-page" id="page-inventory">
-      <!-- Кейси -->
       <div class="inventory-section" id="cases-section" style="display:none;">
-        <div class="inventory-title">📦 Кейси</div>
+        <div class="inventory-title" data-i18n="cases_title">📦 Cases</div>
         <div class="inventory-grid" id="inv-cases"></div>
       </div>
 
       <div class="inventory-section">
-        <div class="inventory-title">Титули</div>
+        <div class="inventory-title" data-i18n="titles_title">Titles</div>
         <div class="inventory-grid" id="inv-titles"></div>
       </div>
       <div class="inventory-section">
-        <div class="inventory-title">Аватарки</div>
+        <div class="inventory-title" data-i18n="avatars_title">Avatars</div>
         <div class="inventory-grid" id="inv-avatars"></div>
       </div>
       <div class="inventory-section">
-        <div class="inventory-title">Скіни</div>
+        <div class="inventory-title" data-i18n="skins_title">Skins</div>
         <div class="inventory-grid" id="inv-skins"></div>
       </div>
     </div>
 
     <!-- ТОП -->
     <div class="page scroll-page" id="page-top">
-      <div class="inventory-title" style="text-align:center; font-size: 20px; margin-bottom: 12px;">🏆 Топ гравців</div>
+      <div class="inventory-title" style="text-align:center; font-size: 20px; margin-bottom: 12px;" data-i18n="top_title">🏆 Leaderboard</div>
       <div id="leaderboard-list"></div>
     </div>
 
     <!-- НАЛАШТУВАННЯ -->
     <div class="page scroll-page" id="page-settings">
-      <div class="inventory-title" style="text-align:center; font-size: 20px; margin-bottom: 16px;">⚙️ Налаштування</div>
-
-      <div class="settings-card">
-        <div class="settings-title">Топ гравців</div>
-        <div class="settings-row">
-          <span class="settings-label">Показувати мене в топі</span>
-          <button class="settings-btn green" id="btn-toggle-top">Увімкнено</button>
-        </div>
-      </div>
-
-      <div class="settings-card">
-        <div class="settings-title">Акаунт</div>
-        <div class="settings-row">
-          <span class="settings-label">Вийти з акаунту</span>
-          <button class="settings-btn red" id="btn-logout">Вийти</button>
-        </div>
-      </div>
+      <div class="inventory-title" style="text-align:center; font-size: 20px; margin-bottom: 16px;" data-i18n="settings_title">⚙️ Settings</div>
       
-      <div style="text-align:center; color:#555; font-size:12px; margin-top:20px;">
-        Hamka Game v1.0.0
+      <div class="settings-group">
+        <span class="settings-label" data-i18n="lang_label">Language / Мова / Язык</span>
+        <select class="settings-select" id="language-select">
+          <option value="en">English</option>
+          <option value="uk">Українська</option>
+          <option value="ru">Русский</option>
+        </select>
+      </div>
+
+      <div class="settings-group">
+        <div class="settings-toggle-row">
+          <span class="settings-label" style="margin-bottom:0;" data-i18n="hide_top_label">Hide me from Leaderboard</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="hide-top-toggle">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <button class="settings-btn" id="btn-logout" style="background: #ff5252; color: #fff; font-weight: 700;" data-i18n="logout_btn">🚪 Log out</button>
       </div>
     </div>
 
@@ -729,17 +673,17 @@
     <div class="bottom-panel">
       <div class="bottom-stats">
         <span>⚡ <span id="energy-label-text">200/200</span></span>
-        <span>+1 ⚡/сек</span>
-        <span>+<span id="auto-tap-label">0</span> 🪙/сек</span>
+        <span>+1 ⚡/s</span>
+        <span>+<span id="auto-tap-label">0</span> 🪙/s</span>
         <span>🪙 <span id="bottom-coins">0</span></span>
       </div>
       <div class="energy-bar-wrap"><div class="energy-bar" id="energy-bar" style="width: 100%;"></div></div>
       <div class="energy-labels">
-        <span>Енергія</span>
+        <span data-i18n="energy">Energy</span>
         <span id="energy-label-bottom">200/200</span>
       </div>
       <div class="xp-row">
-        <span id="level-name">0 початківець</span>
+        <span id="level-name">0 beginner</span>
         <span><span id="xp-display">0</span> / <span id="xp-next">50</span> XP</span>
       </div>
       <div class="xp-bar-wrap"><div class="xp-bar" id="xp-bar"></div></div>
@@ -748,16 +692,33 @@
 
   <div id="status"></div>
 
+  <!-- Модалка вибору кількості кейсів -->
+  <div class="modal-overlay" id="modal-case-qty">
+    <div class="modal-content">
+      <div class="modal-title" id="case-modal-title">Open Case</div>
+      <div style="font-size: 14px; color: #aaa; margin-bottom: 16px;" id="case-modal-count">Available: 0</div>
+      <div style="display:flex; gap:8px; margin-bottom:12px;">
+        <button class="modal-btn confirm" onclick="openCasesBatch(1)">1</button>
+        <button class="modal-btn confirm" onclick="openCasesBatch(5)">5</button>
+        <button class="modal-btn confirm" onclick="openCasesBatch(10)">10</button>
+        <button class="modal-btn confirm" onclick="openCasesBatch('all')" data-i18n="all">All</button>
+      </div>
+      <div class="modal-actions">
+        <button class="modal-btn cancel" onclick="document.getElementById('modal-case-qty').classList.remove('show')" data-i18n="cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Модалка перегляду профілю -->
   <div class="modal-overlay" id="modal-view-profile">
     <div class="modal-content">
-      <div class="modal-title">Профіль гравця</div>
+      <div class="modal-title" data-i18n="player_profile">Player Profile</div>
       <div class="preview-box" id="view-prof-avatar" style="font-size: 50px;">🐭</div>
-      <div style="text-align:center; font-size: 20px; font-weight: 800; margin-bottom: 4px;" id="view-prof-nick">Гравець</div>
+      <div style="text-align:center; font-size: 20px; font-weight: 800; margin-bottom: 4px;" id="view-prof-nick">Player</div>
       <div style="text-align:center; font-size: 12px; color: #666; margin-bottom: 8px;" id="view-prof-id">ID: 000000</div>
       
       <div style="text-align:center; margin-bottom:12px;">
-        <span class="profile-title-badge" id="view-prof-title" style="margin-top:0;">Початківець</span>
+        <span class="profile-title-badge" id="view-prof-title" style="margin-top:0;">Beginner</span>
       </div>
 
       <div style="display:flex; justify-content:space-around; background:rgba(255,255,255,0.05); padding:10px; border-radius:10px; margin-bottom:12px;">
@@ -767,34 +728,23 @@
         </div>
         <div style="text-align:center;">
           <div style="font-weight:700; color:#da70d6;" id="view-prof-prestige">0</div>
-          <div style="font-size:10px; color:#888;">Престиж</div>
+          <div style="font-size:10px; color:#888;" data-i18n="prestige">Prestige</div>
         </div>
       </div>
 
       <div class="modal-actions">
-        <button class="modal-btn cancel" onclick="document.getElementById('modal-view-profile').classList.remove('show')">Закрити</button>
+        <button class="modal-btn cancel" onclick="document.getElementById('modal-view-profile').classList.remove('show')" data-i18n="close">Close</button>
       </div>
     </div>
   </div>
 
   <div class="modal-overlay" id="modal-nickname">
     <div class="modal-content">
-      <div class="modal-title">Змінити нікнейм</div>
-      <input type="text" class="admin-input" id="new-nickname-input" placeholder="Новий нікнейм">
+      <div class="modal-title" data-i18n="change_nickname">Change Nickname</div>
+      <input type="text" class="admin-input" id="new-nickname-input" placeholder="New nickname">
       <div class="modal-actions">
-        <button class="modal-btn cancel" onclick="document.getElementById('modal-nickname').classList.remove('show')">Скасувати</button>
-        <button class="modal-btn confirm" id="btn-save-nickname">Зберегти</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Модалка вибору скіна -->
-  <div class="modal-overlay" id="modal-skin-select">
-    <div class="modal-content">
-      <div class="modal-title">🎨 Виберіть скін</div>
-      <div class="inventory-grid" id="modal-skins-grid"></div>
-      <div class="modal-actions">
-        <button class="modal-btn cancel" onclick="document.getElementById('modal-skin-select').classList.remove('show')">Закрити</button>
+        <button class="modal-btn cancel" onclick="document.getElementById('modal-nickname').classList.remove('show')" data-i18n="cancel">Cancel</button>
+        <button class="modal-btn confirm" id="btn-save-nickname" data-i18n="save">Save</button>
       </div>
     </div>
   </div>
@@ -802,45 +752,20 @@
   <!-- Модалка Адмінки -->
   <div class="modal-overlay" id="modal-admin">
     <div class="modal-content">
-      <div class="modal-title">🛠 Адмін Панель</div>
-      
-      <div class="admin-input-group">
-        <label>Додати монет:</label>
-        <input type="number" class="admin-input" id="admin-coins-input" placeholder="Кількість">
-        <button class="modal-btn confirm" style="width:100%; margin-top:8px;" onclick="adminAddCoins()">Нарахувати</button>
-      </div>
+      <div class="modal-title">🛠 Admin Panel</div>
+      <input type="number" class="admin-input" id="admin-coins-input" placeholder="Coins amount">
+      <button class="modal-btn confirm" style="width:100%; margin-bottom:10px;" onclick="adminAddCoins()">Add Coins</button>
 
-      <div class="admin-input-group">
-        <label>Додати Хоми:</label>
-        <input type="number" class="admin-input" id="admin-homs-input" placeholder="Кількість">
-        <button class="modal-btn confirm" style="width:100%; margin-top:8px;" onclick="adminAddHoms()">Нарахувати</button>
-      </div>
+      <input type="number" class="admin-input" id="admin-homs-input" placeholder="Homs amount">
+      <button class="modal-btn confirm" style="width:100%; margin-bottom:10px;" onclick="adminAddHoms()">Add Homs</button>
 
-      <div class="admin-input-group">
-        <label>Додати XP:</label>
-        <input type="number" class="admin-input" id="admin-xp-input" placeholder="Кількість">
-        <button class="modal-btn confirm" style="width:100%; margin-top:8px;" onclick="adminAddXp()">Нарахувати</button>
-      </div>
+      <input type="number" class="admin-input" id="admin-xp-input" placeholder="XP amount">
+      <button class="modal-btn confirm" style="width:100%; margin-bottom:10px;" onclick="adminAddXp()">Add XP</button>
 
-      <div class="admin-input-group">
-        <label>Змінити престиж:</label>
-        <input type="number" class="admin-input" id="admin-prestige-input" placeholder="Новий престиж">
-        <button class="modal-btn confirm" style="width:100%; margin-top:8px;" onclick="adminSetPrestige()">Встановити</button>
-      </div>
-      
-      <div class="admin-input-group">
-        <label>Додати перегляди реклами:</label>
-        <input type="number" class="admin-input" id="admin-ad-views-input" placeholder="Кількість">
-        <button class="modal-btn confirm" style="width:100%; margin-top:8px;" onclick="adminAddAdViews()">Нарахувати</button>
-      </div>
-      
-      <div class="admin-input-group">
-        <label>Додати кейс:</label>
-        <button class="modal-btn confirm" style="width:100%; margin-top:8px;" onclick="adminAddCase()">Додати кейс</button>
-      </div>
+      <button class="modal-btn confirm" style="width:100%; margin-bottom:10px;" onclick="adminAddCase()">Add Case</button>
 
       <div class="modal-actions">
-        <button class="modal-btn cancel" onclick="document.getElementById('modal-admin').classList.remove('show')">Закрити</button>
+        <button class="modal-btn cancel" onclick="document.getElementById('modal-admin').classList.remove('show')">Close</button>
       </div>
     </div>
   </div>
@@ -850,7 +775,7 @@
     <div class="case-opening-box" id="case-opening-box">📦</div>
     <div class="case-reward-text" id="case-reward-text"></div>
     <div class="modal-actions" style="width: 100%; max-width: 300px; margin-top: 30px;">
-      <button class="modal-btn confirm" id="btn-close-case">Забрати</button>
+      <button class="modal-btn confirm" id="btn-close-case" data-i18n="take">Take</button>
     </div>
   </div>
 
@@ -879,10 +804,173 @@
     const db = getDatabase(app);
     const auth = getAuth(app);
 
-    const tg = window.Telegram.WebApp;
-    try { tg.expand(); tg.ready(); } catch(e) {}
+    const tg = window.Telegram?.WebApp;
+    try { tg?.expand(); tg?.ready(); } catch(e) {}
 
     let AdController = null;
+
+    // === ЛОКАЛІЗАЦІЯ (Базова - англійська) ===
+    const translations = {
+      en: {
+        loading: "Loading...",
+        auth_subtitle: "Crypto clicker with upgrades",
+        login: "Login",
+        register: "Register",
+        auth_hint: "🔒 Choose login method",
+        btn_login: "👉 Login",
+        or: "or",
+        btn_tg: "📱 Login via Telegram",
+        season: "🏆 Season 1",
+        menu_tap: "Tap",
+        menu_shop: "Shop",
+        menu_games: "Games",
+        menu_profile: "Profile",
+        menu_inventory: "Inventory",
+        menu_top: "Top",
+        menu_settings: "Settings",
+        shop_auto: "Auto",
+        shop_upgrade: "Upgrades",
+        shop_cases: "Cases",
+        shop_cosmetics: "Cosmetics",
+        roulette: "🎰 Roulette",
+        roulette_title: "Roulette for Ad",
+        roulette_desc: "Spin and get coins, XP, Homs or exclusive items!",
+        spin_btn: "🎬 Spin for Ad",
+        coins: "Coins",
+        homs: "Homs",
+        prestige: "Prestige",
+        prestige_title: "🌟 Prestige",
+        cases_title: "📦 Cases",
+        titles_title: "Titles",
+        avatars_title: "Avatars",
+        skins_title: "Skins",
+        top_title: "🏆 Leaderboard",
+        settings_title: "⚙️ Settings",
+        lang_label: "Language / Мова / Язык",
+        hide_top_label: "Hide me from Leaderboard",
+        logout_btn: "🚪 Log out",
+        all: "All",
+        cancel: "Cancel",
+        close: "Close",
+        player_profile: "Player Profile",
+        change_nickname: "Change Nickname",
+        save: "Save",
+        take: "Take",
+        energy: "Energy"
+      },
+      uk: {
+        loading: "Завантаження...",
+        auth_subtitle: "Крипто-клікер з апгрейдами",
+        login: "Вхід",
+        register: "Реєстрація",
+        auth_hint: "🔒 Виберіть спосіб входу",
+        btn_login: "👉 Увійти",
+        or: "або",
+        btn_tg: "📱 Увійти через Telegram",
+        season: "🏆 Сезон 1",
+        menu_tap: "Гра",
+        menu_shop: "Магазин",
+        menu_games: "Ігри",
+        menu_profile: "Профіль",
+        menu_inventory: "Інвентар",
+        menu_top: "Топ",
+        menu_settings: "Налаштування",
+        shop_auto: "Авто",
+        shop_upgrade: "Прокачка",
+        shop_cases: "Кейси",
+        shop_cosmetics: "Косметика",
+        roulette: "🎰 Рулетка",
+        roulette_title: "Рулетка за рекламу",
+        roulette_desc: "Крути та отримуй монети, XP, Хоми або ексклюзиви!",
+        spin_btn: "🎬 Крутити за рекламу",
+        coins: "Монети",
+        homs: "Хоми",
+        prestige: "Престиж",
+        prestige_title: "🌟 Престиж",
+        cases_title: "📦 Кейси",
+        titles_title: "Титули",
+        avatars_title: "Аватарки",
+        skins_title: "Скіни",
+        top_title: "🏆 Топ гравців",
+        settings_title: "⚙️ Налаштування",
+        lang_label: "Мова / Language / Язык",
+        hide_top_label: "Не показувати мене в топі",
+        logout_btn: "🚪 Вийти з акаунта",
+        all: "Всі",
+        cancel: "Скасувати",
+        close: "Закрити",
+        player_profile: "Профіль гравця",
+        change_nickname: "Змінити нікнейм",
+        save: "Зберегти",
+        take: "Забрати",
+        energy: "Енергія"
+      },
+      ru: {
+        loading: "Загрузка...",
+        auth_subtitle: "Крипто-кликер с апгрейдами",
+        login: "Вход",
+        register: "Регистрация",
+        auth_hint: "🔒 Выберите способ входа",
+        btn_login: "👉 Войти",
+        or: "или",
+        btn_tg: "📱 Войти через Telegram",
+        season: "🏆 Сезон 1",
+        menu_tap: "Игра",
+        menu_shop: "Магазин",
+        menu_games: "Игры",
+        menu_profile: "Профиль",
+        menu_inventory: "Инвентарь",
+        menu_top: "Топ",
+        menu_settings: "Настройки",
+        shop_auto: "Авто",
+        shop_upgrade: "Прокачка",
+        shop_cases: "Кейсы",
+        shop_cosmetics: "Косметика",
+        roulette: "🎰 Рулетка",
+        roulette_title: "Рулетка за рекламу",
+        roulette_desc: "Крути и получай монеты, XP, Хомы или эксклюзивы!",
+        spin_btn: "🎬 Крутить за рекламу",
+        coins: "Монеты",
+        homs: "Хомы",
+        prestige: "Престиж",
+        prestige_title: "🌟 Престиж",
+        cases_title: "📦 Кейсы",
+        titles_title: "Титулы",
+        avatars_title: "Аватарки",
+        skins_title: "Скины",
+        top_title: "🏆 Топ игроков",
+        settings_title: "⚙️ Настройки",
+        lang_label: "Язык / Language / Мова",
+        hide_top_label: "Не показывать меня в топе",
+        logout_btn: "🚪 Выйти из аккаунта",
+        all: "Все",
+        cancel: "Отмена",
+        close: "Закрыть",
+        player_profile: "Профиль игрока",
+        change_nickname: "Изменить никнейм",
+        save: "Сохранить",
+        take: "Забрать",
+        energy: "Энергия"
+      }
+    };
+
+    let currentLang = 'en';
+
+    function setLanguage(lang) {
+      if (!translations[lang]) lang = 'en';
+      currentLang = lang;
+      localStorage.setItem('hamka_lang', lang);
+      
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (translations[lang][key]) {
+          el.innerText = translations[lang][key];
+        }
+      });
+
+      const langSelect = document.getElementById('language-select');
+      if (langSelect) langSelect.value = lang;
+    }
 
     // === DOM ===
     const loadingScreen = document.getElementById('loading-screen');
@@ -946,10 +1034,6 @@
     const newNicknameInput = document.getElementById('new-nickname-input');
     const btnSaveNickname = document.getElementById('btn-save-nickname');
     const btnChangeNickname = document.getElementById('btn-change-nickname');
-    
-    const btnOpenSkinMenu = document.getElementById('btn-open-skin-menu');
-    const modalSkinSelect = document.getElementById('modal-skin-select');
-    const modalSkinsGrid = document.getElementById('modal-skins-grid');
 
     const prestigeOverlay = document.getElementById('prestige-overlay');
     const prestigeText = document.getElementById('prestige-text');
@@ -962,27 +1046,28 @@
     const btnSpinRoulette = document.getElementById('btn-spin-roulette');
     const rouletteStrip = document.getElementById('roulette-strip');
 
-    const btnToggleTop = document.getElementById('btn-toggle-top');
+    const languageSelect = document.getElementById('language-select');
+    const hideTopToggle = document.getElementById('hide-top-toggle');
     const btnLogout = document.getElementById('btn-logout');
+
+    const minitabCrypto = document.getElementById('minitab-crypto');
+    const minitabRoulette = document.getElementById('minitab-roulette');
+    const miniContentCrypto = document.getElementById('mini-content-crypto');
+    const miniContentRoulette = document.getElementById('mini-content-roulette');
 
     // === Стан ===
     let isLoginMode = true;
     let state = { 
       coins: 0, homs: 0, energy: 200, maxEnergy: 200, xp: 0, prestige: 0,
-      title: 'Початківець', avatar: '🐭', nickname: '', publicId: '',
+      title: 'Beginner', avatar: '🐭', nickname: '', publicId: '',
       activeSkin: 'default', holdings: {},
       purchasedTitles: [], purchasedAvatars: [], purchasedSkins: [],
-      cases: [],
+      cases: {}, // об'єкт для стакування кейсів: { basic: 3, epic: 1 }
+      adWatches: 0,
       hideFromTop: false,
       upgrades: { 
-        tapLevel: 0, 
-        tapPower: 1, 
-        xpPerTap: 1, 
-        autoTapRate: 0, 
-        autoXpRate: 0, 
-        energyRate: 1, 
-        caseChance: 0,
-        autoCaseLevel: 0
+        tapLevel: 0, tapPower: 1, xpPerTap: 1, 
+        autoTapRate: 0, autoXpRate: 0, energyRate: 1, caseChance: 0
       }
     };
     let pendingTap = false;
@@ -992,35 +1077,36 @@
     let currentUid = null;
     let currentShopTab = 'auto';
     let isAdmin = false;
+    let selectedCaseTypeToOpen = null;
 
     const GITHUB_RAW = "https://raw.githubusercontent.com/lolord1k228-create/hamka-game/main/skins/";
-
-    // === Дані ===
-    let TITLES = [];
-    let AVATARS = [];
-    let SKINS = [];
-
-    // Ексклюзивні титули з кейсів
-    const CASE_TITLES = [
-      { name: 'Легенда Кейсів', color: 'linear-gradient(90deg, #ff0000, #ff8c00)' },
-      { name: 'Король Лутбоксів', color: 'linear-gradient(90deg, #00ff00, #00bfff)' },
-      { name: 'Обраний', color: 'linear-gradient(90deg, #ffffff, #ffd700)' },
-      { name: 'Тіньовий', color: 'linear-gradient(90deg, #2f4f4f, #000000)' }
+    const SKINS = [
+      { id: 'skin_ai', name: 'AIHamster', file: 'ai_hamster.png', price: 50000 },
+      { id: 'skin_neon', name: 'Neon Hamster', file: 'hamster.png', price: 5000000 }
     ];
 
-    // Титули за ТОП
+    let TITLES = [];
+    let AVATARS = [];
+
+    const CASE_TITLES = [
+      { name: 'Case Legend', color: 'linear-gradient(90deg, #ff0000, #ff8c00)' },
+      { name: 'Lootbox King', color: 'linear-gradient(90deg, #00ff00, #00bfff)' },
+      { name: 'Chosen', color: 'linear-gradient(90deg, #ffffff, #ffd700)' },
+      { name: 'Shadow', color: 'linear-gradient(90deg, #2f4f4f, #000000)' }
+    ];
+
     const TOP_TITLES = [
-      { name: '🥇 Топ 1', color: 'linear-gradient(90deg, #ffd700, #ff8c00)' },
-      { name: '🥈 Топ 2', color: 'linear-gradient(90deg, #c0c0c0, #808080)' },
-      { name: '🥉 Топ 3', color: 'linear-gradient(90deg, #cd7f32, #8b4513)' }
+      { name: '🥇 Top 1', color: 'linear-gradient(90deg, #ffd700, #ff8c00)' },
+      { name: '🥈 Top 2', color: 'linear-gradient(90deg, #c0c0c0, #808080)' },
+      { name: '🥉 Top 3', color: 'linear-gradient(90deg, #cd7f32, #8b4513)' }
     ];
 
     const LEVELS = [
-      { name: '0 початківець', xp: 0 },
-      { name: '1 початківець', xp: 50 },
-      { name: '2 початківець', xp: 200 },
-      { name: '3 початківець', xp: 500 },
-      { name: '4 початківець', xp: 1500 },
+      { name: '0 beginner', xp: 0 },
+      { name: '1 beginner', xp: 50 },
+      { name: '2 beginner', xp: 200 },
+      { name: '3 beginner', xp: 500 },
+      { name: '4 beginner', xp: 1500 },
       { name: 'bronze 1', xp: 5000 },
       { name: 'bronze 2', xp: 10000 },
       { name: 'bronze 3', xp: 15000 },
@@ -1034,22 +1120,18 @@
 
     const COINS = ['OLDHAM', 'NEWHAM', 'HAM', 'BHAM', 'PLAYERHOM'];
     const INITIAL_PRICES = { OLDHAM: 100, NEWHAM: 250, HAM: 500, BHAM: 1000, PLAYERHOM: 50 };
-    const PLAYERHOM_BASE = 50;
-    const PLAYERHOM_PER_UNIT = 2;
     const CRYPTO_FEE = 0.02;
 
     const SHOP_ITEMS = {
       auto: [
-        { id: 'autoCase', title: 'Авто-фарм кейсів', desc: 'Шанс отримати кейс щохвилини', basePrice: 100, multiplier: 5, maxLevel: 5, isHoms: true },
-        { id: 'caseChance', title: 'Покращення кейсів', desc: '+1% до шансу на x2 баланс', basePrice: 5000, multiplier: 5, maxLevel: 5, requires: 'autoCase' },
-        { id: 'autoTap', title: 'Авто тап', desc: '+1 монета/сек', basePrice: 200, multiplier: 2, maxLevel: 999 },
-        { id: 'autoXp', title: 'Авто XP', desc: '+1 XP/сек', basePrice: 1500, multiplier: 2, maxLevel: 999 },
-        { id: 'energyRate', title: '+Енергія', desc: '+1 енергія/сек', basePrice: 1000, multiplier: 10, maxLevel: 999 },
+        { id: 'autoTap', title: 'Auto Tap', desc: '+1 coin/sec', basePrice: 200, multiplier: 2, maxLevel: 999 },
+        { id: 'autoXp', title: 'Auto XP', desc: '+1 XP/sec', basePrice: 1500, multiplier: 2, maxLevel: 999 },
+        { id: 'energyRate', title: '+Energy Regen', desc: '+1 energy/sec', basePrice: 1000, multiplier: 10, maxLevel: 999 },
       ],
       upgrade: [
-        { id: 'tap', title: 'Тап', desc: '+1 монета за тап', basePrice: 50, multiplier: 10, maxLevel: 9, prices: [50, 200, 2000, 5000, 20000, 50000, 150000, 500000, 2000000] },
-        { id: 'xpTap', title: 'XP', desc: '+1 XP за тап', basePrice: 50000, multiplier: 10, maxLevel: 999, prices: [50000, 500000, 5000000, 50000000, 500000000] },
-        { id: 'maxEnergy', title: 'Максимальна енергія', desc: '+50 до макс. енергії', basePrice: 50000, multiplier: 10, maxLevel: 999, prices: [50000, 500000, 5000000, 50000000, 500000000] },
+        { id: 'tap', title: 'Tap Power', desc: '+1 coin per tap', basePrice: 50, multiplier: 10, maxLevel: 9, prices: [50, 200, 2000, 5000, 20000, 50000, 150000, 500000, 2000000] },
+        { id: 'xpTap', title: 'XP Tap', desc: '+1 XP per tap', basePrice: 50000, multiplier: 10, maxLevel: 999, prices: [50000, 500000, 5000000, 50000000, 500000000] },
+        { id: 'maxEnergy', title: 'Max Energy', desc: '+50 max energy', basePrice: 50000, multiplier: 10, maxLevel: 999, prices: [50000, 500000, 5000000, 50000000, 500000000] },
       ]
     };
 
@@ -1057,9 +1139,6 @@
       const allItems = [...SHOP_ITEMS.auto, ...SHOP_ITEMS.upgrade];
       const item = allItems.find(i => i.id === itemId);
       if (!item) return 0;
-      if (item.isHoms) {
-        return Math.floor(item.basePrice * Math.pow(item.multiplier, level));
-      }
       if (item.prices && level < item.prices.length) return item.prices[level];
       if (item.prices && level >= item.prices.length) return Infinity;
       return Math.floor(item.basePrice * Math.pow(item.multiplier, level));
@@ -1091,16 +1170,43 @@
       return p.toFixed(2);
     }
 
+    // Зміна мови в налаштуваннях
+    languageSelect.addEventListener('change', (e) => {
+      setLanguage(e.target.value);
+      if (currentUid) {
+        update(ref(db, 'users/' + currentUid), { language: e.target.value });
+      }
+    });
+
+    // Налаштування приховування з топу
+    hideTopToggle.addEventListener('change', async (e) => {
+      const val = e.target.checked;
+      state.hideFromTop = val;
+      if (currentUid) {
+        await update(ref(db, 'users/' + currentUid), { hideFromTop: val });
+        showStatus('✅ Updated settings');
+      }
+    });
+
+    // Вихід з акаунта
+    btnLogout.addEventListener('click', async () => {
+      try {
+        await signOut(auth);
+        showStatus('Logged out');
+      } catch(e) {}
+    });
+
+    setAuthMode(true);
     function setAuthMode(loginMode) {
       isLoginMode = loginMode;
       if (loginMode) {
         tabLogin.classList.add('active');
         tabRegister.classList.remove('active');
-        authSubmit.innerHTML = '👉 Увійти';
+        authSubmit.innerHTML = '👉 Login';
       } else {
         tabRegister.classList.add('active');
         tabLogin.classList.remove('active');
-        authSubmit.innerHTML = '📝 Зареєструватися';
+        authSubmit.innerHTML = '📝 Register';
       }
       authError.innerText = '';
     }
@@ -1114,116 +1220,57 @@
       return cleanNick + '@hamka.game';
     }
 
-    function getAuthErrorMessage(err) {
-      const messages = {
-        'auth/invalid-email': 'Невірний формат нікнейму',
-        'auth/user-not-found': 'Акаунт не знайдено',
-        'auth/wrong-password': 'Невірний пароль',
-        'auth/email-already-in-use': 'Цей нікнейм вже зайнятий',
-        'auth/weak-password': 'Пароль має бути мінімум 6 символів',
-        'auth/invalid-credential': 'Невірний нікнейм або пароль',
-        'auth/too-many-requests': 'Занадто багато спроб',
-        'auth/network-request-failed': 'Мережева помилка',
-        'auth/operation-not-allowed': 'Увімкніть Email/Password у Firebase',
-        'auth/unauthorized-domain': 'Домен не авторизований',
-        'auth/internal-error': 'Помилка Firebase'
-      };
-      return messages[err.code] || err.message || 'Помилка';
-    }
-
-    // === АВТОМАТИЧНИЙ ВХІД ЧЕРЕЗ TELEGRAM ===
     async function autoLoginTelegram() {
-      const tgUser = tg.initDataUnsafe?.user;
-      
+      const tgUser = tg?.initDataUnsafe?.user;
       if (!tgUser) {
         loadingScreen.style.display = 'none';
         authScreen.classList.remove('hidden');
         return;
       }
-
       const email = `tg_${tgUser.id}@hamka.test`;
       const password = `Tg_${tgUser.id}_SecurePass_2026!`;
-
       try {
         await signInWithEmailAndPassword(auth, email, password);
       } catch (e) {
-        if (e.code === 'auth/user-not-found' || e.code === 'auth/invalid-credential' || e.code === 'auth/invalid-login-credentials') {
-          try {
-            await createUserWithEmailAndPassword(auth, email, password);
-          } catch (createErr) {
-            console.error("Помилка створення:", createErr);
-            loadingScreen.style.display = 'none';
-            authScreen.classList.remove('hidden');
-            authError.innerText = "Помилка створення акаунту Telegram. Спробуйте пізніше.";
-          }
-        } else {
-          console.error("Помилка входу:", e);
+        try {
+          await createUserWithEmailAndPassword(auth, email, password);
+        } catch (createErr) {
           loadingScreen.style.display = 'none';
           authScreen.classList.remove('hidden');
-          authError.innerText = "Помилка входу через Telegram.";
         }
       }
     }
 
-    // Запускаємо автоматичний вхід при старті
     autoLoginTelegram();
 
-    // Звичайний вхід
     authSubmit.addEventListener('click', async () => {
       const nick = authNickname.value.trim();
       const password = authPassword.value;
-
-      if (!nick) { authError.innerText = 'Введіть нікнейм'; return; }
-      if (password.length < 6) { authError.innerText = 'Пароль має бути мінімум 6 символів'; return; }
-
+      if (!nick) { authError.innerText = 'Enter nickname'; return; }
+      if (password.length < 6) { authError.innerText = 'Password min 6 chars'; return; }
       const email = nickToEmail(nick);
-      if (!email) { authError.innerText = 'Нікнейм має містити мінімум 3 літери/цифри'; return; }
+      if (!email) { authError.innerText = 'Invalid nickname'; return; }
 
       authSubmit.disabled = true;
-      authError.innerText = '';
-
       try {
-        if (isLoginMode) {
-          await signInWithEmailAndPassword(auth, email, password);
-        } else {
-          await createUserWithEmailAndPassword(auth, email, password);
-        }
+        if (isLoginMode) await signInWithEmailAndPassword(auth, email, password);
+        else await createUserWithEmailAndPassword(auth, email, password);
       } catch (err) {
-        authError.innerText = getAuthErrorMessage(err);
+        authError.innerText = err.message;
       } finally {
         authSubmit.disabled = false;
       }
     });
 
     tgLoginBtn.addEventListener('click', async () => {
-      authError.innerText = '';
-      const tgUser = tg.initDataUnsafe?.user;
-      if (!tgUser) {
-        authError.innerText = 'Відкрийте гру через Telegram-бота';
-        return;
-      }
-      
-      const email = `tg_${tgUser.id}@hamka.test`;
-      const password = `Tg_${tgUser.id}_SecurePass_2026!`;
-
-      tgLoginBtn.disabled = true;
-      
+      const tgUser = tg?.initDataUnsafe?.user;
+      if (!tgUser) { authError.innerText = 'Open via Telegram bot'; return; }
       try {
-        await signInWithEmailAndPassword(auth, email, password);
+        await signInWithEmailAndPassword(auth, `tg_${tgUser.id}@hamka.test`, `Tg_${tgUser.id}_SecurePass_2026!`);
       } catch (e) {
-        if (e.code === 'auth/user-not-found' || e.code === 'auth/invalid-credential' || e.code === 'auth/invalid-login-credentials') {
-          try {
-            await createUserWithEmailAndPassword(auth, email, password);
-          } catch (createErr) {
-            console.error("Помилка створення:", createErr);
-            authError.innerText = "Помилка створення акаунту Telegram. Спробуйте пізніше.";
-          }
-        } else {
-          console.error("Помилка входу:", e);
-          authError.innerText = "Помилка входу через Telegram.";
-        }
-      } finally {
-        tgLoginBtn.disabled = false;
+        try {
+          await createUserWithEmailAndPassword(auth, `tg_${tgUser.id}@hamka.test`, `Tg_${tgUser.id}_SecurePass_2026!`);
+        } catch (err) {}
       }
     });
 
@@ -1235,11 +1282,7 @@
         gameScreen.classList.add('visible');
         
         if (typeof window.Adsgram !== 'undefined') {
-          try {
-            AdController = window.Adsgram.init({ blockId: "59759" });
-          } catch (e) {
-            console.error("Adsgram init error:", e);
-          }
+          try { AdController = window.Adsgram.init({ blockId: "59759" }); } catch (e) {}
         }
 
         loadGameData().then(() => {
@@ -1269,8 +1312,27 @@
         if (item.dataset.page === 'profile') renderProfile();
         if (item.dataset.page === 'inventory') renderInventory();
         if (item.dataset.page === 'top') loadLeaderboard();
-        if (item.dataset.page === 'settings') renderSettings();
+        if (item.dataset.page === 'minigames') {
+          minitabCrypto.classList.add('active');
+          minitabRoulette.classList.remove('active');
+          miniContentCrypto.style.display = 'block';
+          miniContentRoulette.style.display = 'none';
+        }
       });
+    });
+
+    minitabCrypto.addEventListener('click', () => {
+      minitabCrypto.classList.add('active');
+      minitabRoulette.classList.remove('active');
+      miniContentCrypto.style.display = 'block';
+      miniContentRoulette.style.display = 'none';
+    });
+
+    minitabRoulette.addEventListener('click', () => {
+      minitabCrypto.classList.remove('active');
+      minitabRoulette.classList.add('active');
+      miniContentCrypto.style.display = 'none';
+      miniContentRoulette.style.display = 'block';
     });
 
     document.querySelectorAll('.shop-tab').forEach(tab => {
@@ -1282,122 +1344,52 @@
       });
     });
 
-    // === Налаштування ===
-    function renderSettings() {
-      if (state.hideFromTop) {
-        btnToggleTop.innerText = 'Вимкнено';
-        btnToggleTop.className = 'settings-btn gray';
-      } else {
-        btnToggleTop.innerText = 'Увімкнено';
-        btnToggleTop.className = 'settings-btn green';
-      }
-    }
-
-    btnToggleTop.addEventListener('click', async () => {
-      if (!currentUid) return;
-      const newVal = !state.hideFromTop;
-      await update(ref(db, 'users/' + currentUid), { hideFromTop: newVal });
-      showStatus(newVal ? '✅ Ви приховані з топу' : '✅ Ви знову в топі');
-      renderSettings();
-    });
-
-    btnLogout.addEventListener('click', () => {
-      signOut(auth);
-    });
-
-    // ============================================================
-    // ЗАВАНТАЖЕННЯ ДАНИХ З FIREBASE
-    // ============================================================
     async function loadGameData() {
       try {
         const titlesSnap = await get(ref(db, 'game_data/titles'));
         if (titlesSnap.exists()) {
-          const data = titlesSnap.val();
-          TITLES = Object.keys(data).map(id => ({
-            id: id,
-            name: data[id].name,
-            price: data[id].price || 0,
-            color: data[id].color || 'linear-gradient(90deg, #8a2be2, #da70d6)',
-            reqPrestige: data[id].reqPrestige || 0
-          }));
+          TITLES = Object.keys(titlesSnap.val()).map(id => ({ id, ...titlesSnap.val()[id] }));
         } else {
           TITLES = [
-            { id: 'beg', name: 'Початківець', price: 0, color: 'linear-gradient(90deg, #555, #777)', reqPrestige: 0 },
-            { id: 'brnz', name: 'Бронзовий Хом\'як', price: 0, color: 'linear-gradient(90deg, #cd7f32, #8b4513)', reqPrestige: 1 },
-            { id: 'slvr', name: 'Срібний Хом\'як', price: 0, color: 'linear-gradient(90deg, #c0c0c0, #808080)', reqPrestige: 2 },
-            { id: 'gld', name: 'Золотий Хом\'як', price: 0, color: 'linear-gradient(90deg, #ffd700, #b8860b)', reqPrestige: 3 },
-            { id: 'crypto_baron', name: 'Крипто-Барон', price: 10000, color: 'linear-gradient(90deg, #ff9800, #ff5722)', reqPrestige: 0 },
-            { id: 'tap_god', name: 'Бог Тапів', price: 50000, color: 'linear-gradient(90deg, #00bcd4, #2196f3)', reqPrestige: 0 },
-            { id: 'emperor', name: 'Імператор', price: 500000, color: 'linear-gradient(90deg, #e91e63, #9c27b0)', reqPrestige: 0 }
+            { id: 'beg', name: 'Beginner', price: 0, color: 'linear-gradient(90deg, #555, #777)', reqPrestige: 0 },
+            { id: 'brnz', name: 'Bronze Hamster', price: 0, color: 'linear-gradient(90deg, #cd7f32, #8b4513)', reqPrestige: 1 },
+            { id: 'slvr', name: 'Silver Hamster', price: 0, color: 'linear-gradient(90deg, #c0c0c0, #808080)', reqPrestige: 2 },
+            { id: 'gld', name: 'Gold Hamster', price: 0, color: 'linear-gradient(90deg, #ffd700, #b8860b)', reqPrestige: 3 },
+            { id: 'crypto_baron', name: 'Crypto Baron', price: 10000, color: 'linear-gradient(90deg, #ff9800, #ff5722)', reqPrestige: 0 },
+            { id: 'tap_god', name: 'Tap God', price: 50000, color: 'linear-gradient(90deg, #00bcd4, #2196f3)', reqPrestige: 0 }
           ];
         }
 
         const avatarsSnap = await get(ref(db, 'game_data/avatars'));
         if (avatarsSnap.exists()) {
-          const data = avatarsSnap.val();
-          AVATARS = Object.keys(data).map(id => ({
-            id: id,
-            name: data[id].name,
-            price: data[id].price || 0
-          }));
+          AVATARS = Object.keys(avatarsSnap.val()).map(id => ({ id, ...avatarsSnap.val()[id] }));
         } else {
           AVATARS = [
             { id: 'dog', name: '🐶', price: 5000 },
             { id: 'cat', name: '🐱', price: 5000 },
             { id: 'lion', name: '🦁', price: 15000 },
             { id: 'panda', name: '🐼', price: 20000 },
-            { id: 'unicorn', name: '🦄', price: 30000 },
-            { id: 'alien', name: '👽', price: 40000 }
+            { id: 'unicorn', name: '🦄', price: 30000 }
           ];
         }
-
-        const skinsSnap = await get(ref(db, 'game_data/skins'));
-        if (skinsSnap.exists()) {
-          const data = skinsSnap.val();
-          SKINS = Object.keys(data).map(id => {
-            const item = data[id];
-            if (typeof item === 'object' && item.file) {
-              return {
-                id: id,
-                name: item.name || 'Скін',
-                file: item.file,
-                price: item.price || 0
-              };
-            }
-            return null;
-          }).filter(s => s !== null);
-        }
-      } catch (err) {
-        console.error("Load game data error:", err);
-      }
+      } catch (err) {}
     }
 
-    // ============================================================
-    // ТОП
-    // ============================================================
     async function loadLeaderboard() {
-      leaderboardList.innerHTML = '<div style="text-align:center; padding:20px; color:#888;">Завантаження...</div>';
+      leaderboardList.innerHTML = '<div style="text-align:center; padding:20px; color:#888;">Loading...</div>';
       try {
         const snap = await get(ref(db, 'users'));
         const users = snap.val() || {};
-        
         const arr = [];
         for (const uid in users) {
           const u = users[uid];
-          if (u.hideFromTop) continue; // Пропускаємо тих, хто приховався
-          
+          if (u.hideFromTop) continue; // Не показувати якщо увімкнено
           arr.push({ 
-            uid: uid,
-            nickname: u.nickname || 'Гравець', 
-            avatar: u.avatar || '🐭',
-            title: u.title || 'Початківець',
-            activeSkin: u.activeSkin || 'default',
-            publicId: u.publicId || '000000',
-            xp: u.xp || 0,
-            prestige: u.prestige || 0
+            uid, nickname: u.nickname || 'Player', avatar: u.avatar || '🐭',
+            title: u.title || 'Beginner', activeSkin: u.activeSkin || 'default',
+            publicId: u.publicId || '000000', xp: u.xp || 0, prestige: u.prestige || 0
           });
         }
-        
         arr.sort((a, b) => b.prestige - a.prestige || b.xp - a.xp);
         const top10 = arr.slice(0, 10);
 
@@ -1406,31 +1398,24 @@
           const el = document.createElement('div');
           el.className = 'leaderboard-item';
           
-          // Видача титулів за топ
           if (i < 3 && u.uid === currentUid) {
             const topTitle = TOP_TITLES[i].name;
             if (!state.purchasedTitles.includes(topTitle)) {
-              update(ref(db, 'users/' + currentUid), {
-                purchasedTitles: [...state.purchasedTitles, topTitle]
-              });
+              update(ref(db, 'users/' + currentUid), { purchasedTitles: [...state.purchasedTitles, topTitle] });
             }
           }
 
-          const titleObj = TITLES.find(t => t.name === u.title) || 
-                           CASE_TITLES.find(t => t.name === u.title) ||
-                           TOP_TITLES.find(t => t.name === u.title);
+          const titleObj = TITLES.find(t => t.name === u.title) || CASE_TITLES.find(t => t.name === u.title) || TOP_TITLES.find(t => t.name === u.title);
           const titleColor = titleObj ? titleObj.color : 'linear-gradient(90deg, #8a2be2, #da70d6)';
 
           let avatarHtml = `<div class="lb-avatar">${u.avatar}</div>`;
           if (u.activeSkin !== 'default') {
             const skinObj = SKINS.find(s => s.id === u.activeSkin);
-            if (skinObj && skinObj.file) {
-              avatarHtml = `<div class="lb-avatar" style="background-image: url('${GITHUB_RAW}${skinObj.file}');"></div>`;
-            }
+            if (skinObj && skinObj.file) avatarHtml = `<div class="lb-avatar" style="background-image: url('${GITHUB_RAW}${skinObj.file}');"></div>`;
           }
 
           el.innerHTML = `
-            <div class="leaderboard-rank" style="font-size:16px; font-weight:800; color:#f5a623; width:25px;">#${i + 1}</div>
+            <div style="font-size:16px; font-weight:800; color:#f5a623; width:25px;">#${i + 1}</div>
             ${avatarHtml}
             <div class="lb-info">
               <div class="lb-name">${u.nickname}</div>
@@ -1441,7 +1426,6 @@
               <div class="lb-prestige">🌟 ${u.prestige}</div>
             </div>
           `;
-          
           el.addEventListener('click', () => {
             viewProfNick.innerText = u.nickname;
             viewProfId.innerText = 'ID: ' + u.publicId;
@@ -1449,33 +1433,13 @@
             viewProfTitle.style.background = titleColor;
             viewProfXp.innerText = formatNumber(u.xp);
             viewProfPrestige.innerText = u.prestige;
-            
-            if (u.activeSkin !== 'default') {
-              const skinObj = SKINS.find(s => s.id === u.activeSkin);
-              if (skinObj && skinObj.file) {
-                viewProfAvatar.style.backgroundImage = `url('${GITHUB_RAW}${skinObj.file}')`;
-                viewProfAvatar.innerText = '';
-              } else {
-                viewProfAvatar.style.backgroundImage = 'none';
-                viewProfAvatar.innerText = u.avatar;
-              }
-            } else {
-              viewProfAvatar.style.backgroundImage = 'none';
-              viewProfAvatar.innerText = u.avatar;
-            }
-
             modalViewProfile.classList.add('show');
           });
-
           leaderboardList.appendChild(el);
         });
-      } catch (err) {
-        console.error(err);
-        leaderboardList.innerHTML = '<div style="text-align:center; padding:20px; color:#ff5252;">Помилка завантаження</div>';
-      }
+      } catch (err) {}
     }
 
-    // === Зміна нікнейму ===
     btnChangeNickname.addEventListener('click', () => {
       newNicknameInput.value = state.nickname;
       modalNickname.classList.add('show');
@@ -1483,181 +1447,71 @@
 
     btnSaveNickname.addEventListener('click', async () => {
       const newNick = newNicknameInput.value.trim();
-      if (newNick.length < 3) { showStatus('❌ Нікнейм занадто короткий'); return; }
-      if (newNick.length > 20) { showStatus('❌ Нікнейм занадто довгий'); return; }
-      
+      if (newNick.length < 3) { showStatus('❌ Too short'); return; }
       await update(ref(db, 'users/' + currentUid), { nickname: newNick });
       modalNickname.classList.remove('show');
-      showStatus('✅ Нікнейм змінено!');
+      showStatus('✅ Saved!');
     });
 
-    // === Вибір скіна з профілю ===
-    btnOpenSkinMenu.addEventListener('click', () => {
-      modalSkinsGrid.innerHTML = '';
-      
-      const defEl = document.createElement('div');
-      defEl.className = `inventory-item ${state.activeSkin === 'default' ? 'active' : ''}`;
-      defEl.innerHTML = `<div class="inventory-item-icon">🐭</div><div class="inventory-item-name">Стандарт</div>`;
-      defEl.addEventListener('click', async () => {
-        await update(ref(db, 'users/' + currentUid), { activeSkin: 'default' });
-        modalSkinSelect.classList.remove('show');
-        showStatus('✅ Скін змінено!');
-      });
-      modalSkinsGrid.appendChild(defEl);
-
-      state.purchasedSkins.forEach(skinId => {
-        const skinObj = SKINS.find(s => s.id === skinId);
-        if (!skinObj || !skinObj.file) return;
-
-        const el = document.createElement('div');
-        el.className = `inventory-item ${state.activeSkin === skinId ? 'active' : ''}`;
-        el.innerHTML = `<div class="inventory-item-icon" style="background-image: url('${GITHUB_RAW}${skinObj.file}'); background-size: cover; border-radius:4px;"></div><div class="inventory-item-name">${skinObj.name}</div>`;
-        el.addEventListener('click', async () => {
-          await update(ref(db, 'users/' + currentUid), { activeSkin: skinId });
-          modalSkinSelect.classList.remove('show');
-          showStatus('✅ Скін змінено!');
-        });
-        modalSkinsGrid.appendChild(el);
-      });
-
-      modalSkinSelect.classList.add('show');
-    });
-
-    // === АДМІНКА ===
     async function checkAdminStatus(uid) {
       try {
         const snap = await get(ref(db, 'admins/' + uid));
         if (snap.exists() && snap.val() === true) {
           isAdmin = true;
           adminBtnBadge.style.display = 'flex';
-        } else {
-          isAdmin = false;
-          adminBtnBadge.style.display = 'none';
         }
-      } catch (err) {
-        console.error("Admin check error:", err);
-      }
+      } catch (e) {}
     }
 
     window.adminAddCoins = async () => {
       if (!isAdmin || !currentUid) return;
-      const amount = parseInt(document.getElementById('admin-coins-input').value);
-      if (!amount || amount <= 0) { showStatus('❌ Введіть суму'); return; }
-      
-      await runTransaction(ref(db, 'users/' + currentUid), (data) => {
-        if (!data) return data;
-        data.coins = (data.coins || 0) + amount;
-        return data;
-      });
-      showStatus(`✅ Нараховано ${amount} монет`);
-      document.getElementById('admin-coins-input').value = '';
+      const amount = parseInt(document.getElementById('admin-coins-input').value) || 0;
+      await runTransaction(ref(db, 'users/' + currentUid), d => { if (d) d.coins = (d.coins || 0) + amount; return d; });
+      showStatus('✅ Added coins');
     };
-
     window.adminAddHoms = async () => {
       if (!isAdmin || !currentUid) return;
-      const amount = parseInt(document.getElementById('admin-homs-input').value);
-      if (!amount || amount <= 0) { showStatus('❌ Введіть суму'); return; }
-      
-      await runTransaction(ref(db, 'users/' + currentUid), (data) => {
-        if (!data) return data;
-        data.homs = (data.homs || 0) + amount;
-        return data;
-      });
-      showStatus(`✅ Нараховано ${amount} Хомів`);
-      document.getElementById('admin-homs-input').value = '';
+      const amount = parseInt(document.getElementById('admin-homs-input').value) || 0;
+      await runTransaction(ref(db, 'users/' + currentUid), d => { if (d) d.homs = (d.homs || 0) + amount; return d; });
+      showStatus('✅ Added Homs');
     };
-
     window.adminAddXp = async () => {
       if (!isAdmin || !currentUid) return;
-      const amount = parseInt(document.getElementById('admin-xp-input').value);
-      if (!amount || amount <= 0) { showStatus('❌ Введіть суму'); return; }
-      
-      await runTransaction(ref(db, 'users/' + currentUid), (data) => {
-        if (!data) return data;
-        data.xp = (data.xp || 0) + amount;
-        return data;
-      });
-      showStatus(`✅ Нараховано ${amount} XP`);
-      document.getElementById('admin-xp-input').value = '';
+      const amount = parseInt(document.getElementById('admin-xp-input').value) || 0;
+      await runTransaction(ref(db, 'users/' + currentUid), d => { if (d) d.xp = (d.xp || 0) + amount; return d; });
+      showStatus('✅ Added XP');
     };
-
-    window.adminSetPrestige = async () => {
-      if (!isAdmin || !currentUid) return;
-      const amount = parseInt(document.getElementById('admin-prestige-input').value);
-      if (isNaN(amount) || amount < 0) { showStatus('❌ Введіть число'); return; }
-      
-      await update(ref(db, 'users/' + currentUid), { prestige: amount });
-      showStatus(`✅ Престиж встановлено на ${amount}`);
-      document.getElementById('admin-prestige-input').value = '';
-    };
-
-    window.adminAddAdViews = async () => {
-      if (!isAdmin || !currentUid) return;
-      const amount = parseInt(document.getElementById('admin-ad-views-input').value);
-      if (!amount || amount <= 0) { showStatus('❌ Введіть суму'); return; }
-      
-      await runTransaction(ref(db, 'users/' + currentUid), (data) => {
-        if (!data) return data;
-        data.adWatches = (data.adWatches || 0) + amount;
-        return data;
-      });
-      showStatus(`✅ Нараховано ${amount} переглядів`);
-      document.getElementById('admin-ad-views-input').value = '';
-    };
-    
     window.adminAddCase = async () => {
       if (!isAdmin || !currentUid) return;
-      await runTransaction(ref(db, 'users/' + currentUid), (data) => {
-        if (!data) return data;
-        if (!data.cases) data.cases = [];
-        data.cases.push({ type: 'basic', name: 'Базовий кейс' });
-        return data;
+      await runTransaction(ref(db, 'users/' + currentUid), d => {
+        if (!d) return d;
+        if (!d.cases) d.cases = {};
+        d.cases.basic = (d.cases.basic || 0) + 1;
+        return d;
       });
-      showStatus('✅ Кейс додано');
+      showStatus('✅ Case added');
     };
 
-    // ============================================================
-    // ГРА
-    // ============================================================
     function initGame(uid) {
       const userRef = ref(db, 'users/' + uid);
       
       get(userRef).then((snap) => {
         if (!snap.exists()) {
-          let generatedId = '';
-          let defaultNick = '';
-          const tgUser = tg.initDataUnsafe?.user;
-          
-          if (tgUser) {
-            generatedId = 'tg_' + tgUser.id;
-            defaultNick = tgUser.username || tgUser.first_name || 'Гравець';
-          } else {
-            generatedId = Math.floor(100000 + Math.random() * 900000).toString();
-            defaultNick = 'Гравець_' + generatedId;
-          }
+          const tgUser = tg?.initDataUnsafe?.user;
+          const generatedId = tgUser ? 'tg_' + tgUser.id : Math.floor(100000 + Math.random() * 900000).toString();
+          const defaultNick = tgUser ? (tgUser.username || tgUser.first_name) : 'Player_' + generatedId;
 
           set(userRef, { 
             coins: 0, homs: 0, energy: 200, maxEnergy: 200, xp: 0, prestige: 0, 
-            title: 'Початківець', avatar: '🐭', holdings: {},
-            nickname: defaultNick,
-            publicId: generatedId,
-            activeSkin: 'default',
-            tapLevel: 0, tapPower: 1, xpPerTap: 1,
-            autoTapRate: 0, autoXpRate: 0, energyRate: 1,
-            caseChance: 0,
-            autoCaseLevel: 0,
+            title: 'Beginner', avatar: '🐭', holdings: {},
+            nickname: defaultNick, publicId: generatedId, activeSkin: 'default',
+            tapLevel: 0, tapPower: 1, xpPerTap: 1, autoTapRate: 0, autoXpRate: 0, energyRate: 1,
             purchasedTitles: [], purchasedAvatars: [], purchasedSkins: [],
-            cases: [],
-            hideFromTop: false,
-            adWatches: 0,
-            lastCaseDate: 0,
+            cases: { basic: 1 }, adWatches: 0, hideFromTop: false, language: 'en',
             createdAt: Date.now()
           });
-        } else if (!snap.val().publicId) {
-          const generatedId = 'user_' + Math.floor(100000 + Math.random() * 900000);
-          update(userRef, { publicId: generatedId, nickname: 'Гравець_' + generatedId });
         }
-      }).catch(err => console.error("Init user error:", err));
+      }).catch(err => {});
 
       unsubscribeUserData = onValue(userRef, (snapshot) => {
         const data = snapshot.val();
@@ -1670,40 +1524,39 @@
         state.maxEnergy = data.maxEnergy ?? 200;
         state.xp = data.xp || 0;
         state.prestige = data.prestige || 0;
-        state.title = data.title || 'Початківець';
+        state.title = data.title || 'Beginner';
         state.avatar = data.avatar || '🐭';
-        state.nickname = data.nickname || 'Гравець';
+        state.nickname = data.nickname || 'Player';
         state.publicId = data.publicId || '000000';
         state.holdings = data.holdings || {};
         state.purchasedTitles = data.purchasedTitles || [];
         state.purchasedAvatars = data.purchasedAvatars || [];
         state.purchasedSkins = data.purchasedSkins || [];
-        state.cases = data.cases || [];
+        state.cases = data.cases || {};
         state.activeSkin = data.activeSkin || 'default';
-        state.hideFromTop = data.hideFromTop || false;
         state.adWatches = data.adWatches || 0;
-        state.lastCaseDate = data.lastCaseDate || 0;
+        state.hideFromTop = data.hideFromTop || false;
         
+        if (data.language && data.language !== currentLang) {
+          setLanguage(data.language);
+        }
+
         state.upgrades.tapLevel = data.tapLevel || 0;
         state.upgrades.tapPower = data.tapPower || 1;
         state.upgrades.xpPerTap = data.xpPerTap || 1;
         state.upgrades.autoTapRate = data.autoTapRate || 0;
         state.upgrades.autoXpRate = data.autoXpRate || 0;
         state.upgrades.energyRate = data.energyRate || 1;
-        state.upgrades.caseChance = data.caseChance || 0;
-        state.upgrades.autoCaseLevel = data.autoCaseLevel || 0;
+
+        hideTopToggle.checked = state.hideFromTop;
 
         renderUI();
         checkAutoPrestige();
         updateHamsterSkin();
-        checkAdReward();
-        checkAutoCase();
 
-        // Оновлюємо активні сторінки в реальному часі
         if (document.getElementById('page-shop').classList.contains('active')) renderShop();
         if (document.getElementById('page-profile').classList.contains('active')) renderProfile();
         if (document.getElementById('page-inventory').classList.contains('active')) renderInventory();
-        if (document.getElementById('page-settings').classList.contains('active')) renderSettings();
         renderCryptoList();
       });
 
@@ -1729,13 +1582,13 @@
       }, 1000);
 
       hamster.onclick = async (e) => {
-        if (state.energy < 1) { showStatus("❌ Немає енергії!"); return; }
+        if (state.energy < 1) { showStatus("❌ No energy!"); return; }
         const tapPower = state.upgrades.tapPower;
         const xpPerTap = state.upgrades.xpPerTap;
 
         state.energy = Math.max(0, state.energy - 1);
-        state.coins = state.coins + tapPower;
-        state.xp = state.xp + xpPerTap;
+        state.coins += tapPower;
+        state.xp += xpPerTap;
         renderUI();
 
         const rect = tapArea.getBoundingClientRect();
@@ -1747,7 +1600,7 @@
         tapArea.appendChild(effect);
         setTimeout(() => effect.remove(), 800);
 
-        try { tg.HapticFeedback.impactOccurred('light'); } catch(e) {}
+        try { tg?.HapticFeedback?.impactOccurred('light'); } catch(e) {}
 
         pendingTap = true;
         try {
@@ -1760,8 +1613,7 @@
             data.xp = (data.xp || 0) + xpPerTap;
             return data;
           });
-        } catch (err) { console.error(err); } 
-        finally { pendingTap = false; }
+        } catch (err) {} finally { pendingTap = false; }
       };
     }
 
@@ -1782,8 +1634,7 @@
     }
 
     function getPrestigeReq(prestigeLvl) {
-      if (prestigeLvl === 0) return 1000000;
-      return 1000000 * Math.pow(2, prestigeLvl);
+      return prestigeLvl === 0 ? 1000000 : 1000000 * Math.pow(2, prestigeLvl);
     }
 
     async function checkAutoPrestige() {
@@ -1804,35 +1655,7 @@
           }
           return data;
         });
-        try { tg.HapticFeedback.notificationOccurred('success'); } catch(e) {}
-      }
-    }
-
-    // === Нагорода за 5 переглядів (Кейс) ===
-    async function checkAdReward() {
-      if (state.adWatches >= 5 && currentUid) {
-        await update(ref(db, 'users/' + currentUid), {
-          adWatches: 0,
-          cases: [...(state.cases || []), { type: 'basic', name: 'Базовий кейс' }]
-        });
-        
-        showStatus('📦 Ви отримали кейс за 5 переглядів!');
-        try { tg.HapticFeedback.notificationOccurred('success'); } catch(e) {}
-      }
-    }
-
-    // === Авто-фарм кейсів ===
-    function checkAutoCase() {
-      if (state.upgrades.autoCaseLevel > 0 && currentUid) {
-        const chance = state.upgrades.autoCaseLevel * 0.01; 
-        if (Math.random() < chance) {
-          runTransaction(ref(db, 'users/' + currentUid), (data) => {
-            if (!data) return data;
-            if (!data.cases) data.cases = [];
-            data.cases.push({ type: 'basic', name: 'Авто-кейс' });
-            return data;
-          });
-        }
+        try { tg?.HapticFeedback?.notificationOccurred('success'); } catch(e) {}
       }
     }
 
@@ -1872,9 +1695,6 @@
       xpBar.style.width = Math.min(100, Math.max(0, lvlProgress)) + '%';
     }
 
-    // ============================================================
-    // МАГАЗИН
-    // ============================================================
     function renderShop() {
       if (!shopListEl) return;
       shopListEl.innerHTML = '';
@@ -1886,7 +1706,6 @@
         TITLES.forEach(item => {
           if (item.price <= 0) return;
           const isOwned = state.purchasedTitles.includes(item.name);
-
           const card = document.createElement('div');
           card.className = 'shop-card';
           card.innerHTML = `
@@ -1895,27 +1714,22 @@
               <div class="shop-card-title" style="background:${item.color}; -webkit-background-clip:text; -webkit-text-fill-color:transparent;">${item.name}</div>
               <div class="shop-card-price">${formatNumber(item.price)} 🪙</div>
             </div>
-            <button class="shop-card-btn" data-title-name="${item.name}" ${isOwned ? 'disabled' : ''}>
-              ${isOwned ? 'Куплено' : 'Купити'}
-            </button>
+            <button class="shop-card-btn" data-title-name="${item.name}" ${isOwned ? 'disabled' : ''}>${isOwned ? 'Owned' : 'Buy'}</button>
           `;
           grid.appendChild(card);
         });
 
         AVATARS.forEach(item => {
           const isOwned = state.purchasedAvatars.includes(item.name);
-
           const card = document.createElement('div');
           card.className = 'shop-card';
           card.innerHTML = `
             <div class="grid-preview">${item.name}</div>
             <div class="shop-card-info">
-              <div class="shop-card-title">Аватарка</div>
+              <div class="shop-card-title">Avatar</div>
               <div class="shop-card-price">${formatNumber(item.price)} 🪙</div>
             </div>
-            <button class="shop-card-btn" data-avatar-name="${item.name}" ${isOwned ? 'disabled' : ''}>
-              ${isOwned ? 'Куплено' : 'Купити'}
-            </button>
+            <button class="shop-card-btn" data-avatar-name="${item.name}" ${isOwned ? 'disabled' : ''}>${isOwned ? 'Owned' : 'Buy'}</button>
           `;
           grid.appendChild(card);
         });
@@ -1923,18 +1737,15 @@
         SKINS.forEach(item => {
           if (!item.file) return;
           const isOwned = state.purchasedSkins.includes(item.id);
-
           const card = document.createElement('div');
           card.className = 'shop-card';
           card.innerHTML = `
             <div class="grid-preview" style="background-image: url('${GITHUB_RAW}${item.file}');"></div>
             <div class="shop-card-info">
-              <div class="shop-card-title">Скін: ${item.name}</div>
+              <div class="shop-card-title">Skin: ${item.name}</div>
               <div class="shop-card-price">${formatNumber(item.price)} 🪙</div>
             </div>
-            <button class="shop-card-btn" data-skin-id="${item.id}" ${isOwned ? 'disabled' : ''}>
-              ${isOwned ? 'Куплено' : 'Купити'}
-            </button>
+            <button class="shop-card-btn" data-skin-id="${item.id}" ${isOwned ? 'disabled' : ''}>${isOwned ? 'Owned' : 'Buy'}</button>
           `;
           grid.appendChild(card);
         });
@@ -1942,13 +1753,9 @@
         shopListEl.appendChild(grid);
 
         shopListEl.querySelectorAll('.shop-card-btn').forEach(btn => {
-          if (btn.dataset.titleName) {
-            btn.addEventListener('click', () => openBuyTitleModal(btn.dataset.titleName));
-          } else if (btn.dataset.avatarName) {
-            btn.addEventListener('click', () => openBuyAvatarModal(btn.dataset.avatarName));
-          } else if (btn.dataset.skinId) {
-            btn.addEventListener('click', () => openBuySkinModal(btn.dataset.skinId));
-          }
+          if (btn.dataset.titleName) btn.addEventListener('click', () => buyCosmetic({ name: btn.dataset.titleName, price: TITLES.find(t => t.name === btn.dataset.titleName).price, type: 'title' }));
+          else if (btn.dataset.avatarName) btn.addEventListener('click', () => buyCosmetic({ name: btn.dataset.avatarName, price: AVATARS.find(a => a.name === btn.dataset.avatarName).price, type: 'avatar' }));
+          else if (btn.dataset.skinId) btn.addEventListener('click', () => buySkin(SKINS.find(s => s.id === btn.dataset.skinId)));
         });
         return;
       }
@@ -1959,46 +1766,24 @@
         caseCard.innerHTML = `
           <div class="grid-preview" style="font-size:40px;">📦</div>
           <div class="shop-card-info">
-            <div class="shop-card-title">Базовий кейс</div>
+            <div class="shop-card-title">Basic Case</div>
             <div class="shop-card-price">100 🐹</div>
           </div>
-          <button class="shop-card-btn" id="btn-buy-case-homs">Купити</button>
+          <button class="shop-card-btn" id="btn-buy-case-homs">Buy</button>
         `;
         shopListEl.appendChild(caseCard);
         
         document.getElementById('btn-buy-case-homs').addEventListener('click', async () => {
-          if (state.homs < 100) { showStatus('❌ Недостатньо Хомів'); return; }
+          if (state.homs < 100) { showStatus('❌ Not enough Homs'); return; }
           await runTransaction(ref(db, 'users/' + currentUid), (data) => {
-            if (!data) return data;
-            if ((data.homs || 0) < 100) return;
-            data.homs = (data.homs || 0) - 100;
-            if (!data.cases) data.cases = [];
-            data.cases.push({ type: 'basic', name: 'Базовий кейс' });
+            if (!data || (data.homs || 0) < 100) return;
+            data.homs -= 100;
+            if (!data.cases) data.cases = {};
+            data.cases.basic = (data.cases.basic || 0) + 1;
             return data;
           });
-          showStatus('✅ Кейс куплено!');
+          showStatus('✅ Case purchased!');
         });
-        
-        const adCaseCard = document.createElement('div');
-        adCaseCard.className = 'shop-card';
-        adCaseCard.innerHTML = `
-          <div class="grid-preview" style="font-size:40px;">🎬</div>
-          <div class="shop-card-info">
-            <div class="shop-card-title">Кейс за рекламу</div>
-            <div class="shop-card-price">Потрібно 5 переглядів</div>
-          </div>
-          <button class="shop-card-btn" id="btn-buy-case-ad">Отримати</button>
-        `;
-        shopListEl.appendChild(adCaseCard);
-        
-        document.getElementById('btn-buy-case-ad').addEventListener('click', async () => {
-          if (state.adWatches < 5) {
-            showStatus(`❌ Потрібно переглянути ще ${5 - state.adWatches} реклам`);
-            return;
-          }
-          showStatus('✅ Кейс отримано!');
-        });
-        
         return;
       }
 
@@ -2011,41 +1796,20 @@
         else if (item.id === 'tap') currentLevel = state.upgrades.tapLevel;
         else if (item.id === 'xpTap') currentLevel = state.upgrades.xpPerTap - 1;
         else if (item.id === 'maxEnergy') currentLevel = (state.maxEnergy - 200) / 50;
-        else if (item.id === 'caseChance') currentLevel = state.upgrades.caseChance;
-        else if (item.id === 'autoCase') currentLevel = state.upgrades.autoCaseLevel;
-
-        if (item.requires && state.upgrades[item.requires] === 0) {
-          return;
-        }
 
         const price = getShopPrice(item.id, currentLevel);
         const isMaxed = currentLevel >= item.maxLevel || price === Infinity;
-        
-        let canAfford;
-        if (item.isHoms) {
-          canAfford = state.homs >= price;
-        } else {
-          canAfford = state.coins >= price;
-        }
-
-        let priceText;
-        if (item.isHoms) {
-          priceText = formatNumber(price) + ' 🐹';
-        } else {
-          priceText = formatNumber(price) + ' 🪙';
-        }
+        const canAfford = state.coins >= price;
 
         const card = document.createElement('div');
         card.className = 'shop-card';
         card.innerHTML = `
           <div class="shop-card-info">
-            <div class="shop-card-title">${item.title} <span style="font-size:10px; color:#888;">(Рів. ${currentLevel}${item.maxLevel < 999 ? '/' + item.maxLevel : ''})</span></div>
+            <div class="shop-card-title">${item.title} <span style="font-size:10px; color:#888;">(Lvl ${currentLevel})</span></div>
             <div class="shop-card-desc">${item.desc}</div>
-            ${!isMaxed ? `<div class="shop-card-price">${priceText}</div>` : '<div class="shop-card-price" style="color:#2ecc71;">МАКСИМУМ</div>'}
+            ${!isMaxed ? `<div class="shop-card-price">${formatNumber(price)} 🪙</div>` : '<div class="shop-card-price" style="color:#2ecc71;">MAX</div>'}
           </div>
-          <button class="shop-card-btn" data-id="${item.id}" ${isMaxed || !canAfford ? 'disabled' : ''}>
-            ${isMaxed ? 'Макс' : 'Купити'}
-          </button>
+          <button class="shop-card-btn" data-id="${item.id}" ${isMaxed || !canAfford ? 'disabled' : ''}>${isMaxed ? 'Max' : 'Buy'}</button>
         `;
         shopListEl.appendChild(card);
       });
@@ -2053,33 +1817,6 @@
       shopListEl.querySelectorAll('.shop-card-btn').forEach(btn => {
         btn.addEventListener('click', () => buyUpgrade(btn.dataset.id));
       });
-    }
-
-    function openBuyTitleModal(titleName) {
-      const item = TITLES.find(t => t.name === titleName);
-      if (!item) return;
-      
-      if (confirm(`Купити титул "${item.name}" за ${formatNumber(item.price)} монет?`)) {
-        buyCosmetic({ ...item, type: 'title' });
-      }
-    }
-
-    function openBuyAvatarModal(avatarName) {
-      const item = AVATARS.find(a => a.name === avatarName);
-      if (!item) return;
-      
-      if (confirm(`Купити аватарку ${item.name} за ${formatNumber(item.price)} монет?`)) {
-        buyCosmetic({ ...item, type: 'avatar' });
-      }
-    }
-
-    function openBuySkinModal(skinId) {
-      const item = SKINS.find(s => s.id === skinId);
-      if (!item) return;
-      
-      if (confirm(`Купити скін "${item.name}" за ${formatNumber(item.price)} монет?`)) {
-        buySkin(item);
-      }
     }
 
     async function buyUpgrade(itemId) {
@@ -2095,120 +1832,51 @@
       else if (itemId === 'tap') currentLevel = state.upgrades.tapLevel;
       else if (itemId === 'xpTap') currentLevel = state.upgrades.xpPerTap - 1;
       else if (itemId === 'maxEnergy') currentLevel = (state.maxEnergy - 200) / 50;
-      else if (itemId === 'caseChance') currentLevel = state.upgrades.caseChance;
-      else if (itemId === 'autoCase') currentLevel = state.upgrades.autoCaseLevel;
 
       const price = getShopPrice(itemId, currentLevel);
-      const userRef = ref(db, 'users/' + currentUid);
-
-      try {
-        let success = false;
-        let errorMsg = '';
-
-        await runTransaction(userRef, (data) => {
-          if (!data) return data;
-          
-          if (item.isHoms) {
-            if ((data.homs || 0) < price) { errorMsg = 'Недостатньо Хомів'; return; }
-            data.homs = (data.homs || 0) - price;
-          } else {
-            if ((data.coins || 0) < price) { errorMsg = 'Недостатньо монет'; return; }
-            data.coins = (data.coins || 0) - price;
-          }
-
-          if (itemId === 'autoTap') data.autoTapRate = (data.autoTapRate || 0) + 1;
-          else if (itemId === 'autoXp') data.autoXpRate = (data.autoXpRate || 0) + 1;
-          else if (itemId === 'energyRate') data.energyRate = (data.energyRate || 1) + 1;
-          else if (itemId === 'tap') {
-            data.tapLevel = (data.tapLevel || 0) + 1;
-            data.tapPower = (data.tapPower || 1) + 1;
-          }
-          else if (itemId === 'xpTap') data.xpPerTap = (data.xpPerTap || 1) + 1;
-          else if (itemId === 'maxEnergy') data.maxEnergy = (data.maxEnergy || 200) + 50;
-          else if (itemId === 'caseChance') data.caseChance = (data.caseChance || 0) + 1;
-          else if (itemId === 'autoCase') data.autoCaseLevel = (data.autoCaseLevel || 0) + 1;
-
-          success = true;
-          return data;
-        });
-
-        if (!success) { showStatus("❌ " + (errorMsg || "Помилка")); return; }
-        
-        showStatus(`✅ Покращення куплено!`);
-        try { tg.HapticFeedback.notificationOccurred('success'); } catch(e) {}
-      } catch (err) {
-        console.error(err);
-        showStatus("❌ Помилка транзакції");
-      }
+      await runTransaction(ref(db, 'users/' + currentUid), (data) => {
+        if (!data || (data.coins || 0) < price) return;
+        data.coins -= price;
+        if (itemId === 'autoTap') data.autoTapRate = (data.autoTapRate || 0) + 1;
+        else if (itemId === 'autoXp') data.autoXpRate = (data.autoXpRate || 0) + 1;
+        else if (itemId === 'energyRate') data.energyRate = (data.energyRate || 1) + 1;
+        else if (itemId === 'tap') { data.tapLevel = (data.tapLevel || 0) + 1; data.tapPower = (data.tapPower || 1) + 1; }
+        else if (itemId === 'xpTap') data.xpPerTap = (data.xpPerTap || 1) + 1;
+        else if (itemId === 'maxEnergy') data.maxEnergy = (data.maxEnergy || 200) + 50;
+        return data;
+      });
+      showStatus('✅ Upgrade purchased!');
     }
 
     async function buySkin(item) {
-      const userRef = ref(db, 'users/' + currentUid);
-      try {
-        let success = false;
-        let errorMsg = '';
-
-        await runTransaction(userRef, (data) => {
-          if (!data) return data;
-          if ((data.coins || 0) < item.price) { errorMsg = 'Недостатньо монет'; return; }
-
-          data.coins = (data.coins || 0) - item.price;
-          
-          if (!data.purchasedSkins) data.purchasedSkins = [];
-          if (!data.purchasedSkins.includes(item.id)) data.purchasedSkins.push(item.id);
-          
-          success = true;
-          return data;
-        });
-
-        if (!success) { showStatus("❌ " + (errorMsg || "Помилка")); return; }
-        
-        showStatus(`✅ Скін куплено! Перевірте інвентар.`);
-        renderShop();
-        try { tg.HapticFeedback.notificationOccurred('success'); } catch(e) {}
-      } catch (err) {
-        console.error(err);
-        showStatus("❌ Помилка транзакції");
-      }
+      await runTransaction(ref(db, 'users/' + currentUid), (data) => {
+        if (!data || (data.coins || 0) < item.price) return;
+        data.coins -= item.price;
+        if (!data.purchasedSkins) data.purchasedSkins = [];
+        if (!data.purchasedSkins.includes(item.id)) data.purchasedSkins.push(item.id);
+        return data;
+      });
+      showStatus('✅ Skin bought!');
+      renderShop();
     }
 
     async function buyCosmetic(item) {
-      const userRef = ref(db, 'users/' + currentUid);
-      try {
-        let success = false;
-        let errorMsg = '';
-
-        await runTransaction(userRef, (data) => {
-          if (!data) return data;
-          if ((data.coins || 0) < item.price) { errorMsg = 'Недостатньо монет'; return; }
-
-          data.coins = (data.coins || 0) - item.price;
-          
-          if (item.type === 'title') {
-            if (!data.purchasedTitles) data.purchasedTitles = [];
-            if (!data.purchasedTitles.includes(item.name)) data.purchasedTitles.push(item.name);
-          } else if (item.type === 'avatar') {
-            if (!data.purchasedAvatars) data.purchasedAvatars = [];
-            if (!data.purchasedAvatars.includes(item.name)) data.purchasedAvatars.push(item.name);
-          }
-          success = true;
-          return data;
-        });
-
-        if (!success) { showStatus("❌ " + (errorMsg || "Помилка")); return; }
-        
-        showStatus(`✅ Куплено! Перевірте інвентар.`);
-        renderShop();
-        try { tg.HapticFeedback.notificationOccurred('success'); } catch(e) {}
-      } catch (err) {
-        console.error(err);
-        showStatus("❌ Помилка транзакції");
-      }
+      await runTransaction(ref(db, 'users/' + currentUid), (data) => {
+        if (!data || (data.coins || 0) < item.price) return;
+        data.coins -= item.price;
+        if (item.type === 'title') {
+          if (!data.purchasedTitles) data.purchasedTitles = [];
+          if (!data.purchasedTitles.includes(item.name)) data.purchasedTitles.push(item.name);
+        } else if (item.type === 'avatar') {
+          if (!data.purchasedAvatars) data.purchasedAvatars = [];
+          if (!data.purchasedAvatars.includes(item.name)) data.purchasedAvatars.push(item.name);
+        }
+        return data;
+      });
+      showStatus('✅ Purchased!');
+      renderShop();
     }
 
-    // ============================================================
-    // ПРОФІЛЬ
-    // ============================================================
     function renderProfile() {
       profCoins.innerText = formatNumber(state.coins);
       profHoms.innerText = formatNumber(state.homs);
@@ -2222,18 +1890,13 @@
         if (skinObj && skinObj.file) {
           profAvatar.style.backgroundImage = `url('${GITHUB_RAW}${skinObj.file}')`;
           profAvatar.innerText = '';
-        } else {
-          profAvatar.style.backgroundImage = 'none';
-          profAvatar.innerText = state.avatar;
         }
       } else {
         profAvatar.style.backgroundImage = 'none';
         profAvatar.innerText = state.avatar;
       }
 
-      const titleObj = TITLES.find(t => t.name === state.title) || 
-                       CASE_TITLES.find(t => t.name === state.title) ||
-                       TOP_TITLES.find(t => t.name === state.title);
+      const titleObj = TITLES.find(t => t.name === state.title) || CASE_TITLES.find(t => t.name === state.title) || TOP_TITLES.find(t => t.name === state.title);
       if (titleObj) {
         profTitle.innerText = titleObj.name;
         profTitleBadge.style.background = titleObj.color;
@@ -2243,141 +1906,108 @@
       }
 
       const req = getPrestigeReq(state.prestige);
-      if (state.xp >= req) {
-        prestigeInfo.innerText = `Доступно! Престиж активується автоматично.`;
-      } else {
-        prestigeInfo.innerText = `Потрібно ${formatNumber(req)} XP (у вас ${formatNumber(state.xp)})`;
-      }
+      prestigeInfo.innerText = state.xp >= req ? 'Ready!' : `Required ${formatNumber(req)} XP`;
     }
 
-    // ============================================================
-    // ІНВЕНТАР
-    // ============================================================
+    // === ІНВЕНТАР ТА СТАКУВАННЯ КЕЙСІВ ===
     function renderInventory() {
-      // 1. Кейси
-      if (state.cases && state.cases.length > 0) {
+      const cases = state.cases || {};
+      const hasCases = Object.keys(cases).some(k => cases[k] > 0);
+      
+      if (hasCases) {
         casesSection.style.display = 'block';
         invCases.innerHTML = '';
-        
-        // Групуємо однакові кейси
-        const caseCounts = {};
-        state.cases.forEach(c => {
-          const key = c.name;
-          if (!caseCounts[key]) caseCounts[key] = { ...c, count: 0 };
-          caseCounts[key].count++;
-        });
-
-        Object.values(caseCounts).forEach((caseItem) => {
+        for (const type in cases) {
+          const count = cases[type];
+          if (count <= 0) continue;
           const el = document.createElement('div');
           el.className = 'case-item';
           el.innerHTML = `
+            <div class="case-count-badge">${count}</div>
             <div class="case-icon">📦</div>
-            <div class="case-name">${caseItem.name}</div>
-            ${caseItem.count > 1 ? `<div class="inventory-item-count">${caseItem.count}</div>` : ''}
+            <div class="case-name">Basic Case</div>
           `;
-          el.addEventListener('click', () => openCase(caseItem.name));
+          el.addEventListener('click', () => openCaseModal(type, count));
           invCases.appendChild(el);
-        });
+        }
       } else {
         casesSection.style.display = 'none';
       }
 
-      // 2. Титули
+      // Титули
       const availableTitles = [
-        ...TITLES.filter(t => {
-          if (t.reqPrestige > 0) return state.prestige >= t.reqPrestige;
-          return state.purchasedTitles.includes(t.name);
-        }),
+        ...TITLES.filter(t => t.reqPrestige === 0 || state.prestige >= t.reqPrestige),
         ...CASE_TITLES.filter(t => state.purchasedTitles.includes(t.name)),
         ...TOP_TITLES.filter(t => state.purchasedTitles.includes(t.name))
       ];
-
-      // Групуємо титули
-      const titleCounts = {};
-      state.purchasedTitles.forEach(name => {
-        titleCounts[name] = (titleCounts[name] || 0) + 1;
-      });
-
       invTitles.innerHTML = '';
       availableTitles.forEach(tItem => {
-        const count = titleCounts[tItem.name] || 0;
-        if (count === 0) return;
-
         const el = document.createElement('div');
         el.className = `inventory-item ${state.title === tItem.name ? 'active' : ''}`;
-        el.innerHTML = `<div class="inventory-item-icon">🏆</div><div class="inventory-item-name" style="background:${tItem.color}; -webkit-background-clip:text; -webkit-text-fill-color:transparent;">${tItem.name}</div>${count > 1 ? `<div class="inventory-item-count">${count}</div>` : ''}`;
+        el.innerHTML = `<div class="inventory-item-icon">🏆</div><div class="inventory-item-name" style="background:${tItem.color}; -webkit-background-clip:text; -webkit-text-fill-color:transparent;">${tItem.name}</div>`;
         el.addEventListener('click', async () => {
-          if (!currentUid) return;
           await update(ref(db, 'users/' + currentUid), { title: tItem.name });
-          showStatus('✅ Титул вдягнуто!');
+          showStatus('✅ Title equipped!');
         });
         invTitles.appendChild(el);
       });
 
-      // 3. Аватарки
+      // Аватарки
       const availableAvatars = ['🐭', ...state.purchasedAvatars];
-      const avatarCounts = {};
-      state.purchasedAvatars.forEach(name => {
-        avatarCounts[name] = (avatarCounts[name] || 0) + 1;
-      });
-
       invAvatars.innerHTML = '';
       availableAvatars.forEach(avName => {
-        const count = avName === '🐭' ? 1 : (avatarCounts[avName] || 0);
-        if (count === 0) return;
-
         const el = document.createElement('div');
         el.className = `inventory-item ${state.avatar === avName ? 'active' : ''}`;
-        el.innerHTML = `<div class="inventory-item-icon">${avName}</div>${count > 1 ? `<div class="inventory-item-count">${count}</div>` : ''}`;
+        el.innerHTML = `<div class="inventory-item-icon">${avName}</div>`;
         el.addEventListener('click', async () => {
-          if (!currentUid) return;
           await update(ref(db, 'users/' + currentUid), { avatar: avName });
-          showStatus('✅ Аватарку змінено!');
+          showStatus('✅ Avatar changed!');
         });
         invAvatars.appendChild(el);
       });
 
-      // 4. Скіни
+      // Скіни
       invSkins.innerHTML = '';
       const defaultEl = document.createElement('div');
       defaultEl.className = `inventory-item ${state.activeSkin === 'default' ? 'active' : ''}`;
-      defaultEl.innerHTML = `<div class="inventory-item-icon">🐭</div><div class="inventory-item-name">Стандарт</div>`;
+      defaultEl.innerHTML = `<div class="inventory-item-icon">🐭</div><div class="inventory-item-name">Default</div>`;
       defaultEl.addEventListener('click', async () => {
         await update(ref(db, 'users/' + currentUid), { activeSkin: 'default' });
-        showStatus('✅ Скін змінено!');
+        showStatus('✅ Skin changed!');
       });
       invSkins.appendChild(defaultEl);
 
-      const skinCounts = {};
-      state.purchasedSkins.forEach(id => {
-        skinCounts[id] = (skinCounts[id] || 0) + 1;
-      });
-
-      Object.keys(skinCounts).forEach(skinId => {
+      state.purchasedSkins.forEach(skinId => {
         const skinObj = SKINS.find(s => s.id === skinId);
         if (!skinObj || !skinObj.file) return;
-        const count = skinCounts[skinId];
-
         const el = document.createElement('div');
         el.className = `inventory-item ${state.activeSkin === skinId ? 'active' : ''}`;
-        el.innerHTML = `<div class="inventory-item-icon" style="background-image: url('${GITHUB_RAW}${skinObj.file}'); background-size: cover; border-radius:4px;"></div><div class="inventory-item-name">${skinObj.name}</div>${count > 1 ? `<div class="inventory-item-count">${count}</div>` : ''}`;
+        el.innerHTML = `<div class="inventory-item-icon" style="background-image: url('${GITHUB_RAW}${skinObj.file}'); background-size: cover; border-radius:4px;"></div><div class="inventory-item-name">${skinObj.name}</div>`;
         el.addEventListener('click', async () => {
           await update(ref(db, 'users/' + currentUid), { activeSkin: skinId });
-          showStatus('✅ Скін змінено!');
+          showStatus('✅ Skin changed!');
         });
         invSkins.appendChild(el);
       });
     }
 
-    // === ВІДКРИТТЯ КЕЙСА ===
-    async function openCase(caseName) {
-      if (!currentUid) return;
-      
-      const newCases = [...state.cases];
-      const idx = newCases.findIndex(c => c.name === caseName);
-      if (idx === -1) return;
-      newCases.splice(idx, 1);
-      
+    function openCaseModal(type, count) {
+      selectedCaseTypeToOpen = type;
+      document.getElementById('case-modal-title').innerText = 'Open Case';
+      document.getElementById('case-modal-count').innerText = `Available: ${count}`;
+      document.getElementById('modal-case-qty').classList.add('show');
+    }
+
+    // === ВІДКРИТТЯ КЕЙСІВ ПАЧКОЮ + ПОВТОРКИ ДАЮТЬ ПО 10 ХОМ ===
+    window.openCasesBatch = async function(qty) {
+      document.getElementById('modal-case-qty').classList.remove('show');
+      if (!currentUid || !selectedCaseTypeToOpen) return;
+
+      const currentCount = state.cases[selectedCaseTypeToOpen] || 0;
+      let openNum = qty === 'all' ? currentCount : parseInt(qty);
+      if (openNum > currentCount) openNum = currentCount;
+      if (openNum <= 0) return;
+
       caseOpenOverlay.classList.add('show');
       caseOpeningBox.style.display = 'block';
       caseRewardText.innerText = '';
@@ -2386,71 +2016,73 @@
       setTimeout(async () => {
         caseOpeningBox.style.display = 'none';
         
-        const rand = Math.random() * 100;
-        let rewardText = '';
-        let updateData = {
-          cases: newCases,
-          purchasedTitles: state.purchasedTitles,
-          purchasedAvatars: state.purchasedAvatars,
-          purchasedSkins: state.purchasedSkins,
-          xp: state.xp
-        };
+        let totalXp = 0;
+        let totalHoms = 0;
+        let summaryRewards = [];
 
-        if (rand < 5) {
-          updateData.cases.push({ type: 'epic', name: 'Епічний кейс' });
-          rewardText = '📦 Епічний кейс!';
-        } else if (rand < 20) {
-          if (SKINS.length > 0) {
-            const randomSkin = SKINS[Math.floor(Math.random() * SKINS.length)];
-            if (!updateData.purchasedSkins.includes(randomSkin.id)) {
-              updateData.purchasedSkins.push(randomSkin.id);
-            }
-            rewardText = `🎨 Скін: ${randomSkin.name}`;
-          } else {
-            updateData.xp += 10000;
-            rewardText = '⭐ +10,000 XP';
-          }
-        } else if (rand < 40) {
-          if (AVATARS.length > 0) {
-            const randomAvatar = AVATARS[Math.floor(Math.random() * AVATARS.length)];
-            if (!updateData.purchasedAvatars.includes(randomAvatar.name)) {
-              updateData.purchasedAvatars.push(randomAvatar.name);
-            }
-            rewardText = `🖼️ Іконка: ${randomAvatar.name}`;
-          } else {
-            updateData.xp += 10000;
-            rewardText = '⭐ +10,000 XP';
-          }
-        } else if (rand < 60) {
-          const randomTitle = CASE_TITLES[Math.floor(Math.random() * CASE_TITLES.length)];
-          if (!updateData.purchasedTitles.includes(randomTitle.name)) {
-            updateData.purchasedTitles.push(randomTitle.name);
-          }
-          rewardText = `🏆 Титул: ${randomTitle.name}`;
-        } else {
-          const xpReward = Math.floor(Math.random() * 49000) + 1000;
-          updateData.xp += xpReward;
-          rewardText = `⭐ +${formatNumber(xpReward)} XP`;
-        }
+        await runTransaction(ref(db, 'users/' + currentUid), (data) => {
+          if (!data || !data.cases || (data.cases[selectedCaseTypeToOpen] || 0) < openNum) return;
+          
+          data.cases[selectedCaseTypeToOpen] -= openNum;
+          if (data.cases[selectedCaseTypeToOpen] <= 0) delete data.cases[selectedCaseTypeToOpen];
 
-        await update(ref(db, 'users/' + currentUid), updateData);
-        
-        caseRewardText.innerText = rewardText;
+          if (!data.purchasedTitles) data.purchasedTitles = [];
+          if (!data.purchasedAvatars) data.purchasedAvatars = [];
+          if (!data.purchasedSkins) data.purchasedSkins = [];
+
+          for (let i = 0; i < openNum; i++) {
+            const rand = Math.random() * 100;
+            if (rand < 20) {
+              const randomSkin = SKINS[Math.floor(Math.random() * SKINS.length)];
+              if (data.purchasedSkins.includes(randomSkin.id)) {
+                data.homs = (data.homs || 0) + 10;
+                totalHoms += 10;
+                summaryRewards.push(`+10 Homs (Skin Duplicate)`);
+              } else {
+                data.purchasedSkins.push(randomSkin.id);
+                summaryRewards.push(`Skin: ${randomSkin.name}`);
+              }
+            } else if (rand < 45) {
+              const randomAvatar = AVATARS[Math.floor(Math.random() * AVATARS.length)];
+              if (data.purchasedAvatars.includes(randomAvatar.name)) {
+                data.homs = (data.homs || 0) + 10;
+                totalHoms += 10;
+                summaryRewards.push(`+10 Homs (Avatar Duplicate)`);
+              } else {
+                data.purchasedAvatars.push(randomAvatar.name);
+                summaryRewards.push(`Avatar: ${randomAvatar.name}`);
+              }
+            } else if (rand < 70) {
+              const randomTitle = CASE_TITLES[Math.floor(Math.random() * CASE_TITLES.length)];
+              if (data.purchasedTitles.includes(randomTitle.name)) {
+                data.homs = (data.homs || 0) + 10;
+                totalHoms += 10;
+                summaryRewards.push(`+10 Homs (Title Duplicate)`);
+              } else {
+                data.purchasedTitles.push(randomTitle.name);
+                summaryRewards.push(`Title: ${randomTitle.name}`);
+              }
+            } else {
+              const xpReward = Math.floor(Math.random() * 49000) + 1000;
+              data.xp = (data.xp || 0) + xpReward;
+              totalXp += xpReward;
+              summaryRewards.push(`+${formatNumber(xpReward)} XP`);
+            }
+          }
+          return data;
+        });
+
+        caseRewardText.innerText = summaryRewards.join('\n');
         btnCloseCase.style.display = 'block';
-        
-        try { tg.HapticFeedback.notificationOccurred('success'); } catch(e) {}
-      }, 2000);
-    }
+        try { tg?.HapticFeedback?.notificationOccurred('success'); } catch(e) {}
+      }, 1500);
+    };
 
     btnCloseCase.addEventListener('click', () => {
       caseOpenOverlay.classList.remove('show');
     });
 
-    // ============================================================
-    // КРИПТА
-    // ============================================================
     let cryptoState = {};
-
     async function initCryptoSystem() {
       for (const symbol of COINS) {
         const cRef = ref(db, 'crypto/' + symbol);
@@ -2461,8 +2093,7 @@
         }
       }
 
-      const cryptoRef = ref(db, 'crypto');
-      onValue(cryptoRef, (snap) => {
+      onValue(ref(db, 'crypto'), (snap) => {
         const data = snap.val();
         if (!data) return;
         cryptoState = data;
@@ -2472,7 +2103,6 @@
       if (cryptoInterval) clearInterval(cryptoInterval);
       cryptoInterval = setInterval(async () => {
         for (const symbol of COINS) {
-          if (symbol === 'PLAYERHOM') continue;
           updateCryptoPrice(symbol);
         }
       }, 10000);
@@ -2492,41 +2122,13 @@
           const history = data.history || [];
           history.push({ t: Date.now(), p: newPrice });
           if (history.length > 30) history.shift();
-
           return { price: newPrice, history: history };
         });
-      } catch (err) { console.error(err); }
-    }
-
-    async function recalcPlayerhomPrice() {
-      try {
-        const usersSnap = await get(ref(db, 'users'));
-        const users = usersSnap.val() || {};
-        let totalHoldings = 0;
-        for (const uid in users) {
-          const h = users[uid]?.holdings?.PLAYERHOM || 0;
-          totalHoldings += h;
-        }
-
-        const newPrice = PLAYERHOM_BASE + totalHoldings * PLAYERHOM_PER_UNIT;
-        const playerRef = ref(db, 'crypto/PLAYERHOM');
-
-        await runTransaction(playerRef, (data) => {
-          const history = data?.history || [];
-          history.push({ t: Date.now(), p: newPrice });
-          if (history.length > 30) history.shift();
-          return { price: newPrice, history: history };
-        });
-      } catch (err) { console.error(err); }
+      } catch (err) {}
     }
 
     function renderCryptoList() {
       if (!cryptoListEl) return;
-      document.querySelectorAll('.crypto-input').forEach(inp => {
-        const symbol = inp.dataset.symbol;
-        if (symbol) setQty(symbol, inp.value);
-      });
-
       cryptoListEl.innerHTML = '';
       for (const symbol of COINS) {
         const info = cryptoState[symbol];
@@ -2536,13 +2138,8 @@
         const history = info.history || [];
         const firstPrice = history[0]?.p || price;
         const isUp = price >= firstPrice;
-
         const holding = state.holdings?.[symbol] || 0;
-        const holdingValue = holding * price;
         const qty = getQty(symbol);
-
-        const buyPrice = price * (1 + CRYPTO_FEE);
-        const sellPrice = price * (1 - CRYPTO_FEE);
 
         const card = document.createElement('div');
         card.className = 'crypto-card';
@@ -2554,30 +2151,24 @@
           <canvas class="crypto-chart" id="chart-${symbol}" width="300" height="60"></canvas>
           <div class="crypto-actions">
             <input type="number" min="1" value="${qty}" class="crypto-input" id="qty-${symbol}" data-symbol="${symbol}">
-            <button class="crypto-btn buy" data-symbol="${symbol}" data-action="buy">Купити (${formatPrice(buyPrice)})</button>
-            <button class="crypto-btn sell" data-symbol="${symbol}" data-action="sell">Продати (${formatPrice(sellPrice)})</button>
+            <button class="crypto-btn buy" data-symbol="${symbol}" data-action="buy">Buy</button>
+            <button class="crypto-btn sell" data-symbol="${symbol}" data-action="sell">Sell</button>
           </div>
-          <div class="crypto-holdings">У вас: <span>${holding}</span> ${symbol} (≈ ${formatPrice(holdingValue)} 🪙)</div>
+          <div class="crypto-holdings">You have: <span>${holding}</span> ${symbol}</div>
         `;
         cryptoListEl.appendChild(card);
         drawChart(document.getElementById('chart-' + symbol), history, isUp);
       }
 
       cryptoListEl.querySelectorAll('.crypto-input').forEach(inp => {
-        inp.addEventListener('input', () => {
-          const symbol = inp.dataset.symbol;
-          if (symbol) setQty(symbol, inp.value);
-        });
+        inp.addEventListener('input', () => setQty(inp.dataset.symbol, inp.value));
       });
 
       cryptoListEl.querySelectorAll('.crypto-btn').forEach(btn => {
         btn.addEventListener('click', () => {
           const symbol = btn.dataset.symbol;
           const action = btn.dataset.action;
-          const qtyInput = document.getElementById('qty-' + symbol);
-          const qty = parseInt(qtyInput.value) || 0;
-          if (qty <= 0) { showStatus("❌ Введіть кількість"); return; }
-          setQty(symbol, qty);
+          const qty = parseInt(document.getElementById('qty-' + symbol).value) || 1;
           tradeCrypto(symbol, action, qty);
         });
       });
@@ -2598,21 +2189,13 @@
       ctx.beginPath();
       ctx.strokeStyle = isUp ? '#2ecc71' : '#ff5252';
       ctx.lineWidth = 2;
-      ctx.lineJoin = 'round';
 
       history.forEach((point, i) => {
         const x = (i / (history.length - 1)) * (w - 4) + 2;
         const y = h - ((point.p - min) / range) * (h - 8) - 4;
-        if (i === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
       });
       ctx.stroke();
-
-      ctx.lineTo(w - 2, h);
-      ctx.lineTo(2, h);
-      ctx.closePath();
-      ctx.fillStyle = isUp ? 'rgba(46, 204, 113, 0.15)' : 'rgba(255, 82, 82, 0.15)';
-      ctx.fill();
     }
 
     async function tradeCrypto(symbol, action, qty) {
@@ -2620,226 +2203,63 @@
       const info = cryptoState[symbol];
       if (!info) return;
 
-      const userRef = ref(db, 'users/' + currentUid);
+      const price = info.price;
+      const total = price * qty;
 
-      try {
-        let success = false;
-        let errorMsg = '';
-        let finalTotal = 0;
-        let newPrice = 0;
+      await runTransaction(ref(db, 'users/' + currentUid), (data) => {
+        if (!data) return data;
+        if (!data.holdings) data.holdings = {};
 
-        if (symbol === 'PLAYERHOM') {
-          const usersSnap = await get(ref(db, 'users'));
-          const allUsers = usersSnap.val() || {};
-          let globalHoldings = 0;
-          for (const u in allUsers) {
-            globalHoldings += allUsers[u]?.holdings?.PLAYERHOM || 0;
-          }
-
-          let currentPrice = PLAYERHOM_BASE + globalHoldings * PLAYERHOM_PER_UNIT;
-          
-          if (action === 'buy') {
-            for (let i = 0; i < qty; i++) {
-              finalTotal += currentPrice * (1 + CRYPTO_FEE);
-              currentPrice += PLAYERHOM_PER_UNIT;
-            }
-          } else {
-            for (let i = 0; i < qty; i++) {
-              finalTotal += currentPrice * (1 - CRYPTO_FEE);
-              currentPrice -= PLAYERHOM_PER_UNIT;
-              if (currentPrice < PLAYERHOM_BASE) currentPrice = PLAYERHOM_BASE;
-            }
-          }
-
-          newPrice = currentPrice;
-
-          await runTransaction(userRef, (data) => {
-            if (!data) return data;
-            if (!data.holdings) data.holdings = {};
-
-            if (action === 'buy') {
-              if ((data.coins || 0) < finalTotal) { errorMsg = 'Недостатньо монет'; return; }
-              data.coins = (data.coins || 0) - finalTotal;
-              data.holdings[symbol] = (data.holdings[symbol] || 0) + qty;
-            } else {
-              const owned = data.holdings[symbol] || 0;
-              if (owned < qty) { errorMsg = `У вас лише ${owned} ${symbol}`; return; }
-              data.coins = (data.coins || 0) + finalTotal;
-              data.holdings[symbol] = owned - qty;
-            }
-            success = true;
-            return data;
-          });
-
-          if (success) {
-            await update(ref(db, 'crypto/PLAYERHOM'), {
-              price: newPrice,
-              history: [...(cryptoState.PLAYERHOM?.history || []), { t: Date.now(), p: newPrice }].slice(-30)
-            });
-          }
-
+        if (action === 'buy') {
+          if ((data.coins || 0) < total) return;
+          data.coins -= total;
+          data.holdings[symbol] = (data.holdings[symbol] || 0) + qty;
         } else {
-          const price = info.price;
-          const total = price * qty;
-
-          await runTransaction(userRef, (data) => {
-            if (!data) return data;
-            if (!data.holdings) data.holdings = {};
-
-            if (action === 'buy') {
-              if ((data.coins || 0) < total) { errorMsg = 'Недостатньо монет'; return; }
-              data.coins = (data.coins || 0) - total;
-              data.holdings[symbol] = (data.holdings[symbol] || 0) + qty;
-              finalTotal = total;
-            } else {
-              const owned = data.holdings[symbol] || 0;
-              if (owned < qty) { errorMsg = `У вас лише ${owned} ${symbol}`; return; }
-              data.coins = (data.coins || 0) + total;
-              data.holdings[symbol] = owned - qty;
-              finalTotal = total;
-            }
-            success = true;
-            return data;
-          });
+          const owned = data.holdings[symbol] || 0;
+          if (owned < qty) return;
+          data.coins = (data.coins || 0) + total;
+          data.holdings[symbol] = owned - qty;
         }
-
-        if (!success) { showStatus("❌ " + (errorMsg || "Помилка")); return; }
-
-        showStatus(action === 'buy'
-          ? `✅ Куплено ${qty} ${symbol} за ${formatPrice(finalTotal)} 🪙`
-          : `✅ Продано ${qty} ${symbol} за ${formatPrice(finalTotal)} 🪙`);
-
-        try { tg.HapticFeedback.notificationOccurred('success'); } catch(e) {}
-      } catch (err) {
-        console.error(err);
-        showStatus("❌ Помилка транзакції");
-      }
+        return data;
+      });
+      showStatus('✅ Trade successful!');
     }
 
-    // === РУЛЕТКА ===
     function initRoulette() {
+      if (!rouletteStrip) return;
       rouletteStrip.innerHTML = '';
-      // Заповнюємо стрічку випадковими призами
-      for (let i = 0; i < 20; i++) {
-        const rand = Math.random();
-        let text = '🪙';
-        if (rand < 0.4) text = '🪙';
-        else if (rand < 0.7) text = '⭐';
-        else if (rand < 0.9) text = '🐹';
-        else text = '🏆';
-
+      const items = ['🪙', '⭐', '📦', '🐹', '🪙', '⭐', '🪙', '🐹'];
+      for (let i = 0; i < 30; i++) {
         const div = document.createElement('div');
         div.className = 'roulette-item';
-        div.innerText = text;
+        div.innerText = items[i % items.length];
         rouletteStrip.appendChild(div);
       }
     }
 
     btnSpinRoulette.addEventListener('click', async () => {
-      btnSpinRoulette.disabled = true;
-      btnSpinRoulette.innerText = '⏳ Обертання...';
-
+      if (!AdController) { showStatus('❌ Ad not available'); return; }
       try {
-        if (!AdController) throw new Error("Adsgram not initialized");
-        
         const result = await AdController.show();
-        if (!result || !result.done) throw new Error("Ad not watched");
-
-        // Анімація обертання
-        const itemWidth = 60;
-        const randomIndex = Math.floor(Math.random() * 20);
-        const offset = -(randomIndex * itemWidth) + (rouletteStrip.clientWidth / 2) - (itemWidth / 2);
-        rouletteStrip.style.transform = `translateX(${offset}px)`;
-
-        setTimeout(async () => {
-          // Логіка призу
-          const rand = Math.random() * 100;
-          let rewardText = '';
-          let updateData = {};
-
-          if (rand < 2) {
-            // 2% - Ексклюзивний титул/скім
-            if (Math.random() < 0.5 && SKINS.length > 0) {
-              const randomSkin = SKINS[Math.floor(Math.random() * SKINS.length)];
-              updateData.purchasedSkins = [...state.purchasedSkins, randomSkin.id];
-              rewardText = `🎨 Скін: ${randomSkin.name}`;
-            } else {
-              const randomTitle = CASE_TITLES[Math.floor(Math.random() * CASE_TITLES.length)];
-              updateData.purchasedTitles = [...state.purchasedTitles, randomTitle.name];
-              rewardText = `🏆 Титул: ${randomTitle.name}`;
-            }
-          } else if (rand < 30) {
-            // 28% - Хоми
-            const homs = Math.floor(Math.random() * 50) + 10;
-            updateData.homs = state.homs + homs;
-            rewardText = `🐹 +${homs} Хомів`;
-          } else if (rand < 60) {
-            // 30% - XP
-            const xp = Math.floor(Math.random() * 5000) + 1000;
-            updateData.xp = state.xp + xp;
-            rewardText = `⭐ +${formatNumber(xp)} XP`;
-          } else {
-            // 40% - Монети
-            const coins = Math.floor(Math.random() * 10000) + 1000;
-            updateData.coins = state.coins + coins;
-            rewardText = `🪙 +${formatNumber(coins)} монет`;
-          }
-
-          await update(ref(db, 'users/' + currentUid), updateData);
-          showStatus(`🎰 Ви виграли: ${rewardText}`);
+        if (result && result.done) {
+          const rewards = [
+            { type: 'coins', val: 1000, text: '+1,000 Coins' },
+            { type: 'xp', val: 500, text: '+500 XP' },
+            { type: 'homs', val: 10, text: '+10 Homs' }
+          ];
+          const reward = rewards[Math.floor(Math.random() * rewards.length)];
           
-          // Скидаємо анімацію
-          setTimeout(() => {
-            rouletteStrip.style.transition = 'none';
-            rouletteStrip.style.transform = 'translateX(0)';
-            setTimeout(() => {
-              rouletteStrip.style.transition = 'transform 3s cubic-bezier(0.2, 0.8, 0.3, 1)';
-            }, 50);
-          }, 1000);
-
-        }, 3000);
-
-      } catch (e) {
-        console.error(e);
-        showStatus('❌ Реклама не завершена');
-      } finally {
-        setTimeout(() => {
-          btnSpinRoulette.disabled = false;
-          btnSpinRoulette.innerText = '🎬 Крутити за рекламу';
-        }, 4000);
-      }
-    });
-
-    // === ОБРОБНИК РЕКЛАМИ ===
-    document.getElementById('btn-watch-ad')?.addEventListener('click', async () => {
-      const btn = document.getElementById('btn-watch-ad');
-      if (!btn) return;
-      btn.disabled = true;
-      btn.innerText = '⏳ Завантаження реклами...';
-
-      try {
-        if (!AdController) throw new Error("AdController is not initialized.");
-        
-        const result = await AdController.show();
-        if (!result || !result.done) throw new Error("Ad not completed.");
-
-        if (currentUid) {
           await runTransaction(ref(db, 'users/' + currentUid), (data) => {
             if (!data) return data;
-            data.adWatches = (data.adWatches || 0) + 1;
+            if (reward.type === 'coins') data.coins = (data.coins || 0) + reward.val;
+            if (reward.type === 'xp') data.xp = (data.xp || 0) + reward.val;
+            if (reward.type === 'homs') data.homs = (data.homs || 0) + reward.val;
             return data;
           });
-          showStatus(`✅ Перегляд зараховано! (${state.adWatches + 1}/5)`);
+          showStatus(`🎁 Reward: ${reward.text}`);
         }
-      } catch (e) {
-        console.error("Ad error:", e);
-        showStatus('❌ Реклама не завершена.');
-      } finally {
-        btn.disabled = false;
-        btn.innerText = '🎬 Дивитись рекламу (+1 до прогресу)';
-      }
+      } catch(e) { showStatus('❌ Ad not completed'); }
     });
-
   </script>
 </body>
-  </html>
+</html>
