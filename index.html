@@ -1,24 +1,26 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Hamka Game</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     html, body {
-      height: 100%; overflow: hidden;
+      height: 100dvh;
+      overflow: hidden;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       background: #000; color: #fff; user-select: none;
     }
     body {
       display: flex; flex-direction: column; position: relative;
       background: radial-gradient(circle at 50% 30%, #111 0%, #000 80%);
+      padding-top: env(safe-area-inset-top, 0px);
     }
 
-    /* ===== ЕКРАН ЗАВАНТАЖЕННЯ ===== */
+    /* ЗАВАНТАЖЕННЯ */
     #loading-screen {
       position: fixed; inset: 0; z-index: 2000; background: #0a0a0a;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -31,7 +33,7 @@
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     .loading-text { font-size: 16px; font-weight: 600; color: #fff; }
 
-    /* ===== АВТОРИЗАЦІЯ ===== */
+    /* АВТОРИЗАЦІЯ */
     #auth-screen {
       position: fixed; inset: 0; z-index: 1000; background: #0a0a0a;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -39,11 +41,11 @@
     }
     #auth-screen.hidden { display: none; }
     
-    .auth-logo-img { font-size: 80px; margin-bottom: 10px; line-height: 1; }
-    .auth-title { font-size: 36px; font-weight: 800; color: #2ecc71; margin-bottom: 6px; letter-spacing: -0.5px; }
+    .auth-logo-img { font-size: clamp(64px, 18vw, 88px); margin-bottom: 10px; line-height: 1; }
+    .auth-title { font-size: clamp(30px, 8vw, 38px); font-weight: 800; color: #2ecc71; margin-bottom: 6px; letter-spacing: -0.5px; }
     .auth-subtitle { font-size: 14px; color: #888; margin-bottom: 24px; text-align: center; }
 
-    .auth-tabs { display: flex; width: 100%; max-width: 340px; gap: 10px; margin-bottom: 20px; }
+    .auth-tabs { display: flex; width: 100%; max-width: 360px; gap: 10px; margin-bottom: 20px; }
     .auth-tab {
       flex: 1; padding: 12px; border-radius: 10px; font-size: 15px; font-weight: 700;
       text-align: center; cursor: pointer; border: 1px solid #222; color: #aaa;
@@ -52,12 +54,12 @@
     .auth-tab.active { background: #0f1f15; color: #fff; border-color: #2ecc71; }
 
     .auth-hint-top { font-size: 13px; color: #aaa; margin-bottom: 16px; display: flex; align-items: center; gap: 6px; }
-    .auth-form { width: 100%; max-width: 340px; display: flex; flex-direction: column; gap: 10px; }
+    .auth-form { width: 100%; max-width: 360px; display: flex; flex-direction: column; gap: 10px; }
     
     .input-wrap { position: relative; width: 100%; }
     .input-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 16px; color: #555; pointer-events: none; }
     .auth-input {
-      width: 100%; padding: 16px 16px 16px 44px; background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 12px;
+      width: 100%; padding: 15px 15px 15px 44px; background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 12px;
       color: #fff; font-size: 15px; outline: none; transition: border-color 0.2s;
     }
     .auth-input:focus { border-color: #2ecc71; }
@@ -66,7 +68,7 @@
     .auth-error { color: #ff6b6b; font-size: 12px; text-align: center; min-height: 16px; margin-top: 4px; }
 
     .auth-btn {
-      width: 100%; max-width: 340px; padding: 16px; border: none; border-radius: 12px;
+      width: 100%; max-width: 360px; padding: 15px; border: none; border-radius: 12px;
       font-size: 16px; font-weight: 700; cursor: pointer; transition: transform 0.1s, opacity 0.2s;
       display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 8px;
     }
@@ -78,23 +80,23 @@
 
     .auth-divider {
       display: flex; align-items: center; gap: 12px; color: #555; font-size: 13px; 
-      margin: 10px 0; width: 100%; max-width: 340px;
+      margin: 10px 0; width: 100%; max-width: 360px;
     }
     .auth-divider::before, .auth-divider::after { content: ''; flex: 1; height: 1px; background: #222; }
 
-    /* ===== ГРА ===== */
-    #game-screen { display: none; flex-direction: column; height: 100%; }
+    /* ГРА */
+    #game-screen { display: none; flex-direction: column; height: 100%; max-width: 500px; width: 100%; margin: 0 auto; }
     #game-screen.visible { display: flex; }
 
     .top-stats {
       display: flex; justify-content: space-between; align-items: center;
-      padding: 8px 12px; background: #000; font-size: 12px; font-weight: 600;
-      border-bottom: 1px solid #222;
+      padding: clamp(8px, 1.5vh, 12px) 14px; background: #000; font-size: clamp(12px, 3.2vw, 14px); font-weight: 600;
+      border-bottom: 1px solid #222; flex-shrink: 0;
     }
     .top-stats-group { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
     .stat-pill {
-      display: flex; align-items: center; gap: 4px;
-      background: rgba(255,255,255,0.05); padding: 3px 8px; border-radius: 6px;
+      display: flex; align-items: center; gap: 5px;
+      background: rgba(255,255,255,0.06); padding: 4px 10px; border-radius: 8px;
     }
     .season-badge {
       background: #f5a623; color: #000; padding: 4px 10px;
@@ -109,41 +111,44 @@
 
     .main-menu {
       display: flex; justify-content: space-around; align-items: center;
-      padding: 10px 6px; background: #111; border-bottom: 1px solid #222;
+      padding: clamp(8px, 1.4vh, 12px) 6px; background: #111; border-bottom: 1px solid #222;
       overflow-x: auto; scrollbar-width: none; flex-shrink: 0;
     }
     .main-menu::-webkit-scrollbar { display: none; }
     .menu-item {
       display: flex; flex-direction: column; align-items: center;
-      gap: 3px; color: #666; font-size: 10px; font-weight: 600;
-      min-width: 50px; cursor: pointer;
+      gap: 4px; color: #666; font-size: clamp(10px, 2.6vw, 11px); font-weight: 600;
+      min-width: 48px; cursor: pointer;
     }
     .menu-item.active { color: #fff; }
     .menu-item.active .menu-icon-wrap {
       background: #2ecc71; color: #000; box-shadow: 0 0 12px rgba(46, 204, 113, 0.5);
     }
     .menu-icon-wrap {
-      width: 32px; height: 32px; border-radius: 8px;
+      width: clamp(32px, 8.5vw, 38px); height: clamp(32px, 8.5vw, 38px); border-radius: 10px;
       display: flex; align-items: center; justify-content: center;
-      font-size: 16px; background: rgba(255,255,255,0.05); color: #888;
+      font-size: clamp(16px, 4.2vw, 19px); background: rgba(255,255,255,0.05); color: #888;
     }
 
     .page { display: none; flex: 1; flex-direction: column; overflow-y: auto; }
     .page.active { display: flex; }
 
-    /* ===== ТАП ===== */
+    /* ТАП */
     .tap-area {
       flex: 1; display: flex; flex-direction: column;
       align-items: center; justify-content: center;
-      position: relative; overflow: hidden;
+      position: relative; overflow: hidden; padding: 10px;
     }
     .coin-counter {
-      display: flex; align-items: center; gap: 6px; font-size: 22px; font-weight: 700;
-      color: #fff; margin-bottom: 20px; text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+      display: flex; align-items: center; gap: 8px; font-size: clamp(24px, 7vw, 34px); font-weight: 800;
+      color: #fff; margin-bottom: clamp(16px, 3.5vh, 32px); text-shadow: 0 2px 10px rgba(0,0,0,0.8);
     }
     .hamster-wrap {
       position: relative; display: flex; align-items: center; justify-content: center;
-      width: 320px; height: 320px; max-width: 85vw; max-height: 85vw;
+      width: clamp(240px, 68vw, 340px);
+      height: clamp(240px, 68vw, 340px);
+      max-height: 44dvh;
+      max-width: 44dvh;
     }
     .hamster {
       width: 100%; height: 100%; border-radius: 50%;
@@ -151,65 +156,84 @@
       box-shadow: 0 0 30px rgba(46, 204, 113, 0.6), inset 0 0 40px rgba(46, 204, 113, 0.15);
       background: radial-gradient(circle at 50% 50%, #1a1a1a 0%, #0a0a0a 100%);
       display: flex; align-items: center; justify-content: center;
-      font-size: 140px; cursor: pointer; transition: transform 0.1s ease; position: relative; z-index: 2;
+      font-size: clamp(110px, 32vw, 160px); cursor: pointer; transition: transform 0.1s ease; position: relative; z-index: 2;
       background-size: cover; background-position: center;
     }
     .hamster:active { transform: scale(0.96); }
     
     .tap-effect {
-      position: absolute; font-size: 28px; font-weight: 800; color: #2ecc71;
+      position: absolute; font-size: clamp(24px, 6vw, 32px); font-weight: 800; color: #2ecc71;
       pointer-events: none; animation: floatUp 0.8s ease-out forwards; z-index: 10;
     }
     @keyframes floatUp {
       0% { opacity: 1; transform: translateY(0) scale(1); }
-      100% { opacity: 0; transform: translateY(-80px) scale(1.3); }
+      100% { opacity: 0; transform: translateY(-85px) scale(1.3); }
     }
 
-    /* ===== МАГАЗИН ===== */
+    /* МАГАЗИН */
     .shop-container { display: flex; flex-direction: column; height: 100%; }
     .shop-tabs { 
-      display: flex; gap: 6px; padding: 8px 12px; background: #0a0a0a; 
+      display: flex; gap: 6px; padding: 10px 12px; background: #0a0a0a; 
       border-bottom: 1px solid #222; flex-shrink: 0;
       overflow-x: auto; scrollbar-width: none;
     }
     .shop-tabs::-webkit-scrollbar { display: none; }
     .shop-tab {
-      flex: 1; padding: 8px; text-align: center; font-size: 11px; font-weight: 700;
+      flex: 1; padding: 9px 6px; text-align: center; font-size: clamp(11px, 3vw, 13px); font-weight: 700;
       background: rgba(255,255,255,0.05); border-radius: 8px; cursor: pointer; color: #aaa;
       border: 1px solid transparent; white-space: nowrap;
     }
     .shop-tab.active { background: #2ecc71; color: #000; border-color: #2ecc71; }
     
-    .shop-list { flex: 1; overflow-y: auto; padding: 8px 12px 100px; }
+    .shop-list { flex: 1; overflow-y: auto; padding: 10px 12px 40px; }
 
     .shop-card {
       background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 14px; padding: 10px; margin-bottom: 8px;
+      border-radius: 14px; padding: 12px; margin-bottom: 10px;
       display: flex; justify-content: space-between; align-items: center;
     }
     .shop-card-info { flex: 1; padding-right: 10px; }
-    .shop-card-title { font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 2px; }
-    .shop-card-desc { font-size: 10px; color: #888; }
-    .shop-card-price { font-size: 12px; font-weight: 700; color: #ffd700; margin-top: 4px; }
+    .shop-card-title { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 3px; }
+    .shop-card-desc { font-size: 11px; color: #888; line-height: 1.35; }
+    .shop-card-price { font-size: 13px; font-weight: 700; color: #ffd700; margin-top: 5px; }
     .shop-card-btn {
-      padding: 8px 12px; border: none; border-radius: 8px; font-size: 11px; font-weight: 700;
+      padding: 9px 14px; border: none; border-radius: 9px; font-size: 12px; font-weight: 700;
       background: #2ecc71; color: #000; cursor: pointer; white-space: nowrap;
     }
     .shop-card-btn:disabled { background: #333; color: #666; cursor: not-allowed; }
 
-    .shop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .shop-grid .shop-card { flex-direction: column; text-align: center; padding: 10px 8px; }
+    .shop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .shop-grid .shop-card { flex-direction: column; text-align: center; padding: 12px 8px; margin-bottom: 0; }
     .shop-grid .shop-card-info { padding-right: 0; width: 100%; }
     .shop-grid .shop-card-btn { width: 100%; margin-top: 8px; }
     
     .grid-preview {
-      width: 60px; height: 60px; border-radius: 12px; background: rgba(255,255,255,0.1);
+      width: 64px; height: 64px; border-radius: 14px; background: rgba(255,255,255,0.1);
       display: flex; align-items: center; justify-content: center; font-size: 36px;
-      margin: 0 auto 6px; background-size: cover; background-position: center;
+      margin: 0 auto 8px; background-size: cover; background-position: center;
     }
 
-    /* ===== КРИПТА / МІНІ-ІГРИ ===== */
-    .crypto-page { padding: 8px 12px 100px; }
+    /* Промокод блок */
+    .promo-box {
+      background: linear-gradient(145deg, rgba(46, 204, 113, 0.08), rgba(255, 255, 255, 0.03));
+      border: 1px solid rgba(46, 204, 113, 0.3);
+      border-radius: 14px; padding: 14px; margin-bottom: 12px;
+    }
+    .promo-code-display {
+      display: flex; align-items: center; justify-content: space-between;
+      background: #111; border: 1px dashed #2ecc71; border-radius: 10px;
+      padding: 10px 12px; margin: 10px 0;
+    }
+    .promo-code-text { font-family: monospace; font-size: 16px; font-weight: 800; color: #2ecc71; letter-spacing: 1px; }
+    .promo-input-row { display: flex; gap: 8px; margin-top: 10px; }
+    .promo-input {
+      flex: 1; padding: 11px 12px; background: #141414; border: 1px solid #333;
+      border-radius: 10px; color: #fff; font-size: 14px; outline: none; font-family: monospace;
+    }
+    .promo-input:focus { border-color: #2ecc71; }
+
+    /* КРИПТА / МІНІ-ІГРИ */
+    .crypto-page { padding: 10px 12px 40px; }
     .crypto-card {
       background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 14px; padding: 12px; margin-bottom: 10px;
@@ -222,20 +246,20 @@
     .crypto-chart { width: 100%; height: 60px; display: block; background: rgba(0,0,0,0.3); border-radius: 8px; margin-bottom: 8px; }
     .crypto-actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
     .crypto-input {
-      width: 60px; flex-shrink: 0; padding: 8px; background: rgba(255, 255, 255, 0.06);
+      width: 65px; flex-shrink: 0; padding: 9px; background: rgba(255, 255, 255, 0.06);
       border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; color: #fff; font-size: 14px; outline: none;
       -moz-appearance: textfield;
     }
     .crypto-input::-webkit-outer-spin-button,
     .crypto-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-    .crypto-btn { flex: 1; min-width: 0; padding: 8px; border: none; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+    .crypto-btn { flex: 1; min-width: 0; padding: 9px; border: none; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; }
     .crypto-btn.buy { background: #2ecc71; color: #000; }
     .crypto-btn.sell { background: #ff5252; color: #fff; }
     .crypto-holdings { font-size: 11px; color: #888; margin-top: 6px; }
     .crypto-holdings span { color: #f5a623; font-weight: 600; }
 
-    /* ===== ПРОФІЛЬ ===== */
-    .scroll-page { padding: 8px 12px 100px; }
+    /* ПРОФІЛЬ */
+    .scroll-page { padding: 10px 12px 40px; }
     .profile-card {
       background: linear-gradient(145deg, #1a1a24, #0f0f15);
       border: 1px solid #333; border-radius: 20px; padding: 20px;
@@ -243,24 +267,24 @@
     }
     .profile-avatar-wrap { position: relative; display: inline-block; margin-bottom: 12px; }
     .profile-avatar {
-      width: 80px; height: 80px; border-radius: 50%;
+      width: 84px; height: 84px; border-radius: 50%;
       background: linear-gradient(135deg, #f5a623, #d4891a);
       display: flex; align-items: center; justify-content: center;
-      font-size: 40px; box-shadow: 0 0 20px rgba(245, 166, 35, 0.4);
+      font-size: 42px; box-shadow: 0 0 20px rgba(245, 166, 35, 0.4);
       background-size: cover; background-position: center;
     }
     .profile-name-wrap { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 4px; }
     .profile-name { font-size: 22px; font-weight: 800; color: #fff; }
     .edit-name-btn {
       background: rgba(255,255,255,0.1); border: none; border-radius: 50%;
-      width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;
+      width: 26px; height: 26px; display: flex; align-items: center; justify-content: center;
       font-size: 12px; cursor: pointer; color: #fff;
     }
     .profile-id { font-size: 12px; color: #666; margin-top: 2px; }
     
     .profile-title-badge {
       display: inline-flex; align-items: center; gap: 6px;
-      margin-top: 8px; padding: 4px 16px; border-radius: 20px;
+      margin-top: 8px; padding: 5px 16px; border-radius: 20px;
       font-size: 12px; font-weight: 700; color: #fff;
       box-shadow: 0 0 10px rgba(138, 43, 226, 0.5);
     }
@@ -278,43 +302,49 @@
       border-radius: 14px; padding: 16px; text-align: center; margin-bottom: 16px;
     }
 
-    /* ===== ІНВЕНТАР ===== */
+    /* ІНВЕНТАР */
     .inventory-section { margin-bottom: 16px; }
     .inventory-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; color: #f5a623; }
     .inventory-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
     .inventory-item {
-      background: rgba(255,255,255,0.05); border-radius: 10px; padding: 10px; text-align: center;
+      background: rgba(255,255,255,0.05); border-radius: 10px; padding: 10px 6px; text-align: center;
       cursor: pointer; border: 2px solid transparent; position: relative;
     }
     .inventory-item.active { border-color: #2ecc71; background: rgba(46, 204, 113, 0.1); }
-    .inventory-item-icon { font-size: 24px; height: 30px; display: flex; align-items: center; justify-content: center; background-size: cover; background-position: center; }
-    .inventory-item-name { font-size: 10px; margin-top: 4px; color: #aaa; }
+    .inventory-item-icon { font-size: 24px; height: 32px; display: flex; align-items: center; justify-content: center; background-size: cover; background-position: center; margin: 0 auto; }
+    .inventory-item-name { font-size: 10px; margin-top: 4px; color: #aaa; word-break: break-word; }
 
     .case-item {
       background: linear-gradient(135deg, #2a1b3d, #1a1a24);
       border: 2px solid #8a2be2;
-      border-radius: 12px; padding: 15px; text-align: center;
+      border-radius: 12px; padding: 14px 8px; text-align: center;
       cursor: pointer; box-shadow: 0 0 15px rgba(138, 43, 226, 0.3);
       transition: transform 0.2s; position: relative;
     }
+    .case-item.legendary {
+      background: linear-gradient(135deg, #3d2a1b, #241a0f);
+      border: 2px solid #ffd700;
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+    }
     .case-item:active { transform: scale(0.95); }
-    .case-icon { font-size: 40px; margin-bottom: 5px; }
-    .case-name { font-size: 12px; font-weight: 700; color: #da70d6; }
+    .case-icon { font-size: 36px; margin-bottom: 4px; }
+    .case-name { font-size: 11px; font-weight: 700; color: #da70d6; }
+    .case-item.legendary .case-name { color: #ffd700; }
     .case-count-badge {
       position: absolute; top: 6px; right: 6px; background: #8a2be2; color: #fff;
       font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 10px;
     }
 
-    /* ===== ТОП ===== */
+    /* ТОП */
     .leaderboard-item {
       display: flex; align-items: center; gap: 10px;
-      padding: 10px; background: rgba(255,255,255,0.05); border-radius: 10px;
+      padding: 10px; background: rgba(255,255,255,0.05); border-radius: 12px;
       margin-bottom: 8px; cursor: pointer;
     }
     .leaderboard-item:active { background: rgba(255,255,255,0.1); }
     
     .lb-avatar {
-      width: 40px; height: 40px; border-radius: 50%; background: #333;
+      width: 42px; height: 42px; border-radius: 50%; background: #333;
       display: flex; align-items: center; justify-content: center; font-size: 20px;
       flex-shrink: 0; background-size: cover; background-position: center;
     }
@@ -328,7 +358,7 @@
     .lb-xp { font-size: 13px; font-weight: 700; color: #2ecc71; }
     .lb-prestige { font-size: 11px; font-weight: 700; color: #da70d6; }
 
-    /* ===== НАЛАШТУВАННЯ ===== */
+    /* НАЛАШТУВАННЯ */
     .settings-group {
       background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
       border-radius: 14px; padding: 14px; margin-bottom: 12px;
@@ -354,7 +384,7 @@
     input:checked + .toggle-slider { background-color: #2ecc71; }
     input:checked + .toggle-slider:before { transform: translateX(24px); }
 
-    /* ===== МОДАЛКИ ===== */
+    /* МОДАЛКИ */
     .modal-overlay {
       position: fixed; inset: 0; z-index: 1500; background: rgba(0,0,0,0.8);
       display: flex; align-items: center; justify-content: center; padding: 20px;
@@ -420,21 +450,25 @@
       border-radius: 8px; color: #fff; font-size: 14px; outline: none; margin-bottom: 8px;
     }
 
-    /* ===== НИЖНЯ ПАНЕЛЬ ===== */
-    .bottom-panel { background: #0a0a0a; border-top: 1px solid #222; padding: 6px 12px 10px; flex-shrink: 0; }
-    .bottom-stats { display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: #aaa; margin-bottom: 4px; }
+    /* НИЖНЯ ПАНЕЛЬ */
+    .bottom-panel {
+      background: #0a0a0a; border-top: 1px solid #222;
+      padding: 8px 14px calc(10px + env(safe-area-inset-bottom, 0px));
+      flex-shrink: 0;
+    }
+    .bottom-stats { display: flex; justify-content: space-between; align-items: center; font-size: clamp(11px, 3vw, 12px); color: #aaa; margin-bottom: 5px; }
     .energy-bar-wrap { width: 100%; height: 10px; background: #222; border-radius: 5px; overflow: hidden; position: relative; }
     .energy-bar { height: 100%; background: linear-gradient(90deg, #f5a623, #ffd700); width: 100%; transition: width 0.3s; }
-    .energy-labels { display: flex; justify-content: space-between; font-size: 10px; color: #666; margin-top: 2px; }
-    .xp-row { display: flex; justify-content: space-between; font-size: 11px; color: #666; margin-bottom: 4px; margin-top: 4px; }
+    .energy-labels { display: flex; justify-content: space-between; font-size: 10px; color: #666; margin-top: 3px; }
+    .xp-row { display: flex; justify-content: space-between; font-size: 11px; color: #666; margin-bottom: 4px; margin-top: 5px; }
     .xp-bar-wrap { width: 100%; height: 8px; background: #222; border-radius: 4px; overflow: hidden; margin-bottom: 2px; }
     .xp-bar { height: 100%; background: linear-gradient(90deg, #00bcd4, #2196f3); width: 0%; transition: width 0.3s; }
 
     #status {
-      position: fixed; bottom: 120px; left: 50%; transform: translateX(-50%);
-      background: rgba(0, 0, 0, 0.9); padding: 10px 20px; border-radius: 10px;
+      position: fixed; bottom: calc(115px + env(safe-area-inset-bottom, 0px)); left: 50%; transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.92); padding: 10px 20px; border-radius: 10px;
       font-size: 13px; opacity: 0; transition: opacity 0.3s; pointer-events: none;
-      white-space: nowrap; z-index: 100; border: 1px solid rgba(255, 255, 255, 0.1);
+      white-space: nowrap; z-index: 100; border: 1px solid rgba(255, 255, 255, 0.12);
     }
     #status.show { opacity: 1; }
 
@@ -460,7 +494,7 @@
     <div class="loading-text" data-i18n="loading">Loading...</div>
   </div>
 
-  <!-- ===== АВТОРИЗАЦІЯ ===== -->
+  <!-- АВТОРИЗАЦІЯ -->
   <div id="auth-screen" class="hidden">
     <div class="auth-logo-img">🐭</div>
     <div class="auth-title">Hamka</div>
@@ -492,7 +526,7 @@
     </div>
   </div>
 
-  <!-- ===== ГРА ===== -->
+  <!-- ГРА -->
   <div id="game-screen">
     <div class="top-stats">
       <div class="top-stats-group">
@@ -541,7 +575,7 @@
       </div>
     </div>
 
-    <!-- МІНІ-ІГРИ (Крипта та Рулетка) -->
+    <!-- МІНІ-ІГРИ -->
     <div class="page crypto-page" id="page-minigames">
       <div class="inventory-title" style="text-align:center; font-size: 20px; margin-bottom: 16px;" data-i18n="menu_games">🎲 Mini-games</div>
       
@@ -692,7 +726,7 @@
 
   <div id="status"></div>
 
-  <!-- Модалка вибору кількості кейсів -->
+  <!-- Модалки -->
   <div class="modal-overlay" id="modal-case-qty">
     <div class="modal-content">
       <div class="modal-title" id="case-modal-title" data-i18n="open_case">Open Case</div>
@@ -709,7 +743,6 @@
     </div>
   </div>
 
-  <!-- Модалка перегляду профілю -->
   <div class="modal-overlay" id="modal-view-profile">
     <div class="modal-content">
       <div class="modal-title" data-i18n="player_profile">Player Profile</div>
@@ -749,7 +782,6 @@
     </div>
   </div>
 
-  <!-- Модалка Адмінки -->
   <div class="modal-overlay" id="modal-admin">
     <div class="modal-content">
       <div class="modal-title">🛠 Admin Panel</div>
@@ -770,7 +802,6 @@
     </div>
   </div>
 
-  <!-- Анімація відкриття кейса -->
   <div class="case-open-overlay" id="case-open-overlay">
     <div class="case-opening-box" id="case-opening-box">📦</div>
     <div class="case-reward-text" id="case-reward-text"></div>
@@ -808,8 +839,8 @@
     try { tg?.expand(); tg?.ready(); } catch(e) {}
 
     let AdController = null;
+    const BOT_LINK = "https://t.me/hamka_game_bot";
 
-    // === ТРИМОВНА ЛОКАЛІЗАЦІЯ (Базова - English) ===
     const translations = {
       en: {
         loading: "Loading...",
@@ -861,7 +892,13 @@
         sell: "Sell",
         owned: "Owned",
         max: "MAX",
-        open_case: "Open Case"
+        open_case: "Open Case",
+        promo_title: "🎟 Referral Promo Code",
+        promo_desc: "Share your code! Friend gets 1 Basic Case, you get 1 Legendary Case (x10 loot)!",
+        promo_enter_placeholder: "Enter friend's promo code",
+        promo_activate: "Activate",
+        promo_share: "Share",
+        promo_already_used: "✅ You have already activated a referral promo code"
       },
       uk: {
         loading: "Завантаження...",
@@ -913,7 +950,13 @@
         sell: "Продати",
         owned: "Куплено",
         max: "МАКС",
-        open_case: "Відкрити кейс"
+        open_case: "Відкрити кейс",
+        promo_title: "🎟 Реферальний промокод",
+        promo_desc: "Ділися кодом! Друг отримає 1 Базовий кейс, а ти — 1 Легендарний кейс (лут x10)!",
+        promo_enter_placeholder: "Введіть промокод друга",
+        promo_activate: "Активувати",
+        promo_share: "Поділитися",
+        promo_already_used: "✅ Ви вже активували реферальний промокод"
       },
       ru: {
         loading: "Загрузка...",
@@ -965,7 +1008,13 @@
         sell: "Продать",
         owned: "Куплено",
         max: "МАКС",
-        open_case: "Открыть кейс"
+        open_case: "Открыть кейс",
+        promo_title: "🎟 Реферальный промокод",
+        promo_desc: "Делись кодом! Друг получит 1 Базовый кейс, а ты — 1 Легендарный кейс (лут x10)!",
+        promo_enter_placeholder: "Введите промокод друга",
+        promo_activate: "Активировать",
+        promo_share: "Поделиться",
+        promo_already_used: "✅ Вы уже активировали реферальный промокод"
       }
     };
 
@@ -987,7 +1036,6 @@
       if (langSelect) langSelect.value = lang;
     }
 
-    // === DOM ===
     const loadingScreen = document.getElementById('loading-screen');
     const authScreen = document.getElementById('auth-screen');
     const gameScreen = document.getElementById('game-screen');
@@ -1070,15 +1118,15 @@
     const miniContentCrypto = document.getElementById('mini-content-crypto');
     const miniContentRoulette = document.getElementById('mini-content-roulette');
 
-    // === Стан та захист від спаму/автоклікерів ===
     let isLoginMode = true;
     let state = { 
       coins: 0, homs: 0, energy: 200, maxEnergy: 200, xp: 0, prestige: 0,
       title: 'Beginner', avatar: '🐭', nickname: '', publicId: '',
       activeSkin: 'default', holdings: {},
       purchasedTitles: [], purchasedAvatars: [], purchasedSkins: [],
-      cases: {}, 
+      cases: {}, legendaryCases: 0,
       adWatches: 0,
+      usedReferralCode: false,
       hideFromTop: false,
       upgrades: { 
         tapLevel: 0, tapPower: 1, xpPerTap: 1, 
@@ -1086,7 +1134,7 @@
       }
     };
     let pendingTap = false;
-    let lastTapTime = 0; // Анти-чит: обмеження частоти тапів
+    let lastTapTime = 0;
     let unsubscribeUserData = null;
     let gameLoop = null;
     let cryptoInterval = null;
@@ -1098,7 +1146,8 @@
     const GITHUB_RAW = "https://raw.githubusercontent.com/lolord1k228-create/hamka-game/main/skins/";
     const SKINS = [
       { id: 'skin_ai', name: 'AIHamster', file: 'ai_hamster.png', price: 50000 },
-      { id: 'skin_neon', name: 'Neon Hamster', file: 'hamster.png', price: 5000000 }
+      { id: 'skin_neon', name: 'Neon Hamster', file: 'hamster.png', price: 5000000 },
+      { id: 'skin_hom', name: 'HomHamster', file: 'homhamster.png', price: 1500, currency: 'homs' }
     ];
 
     let TITLES = [];
@@ -1169,7 +1218,7 @@
       statusEl.innerText = text;
       statusEl.classList.add('show');
       clearTimeout(showStatus._t);
-      showStatus._t = setTimeout(() => statusEl.classList.remove('show'), 2000);
+      showStatus._t = setTimeout(() => statusEl.classList.remove('show'), 2500);
     }
 
     function formatNumber(num) {
@@ -1265,8 +1314,11 @@
 
       authSubmit.disabled = true;
       try {
-        if (isLoginMode) await signInWithEmailAndPassword(auth, email, password);
-        else await createUserWithEmailAndPassword(auth, email, password);
+        if (isLoginMode) {
+          await signInWithEmailAndPassword(auth, email, password);
+        } else {
+          await createUserWithEmailAndPassword(auth, email, password);
+        }
       } catch (err) {
         authError.innerText = err.message;
       } finally {
@@ -1368,7 +1420,10 @@
             { id: 'slvr', name: 'Silver Hamster', price: 0, color: 'linear-gradient(90deg, #c0c0c0, #808080)', reqPrestige: 2 },
             { id: 'gld', name: 'Gold Hamster', price: 0, color: 'linear-gradient(90deg, #ffd700, #b8860b)', reqPrestige: 3 },
             { id: 'crypto_baron', name: 'Crypto Baron', price: 10000, color: 'linear-gradient(90deg, #ff9800, #ff5722)', reqPrestige: 0 },
-            { id: 'tap_god', name: 'Tap God', price: 50000, color: 'linear-gradient(90deg, #00bcd4, #2196f3)', reqPrestige: 0 }
+            { id: 'tap_god', name: 'Tap God', price: 50000, color: 'linear-gradient(90deg, #00bcd4, #2196f3)', reqPrestige: 0 },
+            { id: 'h_mag', name: 'Хом\'яковий Магнат', price: 100, currency: 'homs', color: 'linear-gradient(90deg, #2ecc71, #27ae60)', reqPrestige: 0 },
+            { id: 'h_lord', name: 'Володар Хомів', price: 500, currency: 'homs', color: 'linear-gradient(90deg, #9b59b6, #8e44ad)', reqPrestige: 0 },
+            { id: 'h_leg', name: 'Легендарний Хом\'як', price: 2000, currency: 'homs', color: 'linear-gradient(90deg, #f1c40f, #e67e22)', reqPrestige: 0 }
           ];
         }
 
@@ -1519,7 +1574,8 @@
             nickname: defaultNick, publicId: generatedId, activeSkin: 'default',
             tapLevel: 0, tapPower: 1, xpPerTap: 1, autoTapRate: 0, autoXpRate: 0, energyRate: 1,
             purchasedTitles: [], purchasedAvatars: [], purchasedSkins: [],
-            cases: { basic: 1 }, adWatches: 0, hideFromTop: false, language: 'en',
+            cases: { basic: 1 }, legendaryCases: 0, adWatches: 0,
+            usedReferralCode: false, hideFromTop: false, language: 'en',
             createdAt: Date.now()
           });
         }
@@ -1545,8 +1601,10 @@
         state.purchasedAvatars = data.purchasedAvatars || [];
         state.purchasedSkins = data.purchasedSkins || [];
         state.cases = data.cases || {};
+        state.legendaryCases = data.legendaryCases || 0;
         state.activeSkin = data.activeSkin || 'default';
         state.adWatches = data.adWatches || 0;
+        state.usedReferralCode = data.usedReferralCode || false;
         state.hideFromTop = data.hideFromTop || false;
         
         if (data.language && data.language !== currentLang) {
@@ -1595,7 +1653,6 @@
         }
       }, 1000);
 
-      // Захист від автоклікерів: мінімальний інтервал 60 мс між тапами (~16 кліків/сек макс)
       hamster.onclick = async (e) => {
         const now = Date.now();
         if (now - lastTapTime < 60) return; 
@@ -1725,21 +1782,25 @@
         TITLES.forEach(item => {
           if (item.price <= 0) return;
           const isOwned = state.purchasedTitles.includes(item.name);
+          const isHoms = item.currency === 'homs';
+          const canAfford = isHoms ? state.homs >= item.price : state.coins >= item.price;
+          
           const card = document.createElement('div');
           card.className = 'shop-card';
           card.innerHTML = `
             <div class="grid-preview" style="font-size:24px; background:${item.color};">🏆</div>
             <div class="shop-card-info">
               <div class="shop-card-title" style="background:${item.color}; -webkit-background-clip:text; -webkit-text-fill-color:transparent;">${item.name}</div>
-              <div class="shop-card-price">${formatNumber(item.price)} 🪙</div>
+              <div class="shop-card-price">${formatNumber(item.price)} ${isHoms ? '🐹' : '🪙'}</div>
             </div>
-            <button class="shop-card-btn" data-title-name="${item.name}" ${isOwned ? 'disabled' : ''}>${isOwned ? (translations[currentLang].owned || 'Owned') : (translations[currentLang].buy || 'Buy')}</button>
+            <button class="shop-card-btn" data-title-name="${item.name}" ${isOwned || !canAfford ? 'disabled' : ''}>${isOwned ? (translations[currentLang].owned || 'Owned') : (translations[currentLang].buy || 'Buy')}</button>
           `;
           grid.appendChild(card);
         });
 
         AVATARS.forEach(item => {
           const isOwned = state.purchasedAvatars.includes(item.name);
+          const canAfford = state.coins >= item.price;
           const card = document.createElement('div');
           card.className = 'shop-card';
           card.innerHTML = `
@@ -1748,7 +1809,7 @@
               <div class="shop-card-title">Avatar</div>
               <div class="shop-card-price">${formatNumber(item.price)} 🪙</div>
             </div>
-            <button class="shop-card-btn" data-avatar-name="${item.name}" ${isOwned ? 'disabled' : ''}>${isOwned ? (translations[currentLang].owned || 'Owned') : (translations[currentLang].buy || 'Buy')}</button>
+            <button class="shop-card-btn" data-avatar-name="${item.name}" ${isOwned || !canAfford ? 'disabled' : ''}>${isOwned ? (translations[currentLang].owned || 'Owned') : (translations[currentLang].buy || 'Buy')}</button>
           `;
           grid.appendChild(card);
         });
@@ -1756,15 +1817,18 @@
         SKINS.forEach(item => {
           if (!item.file) return;
           const isOwned = state.purchasedSkins.includes(item.id);
+          const isHoms = item.currency === 'homs';
+          const canAfford = isHoms ? state.homs >= item.price : state.coins >= item.price;
+
           const card = document.createElement('div');
           card.className = 'shop-card';
           card.innerHTML = `
             <div class="grid-preview" style="background-image: url('${GITHUB_RAW}${item.file}');"></div>
             <div class="shop-card-info">
               <div class="shop-card-title">Skin: ${item.name}</div>
-              <div class="shop-card-price">${formatNumber(item.price)} 🪙</div>
+              <div class="shop-card-price">${formatNumber(item.price)} ${isHoms ? '🐹' : '🪙'}</div>
             </div>
-            <button class="shop-card-btn" data-skin-id="${item.id}" ${isOwned ? 'disabled' : ''}>${isOwned ? (translations[currentLang].owned || 'Owned') : (translations[currentLang].buy || 'Buy')}</button>
+            <button class="shop-card-btn" data-skin-id="${item.id}" ${isOwned || !canAfford ? 'disabled' : ''}>${isOwned ? (translations[currentLang].owned || 'Owned') : (translations[currentLang].buy || 'Buy')}</button>
           `;
           grid.appendChild(card);
         });
@@ -1772,37 +1836,133 @@
         shopListEl.appendChild(grid);
 
         shopListEl.querySelectorAll('.shop-card-btn').forEach(btn => {
-          if (btn.dataset.titleName) btn.addEventListener('click', () => buyCosmetic({ name: btn.dataset.titleName, price: TITLES.find(t => t.name === btn.dataset.titleName).price, type: 'title' }));
-          else if (btn.dataset.avatarName) btn.addEventListener('click', () => buyCosmetic({ name: btn.dataset.avatarName, price: AVATARS.find(a => a.name === btn.dataset.avatarName).price, type: 'avatar' }));
-          else if (btn.dataset.skinId) btn.addEventListener('click', () => buySkin(SKINS.find(s => s.id === btn.dataset.skinId)));
+          if (btn.dataset.titleName) {
+            const item = TITLES.find(t => t.name === btn.dataset.titleName);
+            btn.addEventListener('click', () => buyCosmetic({ name: item.name, price: item.price, type: 'title', currency: item.currency || 'coins' }));
+          } else if (btn.dataset.avatarName) {
+            const item = AVATARS.find(a => a.name === btn.dataset.avatarName);
+            btn.addEventListener('click', () => buyCosmetic({ name: item.name, price: item.price, type: 'avatar', currency: 'coins' }));
+          } else if (btn.dataset.skinId) {
+            btn.addEventListener('click', () => buySkin(SKINS.find(s => s.id === btn.dataset.skinId)));
+          }
         });
         return;
       }
 
       if (currentShopTab === 'cases') {
-        const caseCard = document.createElement('div');
-        caseCard.className = 'shop-card';
-        caseCard.innerHTML = `
-          <div class="grid-preview" style="font-size:40px;">📦</div>
-          <div class="shop-card-info">
-            <div class="shop-card-title">Basic Case</div>
-            <div class="shop-card-price">100 🐹</div>
-          </div>
-          <button class="shop-card-btn" id="btn-buy-case-homs">${translations[currentLang].buy || 'Buy'}</button>
-        `;
-        shopListEl.appendChild(caseCard);
+        const t = translations[currentLang];
+        const promoBox = document.createElement('div');
+        promoBox.className = 'promo-box';
         
-        document.getElementById('btn-buy-case-homs').addEventListener('click', async () => {
-          if (state.homs < 100) { showStatus('❌ Not enough Homs'); return; }
-          await runTransaction(ref(db, 'users/' + currentUid), (data) => {
-            if (!data || (data.homs || 0) < 100) return;
-            data.homs -= 100;
-            if (!data.cases) data.cases = {};
-            data.cases.basic = (data.cases.basic || 0) + 1;
-            return data;
-          });
-          showStatus('✅ Case purchased!');
+        const enterHtml = state.usedReferralCode 
+          ? `<div style="font-size:12px; color:#2ecc71; margin-top:10px; font-weight:600;">${t.promo_already_used}</div>`
+          : `<div class="promo-input-row">
+               <input type="text" class="promo-input" id="ref-promo-input" placeholder="${t.promo_enter_placeholder}">
+               <button class="shop-card-btn" id="btn-activate-promo">${t.promo_activate}</button>
+             </div>`;
+
+        promoBox.innerHTML = `
+          <div class="shop-card-title" style="color:#2ecc71;">${t.promo_title}</div>
+          <div class="shop-card-desc">${t.promo_desc}</div>
+          <div class="promo-code-display">
+            <span class="promo-code-text" id="my-promo-code">${state.publicId}</span>
+            <div style="display:flex; gap:6px;">
+              <button class="shop-card-btn" id="btn-copy-promo" style="padding:6px 10px;">📋</button>
+              <button class="shop-card-btn" id="btn-share-promo" style="padding:6px 10px; background:#2aabee; color:#fff;">${t.promo_share}</button>
+            </div>
+          </div>
+          ${enterHtml}
+        `;
+        shopListEl.appendChild(promoBox);
+
+        document.getElementById('btn-copy-promo').addEventListener('click', () => {
+          const shareText = `🐭 Грай у Hamka Game та забирай бонусний кейс!\n🤖 Бот: ${BOT_LINK}\n🎟 Мій промокод: ${state.publicId}`;
+          navigator.clipboard.writeText(shareText);
+          showStatus('✅ Copied with bot link!');
         });
+
+        document.getElementById('btn-share-promo').addEventListener('click', () => {
+          const shareText = `🐭 Грай у Hamka Game та забирай бонусний кейс!\n🎟 Мій промокод: ${state.publicId}`;
+          const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(BOT_LINK)}&text=${encodeURIComponent(shareText)}`;
+          if (tg && tg.openTelegramLink) {
+            tg.openTelegramLink(shareUrl);
+          } else {
+            window.open(shareUrl, '_blank');
+          }
+        });
+
+        const btnActivate = document.getElementById('btn-activate-promo');
+        if (btnActivate) {
+          btnActivate.addEventListener('click', async () => {
+            const code = document.getElementById('ref-promo-input').value.trim();
+            if (!code) { showStatus('❌ [ERR_1] Enter code'); return; }
+            if (code === state.publicId || code === currentUid) { showStatus('❌ [ERR_3] Own code'); return; }
+            if (state.usedReferralCode) { showStatus('❌ [ERR_4] Already activated'); return; }
+
+            btnActivate.disabled = true;
+            showStatus('⏳ Searching...');
+            try {
+              const usersSnap = await get(ref(db, 'users'));
+              if (!usersSnap.exists()) {
+                showStatus('❌ [ERR_5] Database empty');
+                btnActivate.disabled = false;
+                return;
+              }
+
+              const users = usersSnap.val();
+              let referrerUid = null;
+              for (const uId in users) {
+                const uData = users[uId];
+                if (String(uData.publicId) === code || uId === code) {
+                  referrerUid = uId;
+                  break;
+                }
+              }
+
+              if (!referrerUid) {
+                showStatus('❌ [ERR_6] Code not found');
+                btnActivate.disabled = false;
+                return;
+              }
+
+              // 1. Нараховуємо гравцю (+1 Базовий кейс)
+              const res1 = await runTransaction(ref(db, 'users/' + currentUid), (data) => {
+                if (!data) return data;
+                if (data.usedReferralCode) return;
+                data.usedReferralCode = true;
+                if (!data.cases) data.cases = {};
+                data.cases.basic = (data.cases.basic || 0) + 1;
+                return data;
+              });
+
+              if (!res1.committed) {
+                showStatus('❌ [ERR_7] User tx failed (Rules)');
+                btnActivate.disabled = false;
+                return;
+              }
+
+              // 2. Нараховуємо власнику коду (+1 Легендарний кейс)
+              const res2 = await runTransaction(ref(db, 'users/' + referrerUid), (data) => {
+                if (!data) return data;
+                data.legendaryCases = (data.legendaryCases || 0) + 1;
+                return data;
+              });
+
+              if (!res2.committed) {
+                showStatus('❌ [ERR_8] Referrer tx failed (Rules)');
+                btnActivate.disabled = false;
+                return;
+              }
+
+              showStatus('🎁 Promo activated! +1 Basic Case!');
+              try { tg?.HapticFeedback?.notificationOccurred('success'); } catch(e) {}
+            } catch (err) {
+              alert(`Firebase Error:\n${err.code || ''}\n${err.message}`);
+              showStatus('❌ [ERR_SYS] ' + (err.code || err.message));
+              btnActivate.disabled = false;
+            }
+          });
+        }
 
         const adCaseCard = document.createElement('div');
         adCaseCard.className = 'shop-card';
@@ -1903,9 +2063,12 @@
     }
 
     async function buySkin(item) {
+      const isHoms = item.currency === 'homs';
       await runTransaction(ref(db, 'users/' + currentUid), (data) => {
-        if (!data || (data.coins || 0) < item.price) return;
-        data.coins -= item.price;
+        if (!data) return data;
+        const bal = isHoms ? (data.homs || 0) : (data.coins || 0);
+        if (bal < item.price) return;
+        if (isHoms) data.homs -= item.price; else data.coins -= item.price;
         if (!data.purchasedSkins) data.purchasedSkins = [];
         if (!data.purchasedSkins.includes(item.id)) data.purchasedSkins.push(item.id);
         return data;
@@ -1915,9 +2078,12 @@
     }
 
     async function buyCosmetic(item) {
+      const isHoms = item.currency === 'homs';
       await runTransaction(ref(db, 'users/' + currentUid), (data) => {
-        if (!data || (data.coins || 0) < item.price) return;
-        data.coins -= item.price;
+        if (!data) return data;
+        const bal = isHoms ? (data.homs || 0) : (data.coins || 0);
+        if (bal < item.price) return;
+        if (isHoms) data.homs -= item.price; else data.coins -= item.price;
         if (item.type === 'title') {
           if (!data.purchasedTitles) data.purchasedTitles = [];
           if (!data.purchasedTitles.includes(item.name)) data.purchasedTitles.push(item.name);
@@ -1965,7 +2131,8 @@
 
     function renderInventory() {
       const cases = state.cases || {};
-      const hasCases = Object.keys(cases).some(k => cases[k] > 0);
+      const legendaryCount = state.legendaryCases || 0;
+      const hasCases = Object.keys(cases).some(k => cases[k] > 0) || legendaryCount > 0;
       
       if (hasCases) {
         casesSection.style.display = 'block';
@@ -1983,12 +2150,24 @@
           el.addEventListener('click', () => openCaseModal(type, count));
           invCases.appendChild(el);
         }
+
+        if (legendaryCount > 0) {
+          const el = document.createElement('div');
+          el.className = 'case-item legendary';
+          el.innerHTML = `
+            <div class="case-count-badge">${legendaryCount}</div>
+            <div class="case-icon">🌟</div>
+            <div class="case-name">Legendary Case</div>
+          `;
+          el.addEventListener('click', () => openCaseModal('legendary', legendaryCount));
+          invCases.appendChild(el);
+        }
       } else {
         casesSection.style.display = 'none';
       }
 
       const availableTitles = [
-        ...TITLES.filter(t => t.reqPrestige === 0 || state.prestige >= t.reqPrestige),
+        ...TITLES.filter(t => (t.price === 0 && (t.reqPrestige === 0 || state.prestige >= t.reqPrestige)) || state.purchasedTitles.includes(t.name)),
         ...CASE_TITLES.filter(t => state.purchasedTitles.includes(t.name)),
         ...TOP_TITLES.filter(t => state.purchasedTitles.includes(t.name))
       ];
@@ -2043,7 +2222,7 @@
 
     function openCaseModal(type, count) {
       selectedCaseTypeToOpen = type;
-      document.getElementById('case-modal-title').innerText = translations[currentLang].open_case || 'Open Case';
+      document.getElementById('case-modal-title').innerText = type === 'legendary' ? 'Open Legendary Case' : 'Open Case';
       document.getElementById('case-modal-count').innerText = `Available: ${count}`;
       document.getElementById('modal-case-qty').classList.add('show');
     }
@@ -2052,25 +2231,33 @@
       document.getElementById('modal-case-qty').classList.remove('show');
       if (!currentUid || !selectedCaseTypeToOpen) return;
 
-      const currentCount = state.cases[selectedCaseTypeToOpen] || 0;
+      const isLegendary = selectedCaseTypeToOpen === 'legendary';
+      const currentCount = isLegendary ? (state.legendaryCases || 0) : (state.cases[selectedCaseTypeToOpen] || 0);
       let openNum = qty === 'all' ? currentCount : parseInt(qty);
       if (openNum > currentCount) openNum = currentCount;
       if (openNum <= 0) return;
 
       caseOpenOverlay.classList.add('show');
       caseOpeningBox.style.display = 'block';
+      caseOpeningBox.innerText = isLegendary ? '🌟' : '📦';
       caseRewardText.innerText = '';
       btnCloseCase.style.display = 'none';
 
       setTimeout(async () => {
         caseOpeningBox.style.display = 'none';
         let summaryRewards = [];
+        const multiplier = isLegendary ? 10 : 1;
 
         await runTransaction(ref(db, 'users/' + currentUid), (data) => {
-          if (!data || !data.cases || (data.cases[selectedCaseTypeToOpen] || 0) < openNum) return;
-          
-          data.cases[selectedCaseTypeToOpen] -= openNum;
-          if (data.cases[selectedCaseTypeToOpen] <= 0) delete data.cases[selectedCaseTypeToOpen];
+          if (!data) return data;
+          if (isLegendary) {
+            if ((data.legendaryCases || 0) < openNum) return;
+            data.legendaryCases -= openNum;
+          } else {
+            if (!data.cases || (data.cases[selectedCaseTypeToOpen] || 0) < openNum) return;
+            data.cases[selectedCaseTypeToOpen] -= openNum;
+            if (data.cases[selectedCaseTypeToOpen] <= 0) delete data.cases[selectedCaseTypeToOpen];
+          }
 
           if (!data.purchasedTitles) data.purchasedTitles = [];
           if (!data.purchasedAvatars) data.purchasedAvatars = [];
@@ -2081,8 +2268,9 @@
             if (rand < 20) {
               const randomSkin = SKINS[Math.floor(Math.random() * SKINS.length)];
               if (data.purchasedSkins.includes(randomSkin.id)) {
-                data.homs = (data.homs || 0) + 10;
-                summaryRewards.push(`+10 Homs (Skin Duplicate)`);
+                const homsBonus = 10 * multiplier;
+                data.homs = (data.homs || 0) + homsBonus;
+                summaryRewards.push(`+${homsBonus} Homs (Skin Duplicate)`);
               } else {
                 data.purchasedSkins.push(randomSkin.id);
                 summaryRewards.push(`Skin: ${randomSkin.name}`);
@@ -2090,8 +2278,9 @@
             } else if (rand < 45) {
               const randomAvatar = AVATARS[Math.floor(Math.random() * AVATARS.length)];
               if (data.purchasedAvatars.includes(randomAvatar.name)) {
-                data.homs = (data.homs || 0) + 10;
-                summaryRewards.push(`+10 Homs (Avatar Duplicate)`);
+                const homsBonus = 10 * multiplier;
+                data.homs = (data.homs || 0) + homsBonus;
+                summaryRewards.push(`+${homsBonus} Homs (Avatar Duplicate)`);
               } else {
                 data.purchasedAvatars.push(randomAvatar.name);
                 summaryRewards.push(`Avatar: ${randomAvatar.name}`);
@@ -2099,14 +2288,15 @@
             } else if (rand < 70) {
               const randomTitle = CASE_TITLES[Math.floor(Math.random() * CASE_TITLES.length)];
               if (data.purchasedTitles.includes(randomTitle.name)) {
-                data.homs = (data.homs || 0) + 10;
-                summaryRewards.push(`+10 Homs (Title Duplicate)`);
+                const homsBonus = 10 * multiplier;
+                data.homs = (data.homs || 0) + homsBonus;
+                summaryRewards.push(`+${homsBonus} Homs (Title Duplicate)`);
               } else {
                 data.purchasedTitles.push(randomTitle.name);
                 summaryRewards.push(`Title: ${randomTitle.name}`);
               }
             } else {
-              const xpReward = Math.floor(Math.random() * 49000) + 1000;
+              const xpReward = (Math.floor(Math.random() * 49000) + 1000) * multiplier;
               data.xp = (data.xp || 0) + xpReward;
               summaryRewards.push(`+${formatNumber(xpReward)} XP`);
             }
@@ -2296,7 +2486,8 @@
               { type: 'coins', val: 1000, text: '+1,000 Coins' },
               { type: 'xp', val: 500, text: '+500 XP' },
               { type: 'homs', val: 10, text: '+10 Homs' },
-              { type: 'case', val: 1, text: '+1 Basic Case' }
+              { type: 'case', val: 1, text: '+1 Basic Case' },
+              { type: 'leg_case', val: 1, text: '+1 Legendary Case' }
             ];
             const reward = rewards[Math.floor(Math.random() * rewards.length)];
 
@@ -2308,6 +2499,9 @@
               if (reward.type === 'case') {
                 if (!data.cases) data.cases = {};
                 data.cases.basic = (data.cases.basic || 0) + 1;
+              }
+              if (reward.type === 'leg_case') {
+                data.legendaryCases = (data.legendaryCases || 0) + 1;
               }
               return data;
             });
