@@ -326,16 +326,10 @@
       border: 2px solid #ffd700;
       box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
     }
-    .case-item.star {
-      background: linear-gradient(135deg, #1b2a3d, #0f1c2e);
-      border: 2px solid #2aabee;
-      box-shadow: 0 0 15px rgba(42, 171, 238, 0.4);
-    }
     .case-item:active { transform: scale(0.95); }
     .case-icon { font-size: 36px; margin-bottom: 4px; }
     .case-name { font-size: 11px; font-weight: 700; color: #da70d6; }
     .case-item.legendary .case-name { color: #ffd700; }
-    .case-item.star .case-name { color: #2aabee; }
     .case-count-badge {
       position: absolute; top: 6px; right: 6px; background: #8a2be2; color: #fff;
       font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 10px;
@@ -1881,42 +1875,6 @@
         `;
         shopListEl.appendChild(promoBox);
 
-        // Зірковий кейс: ціна 10 ⭐, лут x5
-        const starCaseCard = document.createElement('div');
-        starCaseCard.className = 'shop-card';
-        starCaseCard.innerHTML = `
-          <div class="grid-preview" style="font-size:40px; background: linear-gradient(135deg, #1b2a3d, #2aabee);">⭐</div>
-          <div class="shop-card-info">
-            <div class="shop-card-title">Star Case (x5 Loot)</div>
-            <div class="shop-card-desc">Лут x5: скіни, аватарки, титули та багато XP!</div>
-            <div class="shop-card-price" style="color:#2aabee;">⭐ 10 Stars</div>
-          </div>
-          <button class="shop-card-btn" id="btn-buy-star-case" style="background: #2aabee; color: #fff;">Купити</button>
-        `;
-        shopListEl.appendChild(starCaseCard);
-
-        document.getElementById('btn-buy-star-case').addEventListener('click', async () => {
-          const grantStarCase = async () => {
-            await runTransaction(ref(db, 'users/' + currentUid), (data) => {
-              if (!data) return data;
-              if (!data.cases) data.cases = {};
-              data.cases.star = (data.cases.star || 0) + 1;
-              return data;
-            });
-            showStatus('⭐ Отримано Star Case (x5 лут)! Зайди в Інвентар.');
-            try { tg?.HapticFeedback?.notificationOccurred('success'); } catch(e) {}
-          };
-
-          if (!tg || !tg.openInvoice) {
-            if (confirm("Купити Star Case за 10 ⭐ (лут x5)?")) {
-              await grantStarCase();
-            }
-            return;
-          }
-
-          showStatus('⚠️ Підключіть генерацію інвойсу в боті для оплати 10 ⭐');
-        });
-
         document.getElementById('btn-copy-promo').addEventListener('click', () => {
           const shareText = `🐭 Грай у Hamka Game та забирай бонусний кейс!\n🤖 Бот: ${BOT_LINK}\n🎟 Мій промокод: ${state.publicId}`;
           navigator.clipboard.writeText(shareText);
@@ -2180,13 +2138,12 @@
         for (const type in cases) {
           const count = cases[type];
           if (count <= 0) continue;
-          const isStar = type === 'star';
           const el = document.createElement('div');
-          el.className = isStar ? 'case-item star' : 'case-item';
+          el.className = 'case-item';
           el.innerHTML = `
             <div class="case-count-badge">${count}</div>
-            <div class="case-icon">${isStar ? '⭐' : '📦'}</div>
-            <div class="case-name">${isStar ? 'Star Case (x5)' : 'Basic Case'}</div>
+            <div class="case-icon">📦</div>
+            <div class="case-name">Basic Case</div>
           `;
           el.addEventListener('click', () => openCaseModal(type, count));
           invCases.appendChild(el);
@@ -2263,9 +2220,7 @@
 
     function openCaseModal(type, count) {
       selectedCaseTypeToOpen = type;
-      let titleText = 'Open Case';
-      if (type === 'legendary') titleText = 'Open Legendary Case';
-      else if (type === 'star') titleText = 'Open Star Case (x5)';
+      const titleText = type === 'legendary' ? 'Open Legendary Case' : 'Open Case';
       document.getElementById('case-modal-title').innerText = titleText;
       document.getElementById('case-modal-count').innerText = `Available: ${count}`;
       document.getElementById('modal-case-qty').classList.add('show');
@@ -2276,7 +2231,6 @@
       if (!currentUid || !selectedCaseTypeToOpen) return;
 
       const isLegendary = selectedCaseTypeToOpen === 'legendary';
-      const isStar = selectedCaseTypeToOpen === 'star';
       const currentCount = isLegendary ? (state.legendaryCases || 0) : (state.cases[selectedCaseTypeToOpen] || 0);
       let openNum = qty === 'all' ? currentCount : parseInt(qty);
       if (openNum > currentCount) openNum = currentCount;
@@ -2284,14 +2238,14 @@
 
       caseOpenOverlay.classList.add('show');
       caseOpeningBox.style.display = 'block';
-      caseOpeningBox.innerText = isLegendary ? '🌟' : (isStar ? '⭐' : '📦');
+      caseOpeningBox.innerText = isLegendary ? '🌟' : '📦';
       caseRewardText.innerText = '';
       btnCloseCase.style.display = 'none';
 
       setTimeout(async () => {
         caseOpeningBox.style.display = 'none';
         let summaryRewards = [];
-        const multiplier = isLegendary ? 10 : (isStar ? 5 : 1);
+        const multiplier = isLegendary ? 10 : 1;
 
         await runTransaction(ref(db, 'users/' + currentUid), (data) => {
           if (!data) return data;
