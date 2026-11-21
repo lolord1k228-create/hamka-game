@@ -1,421 +1,1273 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>Hamka Game</title>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
+  <script defer src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script defer src="https://sad.adsgram.ai/js/sad.min.js"></script>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    input, textarea, select {
+      user-select: text;
+    }
+
+    :root {
+      --bg-main: #000000;
+      --bg-body: radial-gradient(circle at 50% 30%, #111 0%, #000 80%);
+      --bg-card: rgba(255, 255, 255, 0.04);
+      --bg-surface: #0a0a0a;
+      --bg-elevated: #1a1a1a;
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-strong: #333333;
+      --text-main: #ffffff;
+      --text-muted: #888888;
+      --accent: #2ecc71;
+      --accent-2: #27ae60;
+      --gold: #ffd700;
+      --season-bg: #f5a623;
+      --season-color: #000000;
+      --radius-card: 14px;
+      --radius-btn: 9px;
+      --btn-pad-y: 9px;
+      --btn-pad-x: 14px;
+      --btn-font: 12px;
+      --card-pad: 12px;
+      --hamster-size: clamp(240px, 68vw, 340px);
+      --hamster-max: 44dvh;
+      --hamster-emoji-size: clamp(110px, 32vw, 160px);
+      --banner-opacity: 0.65;
+    }
+
     html, body {
       height: 100dvh;
       overflow: hidden;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #000; color: #fff; user-select: none;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg-main);
+      color: var(--text-main);
     }
+
     body {
-      display: flex; flex-direction: column; position: relative;
-      background: radial-gradient(circle at 50% 30%, #111 0%, #000 80%);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      background: var(--bg-body);
       padding-top: env(safe-area-inset-top, 0px);
+    }
+
+    .hidden {
+      display: none !important;
     }
 
     /* ЗАВАНТАЖЕННЯ */
     #loading-screen {
-      position: fixed; inset: 0; z-index: 2000; background: #0a0a0a;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      position: fixed;
+      inset: 0;
+      z-index: 2000;
+      background: var(--bg-surface);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
     }
-    .loader {
-      width: 50px; height: 50px; border: 5px solid #222;
-      border-top: 5px solid #2ecc71; border-radius: 50%;
-      animation: spin 1s linear infinite; margin-bottom: 20px;
+
+    .loader, .spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid #222;
+      border-top: 5px solid var(--accent);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 16px;
     }
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    .loading-text { font-size: 16px; font-weight: 600; color: #fff; }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .loading-text {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-main);
+    }
 
     /* АВТОРИЗАЦІЯ */
     #auth-screen {
-      position: fixed; inset: 0; z-index: 1000; background: #0a0a0a;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      padding: 24px; overflow-y: auto;
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: var(--bg-surface);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      overflow-y: auto;
     }
-    #auth-screen.hidden { display: none; }
-    
-    .auth-logo-img { font-size: clamp(64px, 18vw, 88px); margin-bottom: 10px; line-height: 1; }
-    .auth-title { font-size: clamp(30px, 8vw, 38px); font-weight: 800; color: #2ecc71; margin-bottom: 6px; letter-spacing: -0.5px; }
-    .auth-subtitle { font-size: 14px; color: #888; margin-bottom: 24px; text-align: center; }
 
-    .auth-tabs { display: flex; width: 100%; max-width: 360px; gap: 10px; margin-bottom: 20px; }
+    .auth-logo-img {
+      font-size: clamp(64px, 18vw, 88px);
+      margin-bottom: 10px;
+      line-height: 1;
+    }
+
+    .auth-title {
+      font-size: clamp(30px, 8vw, 38px);
+      font-weight: 800;
+      color: var(--accent);
+      margin-bottom: 6px;
+      letter-spacing: -0.5px;
+    }
+
+    .auth-subtitle {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
+    .auth-tabs {
+      display: flex;
+      width: 100%;
+      max-width: 360px;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
     .auth-tab {
-      flex: 1; padding: 12px; border-radius: 10px; font-size: 15px; font-weight: 700;
-      text-align: center; cursor: pointer; border: 1px solid #222; color: #aaa;
-      background: transparent; transition: 0.2s;
+      flex: 1;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 700;
+      text-align: center;
+      cursor: pointer;
+      border: 1px solid #222;
+      color: #aaa;
+      background: transparent;
+      transition: 0.2s;
     }
-    .auth-tab.active { background: #0f1f15; color: #fff; border-color: #2ecc71; }
 
-    .auth-hint-top { font-size: 13px; color: #aaa; margin-bottom: 16px; display: flex; align-items: center; gap: 6px; }
-    .auth-form { width: 100%; max-width: 360px; display: flex; flex-direction: column; gap: 10px; }
-    
-    .input-wrap { position: relative; width: 100%; }
-    .input-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 16px; color: #555; pointer-events: none; }
+    .auth-tab.active {
+      background: rgba(46, 204, 113, 0.12);
+      color: var(--text-main);
+      border-color: var(--accent);
+    }
+
+    .auth-hint-top {
+      font-size: 13px;
+      color: #aaa;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .auth-form {
+      width: 100%;
+      max-width: 360px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .input-wrap {
+      position: relative;
+      width: 100%;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 16px;
+      color: #555;
+      pointer-events: none;
+    }
+
     .auth-input {
-      width: 100%; padding: 15px 15px 15px 44px; background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 12px;
-      color: #fff; font-size: 15px; outline: none; transition: border-color 0.2s;
+      width: 100%;
+      padding: 14px 14px 14px 42px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-strong);
+      border-radius: 12px;
+      color: var(--text-main);
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
     }
-    .auth-input:focus { border-color: #2ecc71; }
-    .auth-input::placeholder { color: #555; }
 
-    .auth-error { color: #ff6b6b; font-size: 12px; text-align: center; min-height: 16px; margin-top: 4px; }
+    .auth-input:focus {
+      border-color: var(--accent);
+    }
+
+    .auth-error {
+      color: #ff6b6b;
+      font-size: 12px;
+      text-align: center;
+      min-height: 16px;
+      margin-top: 4px;
+    }
 
     .auth-btn {
-      width: 100%; max-width: 360px; padding: 15px; border: none; border-radius: 12px;
-      font-size: 16px; font-weight: 700; cursor: pointer; transition: transform 0.1s, opacity 0.2s;
-      display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 8px;
+      width: 100%;
+      max-width: 360px;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.1s, opacity 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 6px;
     }
-    .auth-btn:active { transform: scale(0.97); }
-    .auth-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    
-    .btn-green { background: #2ecc71; color: #000; box-shadow: 0 4px 15px rgba(46, 204, 113, 0.2); }
-    .btn-blue { background: #2aabee; color: #fff; }
+
+    .auth-btn:active {
+      transform: scale(0.97);
+    }
+
+    .auth-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-green {
+      background: var(--accent);
+      color: #000000;
+      box-shadow: 0 4px 15px rgba(46, 204, 113, 0.2);
+    }
+
+    .btn-blue {
+      background: #2aabee;
+      color: #ffffff;
+    }
 
     .auth-divider {
-      display: flex; align-items: center; gap: 12px; color: #555; font-size: 13px; 
-      margin: 10px 0; width: 100%; max-width: 360px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #555;
+      font-size: 13px;
+      margin: 8px 0;
+      width: 100%;
+      max-width: 360px;
     }
-    .auth-divider::before, .auth-divider::after { content: ''; flex: 1; height: 1px; background: #222; }
 
-    /* ГРА */
-    #game-screen { display: none; flex-direction: column; height: 100%; max-width: 500px; width: 100%; margin: 0 auto; }
-    #game-screen.visible { display: flex; }
+    .auth-divider::before,
+    .auth-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #222;
+    }
+
+    /* ГОЛОВНИЙ ЕКРАН ГРИ */
+    #game-screen {
+      display: none;
+      flex-direction: column;
+      height: 100%;
+      max-width: 500px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    #game-screen.visible {
+      display: flex;
+    }
 
     .top-stats {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: clamp(8px, 1.5vh, 12px) 14px; background: #000; font-size: clamp(12px, 3.2vw, 14px); font-weight: 600;
-      border-bottom: 1px solid #222; flex-shrink: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: clamp(8px, 1.5vh, 12px) 14px;
+      background: var(--bg-main);
+      font-size: clamp(12px, 3.2vw, 14px);
+      font-weight: 600;
+      border-bottom: 1px solid #222;
+      flex-shrink: 0;
     }
-    .top-stats-group { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+    .top-stats-group {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
     .stat-pill {
-      display: flex; align-items: center; gap: 5px;
-      background: rgba(255,255,255,0.06); padding: 4px 10px; border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(255, 255, 255, 0.06);
+      padding: 4px 10px;
+      border-radius: 8px;
     }
+
     .season-badge {
-      background: #f5a623; color: #000; padding: 4px 10px;
-      border-radius: 20px; font-size: 11px; font-weight: 700;
-      display: flex; align-items: center; gap: 4px; white-space: nowrap;
+      background: var(--season-bg);
+      color: var(--season-color);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
     }
+
     .admin-btn-badge {
-      background: #ff3333; color: #fff; padding: 4px 10px;
-      border-radius: 20px; font-size: 11px; font-weight: 700;
-      cursor: pointer; display: none; align-items: center; gap: 4px;
+      background: #ff3333;
+      color: #ffffff;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .boost-badge {
+      display: none;
+      background: rgba(46, 204, 113, 0.16);
+      border: 1px solid #2ecc71;
+      color: #2ecc71;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .boost-badge.active {
+      display: inline-flex;
+      align-items: center;
     }
 
     .main-menu {
-      display: flex; justify-content: space-around; align-items: center;
-      padding: clamp(8px, 1.4vh, 12px) 6px; background: #111; border-bottom: 1px solid #222;
-      overflow-x: auto; scrollbar-width: none; flex-shrink: 0;
-    }
-    .main-menu::-webkit-scrollbar { display: none; }
-    .menu-item {
-      display: flex; flex-direction: column; align-items: center;
-      gap: 4px; color: #666; font-size: clamp(10px, 2.6vw, 11px); font-weight: 600;
-      min-width: 48px; cursor: pointer;
-    }
-    .menu-item.active { color: #fff; }
-    .menu-item.active .menu-icon-wrap {
-      background: #2ecc71; color: #000; box-shadow: 0 0 12px rgba(46, 204, 113, 0.5);
-    }
-    .menu-icon-wrap {
-      width: clamp(32px, 8.5vw, 38px); height: clamp(32px, 8.5vw, 38px); border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: clamp(16px, 4.2vw, 19px); background: rgba(255,255,255,0.05); color: #888;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: clamp(8px, 1.4vh, 12px) 6px;
+      background: #111111;
+      border-bottom: 1px solid #222;
+      overflow-x: auto;
+      scrollbar-width: none;
+      flex-shrink: 0;
     }
 
-    .page { display: none; flex: 1; flex-direction: column; overflow-y: auto; }
-    .page.active { display: flex; }
+    .main-menu::-webkit-scrollbar {
+      display: none;
+    }
+
+    .menu-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      color: #666666;
+      font-size: clamp(10px, 2.6vw, 11px);
+      font-weight: 600;
+      min-width: 48px;
+      cursor: pointer;
+    }
+
+    .menu-item.active {
+      color: var(--text-main);
+    }
+
+    .menu-item.active .menu-icon-wrap {
+      background: var(--accent);
+      color: #000000;
+      box-shadow: 0 0 12px rgba(46, 204, 113, 0.5);
+    }
+
+    .menu-icon-wrap {
+      width: clamp(32px, 8.5vw, 38px);
+      height: clamp(32px, 8.5vw, 38px);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: clamp(16px, 4.2vw, 19px);
+      background: rgba(255, 255, 255, 0.05);
+      color: #888888;
+    }
+
+    .page {
+      display: none;
+      flex: 1;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+
+    .page.active {
+      display: flex;
+    }
 
     /* ТАП */
     .tap-area {
-      flex: 1; display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      position: relative; overflow: hidden; padding: 10px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      padding: 10px;
     }
+
     .coin-counter {
-      display: flex; align-items: center; gap: 8px; font-size: clamp(24px, 7vw, 34px); font-weight: 800;
-      color: #fff; margin-bottom: clamp(16px, 3.5vh, 32px); text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: clamp(24px, 7vw, 34px);
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: clamp(16px, 3.5vh, 32px);
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
     }
+
     .hamster-wrap {
-      position: relative; display: flex; align-items: center; justify-content: center;
-      width: clamp(240px, 68vw, 340px);
-      height: clamp(240px, 68vw, 340px);
-      max-height: 44dvh;
-      max-width: 44dvh;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: var(--hamster-size);
+      height: var(--hamster-size);
+      max-height: var(--hamster-max);
+      max-width: var(--hamster-max);
     }
+
     .hamster {
-      width: 100%; height: 100%; border-radius: 50%;
-      border: 4px solid #2ecc71;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 4px solid var(--accent);
       box-shadow: 0 0 30px rgba(46, 204, 113, 0.6), inset 0 0 40px rgba(46, 204, 113, 0.15);
       background: radial-gradient(circle at 50% 50%, #1a1a1a 0%, #0a0a0a 100%);
-      display: flex; align-items: center; justify-content: center;
-      font-size: clamp(110px, 32vw, 160px); cursor: pointer; transition: transform 0.1s ease; position: relative; z-index: 2;
-      background-size: cover; background-position: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--hamster-emoji-size);
+      cursor: pointer;
+      transition: transform 0.1s ease;
+      position: relative;
+      z-index: 2;
+      background-size: cover;
+      background-position: center;
     }
-    .hamster:active { transform: scale(0.96); }
-    
+
+    .hamster:active {
+      transform: scale(0.96);
+    }
+
     .tap-effect {
-      position: absolute; font-size: clamp(24px, 6vw, 32px); font-weight: 800; color: #2ecc71;
-      pointer-events: none; animation: floatUp 0.8s ease-out forwards; z-index: 10;
+      position: absolute;
+      font-size: clamp(24px, 6vw, 32px);
+      font-weight: 800;
+      color: var(--accent);
+      pointer-events: none;
+      animation: floatUp 0.8s ease-out forwards;
+      z-index: 10;
     }
+
     @keyframes floatUp {
       0% { opacity: 1; transform: translateY(0) scale(1); }
       100% { opacity: 0; transform: translateY(-85px) scale(1.3); }
     }
 
     /* МАГАЗИН */
-    .shop-container { display: flex; flex-direction: column; height: 100%; }
-    .shop-tabs { 
-      display: flex; gap: 6px; padding: 10px 12px; background: #0a0a0a; 
-      border-bottom: 1px solid #222; flex-shrink: 0;
-      overflow-x: auto; scrollbar-width: none;
+    .shop-container {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
     }
-    .shop-tabs::-webkit-scrollbar { display: none; }
+
+    .shop-tabs {
+      display: flex;
+      gap: 6px;
+      padding: 10px 12px;
+      background: var(--bg-surface);
+      border-bottom: 1px solid #222;
+      flex-shrink: 0;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .shop-tabs::-webkit-scrollbar {
+      display: none;
+    }
+
     .shop-tab {
-      flex: 1; padding: 9px 6px; text-align: center; font-size: clamp(11px, 3vw, 13px); font-weight: 700;
-      background: rgba(255,255,255,0.05); border-radius: 8px; cursor: pointer; color: #aaa;
-      border: 1px solid transparent; white-space: nowrap;
+      flex: 1;
+      padding: 9px 6px;
+      text-align: center;
+      font-size: clamp(11px, 3vw, 13px);
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      cursor: pointer;
+      color: #aaa;
+      border: 1px solid transparent;
+      white-space: nowrap;
     }
-    .shop-tab.active { background: #2ecc71; color: #000; border-color: #2ecc71; }
-    
-    .shop-list { flex: 1; overflow-y: auto; padding: 10px 12px 40px; }
+
+    .shop-tab.active {
+      background: var(--accent);
+      color: #000000;
+      border-color: var(--accent);
+    }
+
+    .shop-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px 12px 40px;
+    }
 
     .shop-card {
-      background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 14px; padding: 12px; margin-bottom: 10px;
-      display: flex; justify-content: space-between; align-items: center;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-card);
+      padding: var(--card-pad);
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
-    .shop-card-info { flex: 1; padding-right: 10px; }
-    .shop-card-title { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 3px; }
-    .shop-card-desc { font-size: 11px; color: #888; line-height: 1.35; }
-    .shop-card-price { font-size: 13px; font-weight: 700; color: #ffd700; margin-top: 5px; }
+
+    .shop-card-info {
+      flex: 1;
+      padding-right: 10px;
+    }
+
+    .shop-card-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 3px;
+    }
+
+    .shop-card-desc {
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.35;
+    }
+
+    .shop-card-price {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--gold);
+      margin-top: 5px;
+    }
+
     .shop-card-btn {
-      padding: 9px 14px; border: none; border-radius: 9px; font-size: 12px; font-weight: 700;
-      background: #2ecc71; color: #000; cursor: pointer; white-space: nowrap;
+      padding: var(--btn-pad-y) var(--btn-pad-x);
+      border: none;
+      border-radius: var(--radius-btn);
+      font-size: var(--btn-font);
+      font-weight: 700;
+      background: var(--accent);
+      color: #000000;
+      cursor: pointer;
+      white-space: nowrap;
     }
-    .shop-card-btn:disabled { background: #333; color: #666; cursor: not-allowed; }
 
-    .shop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .shop-grid .shop-card { flex-direction: column; text-align: center; padding: 12px 8px; margin-bottom: 0; }
-    .shop-grid .shop-card-info { padding-right: 0; width: 100%; }
-    .shop-grid .shop-card-btn { width: 100%; margin-top: 8px; }
-    
+    .shop-card-btn:disabled {
+      background: #333333;
+      color: #666666;
+      cursor: not-allowed;
+    }
+
+    .shop-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .shop-grid .shop-card {
+      flex-direction: column;
+      text-align: center;
+      padding: 12px 8px;
+      margin-bottom: 0;
+    }
+
+    .shop-grid .shop-card-info {
+      padding-right: 0;
+      width: 100%;
+    }
+
+    .shop-grid .shop-card-btn {
+      width: 100%;
+      margin-top: 8px;
+    }
+
     .grid-preview {
-      width: 64px; height: 64px; border-radius: 14px; background: rgba(255,255,255,0.1);
-      display: flex; align-items: center; justify-content: center; font-size: 36px;
-      margin: 0 auto 8px; background-size: cover; background-position: center;
+      width: 64px;
+      height: 64px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      margin: 0 auto 8px;
+      background-size: cover;
+      background-position: center;
     }
 
-    /* Промокод блок */
     .promo-box {
       background: linear-gradient(145deg, rgba(46, 204, 113, 0.08), rgba(255, 255, 255, 0.03));
       border: 1px solid rgba(46, 204, 113, 0.3);
-      border-radius: 14px; padding: 14px; margin-bottom: 12px;
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 12px;
     }
+
     .promo-code-display {
-      display: flex; align-items: center; justify-content: space-between;
-      background: #111; border: 1px dashed #2ecc71; border-radius: 10px;
-      padding: 10px 12px; margin: 10px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #111111;
+      border: 1px dashed #2ecc71;
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-top: 10px;
     }
-    .promo-code-text { font-family: monospace; font-size: 16px; font-weight: 800; color: #2ecc71; letter-spacing: 1px; }
-    .promo-input-row { display: flex; gap: 8px; margin-top: 10px; }
-    .promo-input {
-      flex: 1; padding: 11px 12px; background: #141414; border: 1px solid #333;
-      border-radius: 10px; color: #fff; font-size: 14px; outline: none; font-family: monospace;
+
+    .promo-code-text {
+      font-family: monospace;
+      font-size: 13px;
+      font-weight: 800;
+      color: #2ecc71;
+      word-break: break-all;
     }
-    .promo-input:focus { border-color: #2ecc71; }
 
     /* КРИПТА / МІНІ-ІГРИ */
-    .crypto-page { padding: 10px 12px 40px; }
-    .crypto-card {
-      background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 14px; padding: 12px; margin-bottom: 10px;
+    .crypto-page {
+      padding: 10px 12px 40px;
     }
-    .crypto-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-    .crypto-symbol { font-size: 16px; font-weight: 700; color: #f5a623; }
-    .crypto-price { font-size: 15px; font-weight: 700; }
+
+    .crypto-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-card);
+      padding: var(--card-pad);
+      margin-bottom: 10px;
+    }
+
+    .crypto-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .crypto-symbol {
+      font-size: 16px;
+      font-weight: 700;
+      color: #f5a623;
+    }
+
+    .crypto-price {
+      font-size: 15px;
+      font-weight: 700;
+    }
+
     .crypto-price.up { color: #2ecc71; }
     .crypto-price.down { color: #ff5252; }
-    .crypto-chart { width: 100%; height: 60px; display: block; background: rgba(0,0,0,0.3); border-radius: 8px; margin-bottom: 8px; }
-    .crypto-actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+
+    .crypto-chart {
+      width: 100%;
+      height: 60px;
+      display: block;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 8px;
+      margin-bottom: 8px;
+    }
+
+    .crypto-actions {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
     .crypto-input {
-      width: 65px; flex-shrink: 0; padding: 9px; background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; color: #fff; font-size: 14px; outline: none;
+      width: 68px;
+      flex-shrink: 0;
+      padding: 9px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      color: var(--text-main);
+      font-size: 14px;
+      outline: none;
       -moz-appearance: textfield;
     }
+
     .crypto-input::-webkit-outer-spin-button,
-    .crypto-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-    .crypto-btn { flex: 1; min-width: 0; padding: 9px; border: none; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; }
-    .crypto-btn.buy { background: #2ecc71; color: #000; }
-    .crypto-btn.sell { background: #ff5252; color: #fff; }
-    .crypto-holdings { font-size: 11px; color: #888; margin-top: 6px; }
-    .crypto-holdings span { color: #f5a623; font-weight: 600; }
+    .crypto-input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    .crypto-btn {
+      flex: 1;
+      min-width: 0;
+      padding: var(--btn-pad-y) var(--btn-pad-x);
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .crypto-btn.buy { background: #2ecc71; color: #000000; }
+    .crypto-btn.sell { background: #ff5252; color: #ffffff; }
+
+    .crypto-holdings {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    .crypto-holdings span {
+      color: #f5a623;
+      font-weight: 600;
+    }
 
     /* ПРОФІЛЬ */
-    .scroll-page { padding: 10px 12px 40px; }
+    .scroll-page {
+      padding: 10px 12px 40px;
+    }
+
     .profile-card {
+      position: relative;
+      overflow: hidden;
       background: linear-gradient(145deg, #1a1a24, #0f0f15);
-      border: 1px solid #333; border-radius: 20px; padding: 20px;
-      text-align: center; margin-bottom: 16px; position: relative;
+      border: 1px solid #333;
+      border-radius: 20px;
+      padding: 20px;
+      text-align: center;
+      margin-bottom: 14px;
     }
-    .profile-avatar-wrap { position: relative; display: inline-block; margin-bottom: 12px; }
+
+    .profile-banner-bg {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      opacity: var(--banner-opacity);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .profile-card-inner {
+      position: relative;
+      z-index: 1;
+    }
+
+    .profile-avatar-wrap {
+      position: relative;
+      display: inline-block;
+      margin-bottom: 12px;
+    }
+
     .profile-avatar {
-      width: 84px; height: 84px; border-radius: 50%;
+      width: 84px;
+      height: 84px;
+      border-radius: 50%;
       background: linear-gradient(135deg, #f5a623, #d4891a);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 42px; box-shadow: 0 0 20px rgba(245, 166, 35, 0.4);
-      background-size: cover; background-position: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 42px;
+      box-shadow: 0 0 20px rgba(245, 166, 35, 0.4);
+      background-size: cover;
+      background-position: center;
     }
-    .profile-name-wrap { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 4px; }
-    .profile-name { font-size: 22px; font-weight: 800; color: #fff; }
+
+    .profile-name-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .profile-name {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
     .edit-name-btn {
-      background: rgba(255,255,255,0.1); border: none; border-radius: 50%;
-      width: 26px; height: 26px; display: flex; align-items: center; justify-content: center;
-      font-size: 12px; cursor: pointer; color: #fff;
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      border-radius: 50%;
+      width: 26px;
+      height: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      cursor: pointer;
+      color: var(--text-main);
     }
-    .profile-id { font-size: 12px; color: #666; margin-top: 2px; }
-    
+
+    .profile-id {
+      font-size: 12px;
+      color: #9aa2b1;
+      margin-top: 2px;
+    }
+
     .profile-title-badge {
-      display: inline-flex; align-items: center; gap: 6px;
-      margin-top: 8px; padding: 5px 16px; border-radius: 20px;
-      font-size: 12px; font-weight: 700; color: #fff;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 8px;
+      padding: 5px 16px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #ffffff;
       box-shadow: 0 0 10px rgba(138, 43, 226, 0.5);
     }
-    
-    .profile-stats {
-      display: flex; justify-content: space-around; margin-top: 16px;
-      background: rgba(0,0,0,0.3); border-radius: 12px; padding: 12px;
-    }
-    .profile-stat-item { text-align: center; }
-    .profile-stat-val { font-size: 16px; font-weight: 700; color: #f5a623; }
-    .profile-stat-lbl { font-size: 10px; color: #888; text-transform: uppercase; }
 
-    .prestige-section {
-      background: rgba(138, 43, 226, 0.1); border: 1px solid rgba(138, 43, 226, 0.3);
-      border-radius: 14px; padding: 16px; text-align: center; margin-bottom: 16px;
+    .profile-stats {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 16px;
+      background: rgba(0, 0, 0, 0.35);
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .profile-stat-item {
+      text-align: center;
+    }
+
+    .profile-stat-val {
+      font-size: 16px;
+      font-weight: 700;
+      color: #f5a623;
+    }
+
+    .profile-stat-lbl {
+      font-size: 10px;
+      color: #aaa;
+      text-transform: uppercase;
+    }
+
+    /* Серія та престижі внизу профілю в 1 ряд */
+    .streak-prestige-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      align-items: stretch;
+    }
+
+    .streak-prestige-col {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 8px;
     }
 
     /* ІНВЕНТАР */
-    .inventory-section { margin-bottom: 16px; }
-    .inventory-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; color: #f5a623; }
-    .inventory-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-    .inventory-item {
-      background: rgba(255,255,255,0.05); border-radius: 10px; padding: 10px 6px; text-align: center;
-      cursor: pointer; border: 2px solid transparent; position: relative;
+    .inventory-section {
+      margin-bottom: 16px;
     }
-    .inventory-item.active { border-color: #2ecc71; background: rgba(46, 204, 113, 0.1); }
-    .inventory-item-icon { font-size: 24px; height: 32px; display: flex; align-items: center; justify-content: center; background-size: cover; background-position: center; margin: 0 auto; }
-    .inventory-item-name { font-size: 10px; margin-top: 4px; color: #aaa; word-break: break-word; }
+
+    .inventory-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #f5a623;
+    }
+
+    .inventory-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .inventory-item,
+    .banner-item {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      padding: 10px 6px;
+      text-align: center;
+      cursor: pointer;
+      border: 2px solid transparent;
+      position: relative;
+    }
+
+    .inventory-item.active,
+    .banner-item.active {
+      border-color: var(--accent);
+      background: rgba(46, 204, 113, 0.1);
+    }
+
+    .inventory-item-icon {
+      font-size: 24px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-size: cover;
+      background-position: center;
+      margin: 0 auto;
+    }
+
+    .banner-preview {
+      width: 100%;
+      height: 36px;
+      border-radius: 6px;
+      background: var(--bg-surface);
+      background-size: cover;
+      background-position: center;
+      margin-bottom: 4px;
+    }
+
+    .inventory-item-name {
+      font-size: 10px;
+      margin-top: 4px;
+      color: #aaa;
+      word-break: break-word;
+    }
 
     .case-item {
       background: linear-gradient(135deg, #2a1b3d, #1a1a24);
       border: 2px solid #8a2be2;
-      border-radius: 12px; padding: 14px 8px; text-align: center;
-      cursor: pointer; box-shadow: 0 0 15px rgba(138, 43, 226, 0.3);
-      transition: transform 0.2s; position: relative;
+      border-radius: 12px;
+      padding: 14px 8px;
+      text-align: center;
+      cursor: pointer;
+      box-shadow: 0 0 15px rgba(138, 43, 226, 0.3);
+      transition: transform 0.2s;
+      position: relative;
     }
+
     .case-item.legendary {
       background: linear-gradient(135deg, #3d2a1b, #241a0f);
       border: 2px solid #ffd700;
       box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
     }
-    .case-item:active { transform: scale(0.95); }
-    .case-icon { font-size: 36px; margin-bottom: 4px; }
-    .case-name { font-size: 11px; font-weight: 700; color: #da70d6; }
-    .case-item.legendary .case-name { color: #ffd700; }
+
+    .case-item:active {
+      transform: scale(0.95);
+    }
+
+    .case-icon {
+      font-size: 36px;
+      margin-bottom: 4px;
+    }
+
+    .case-name {
+      font-size: 11px;
+      font-weight: 700;
+      color: #da70d6;
+    }
+
+    .case-item.legendary .case-name {
+      color: #ffd700;
+    }
+
     .case-count-badge {
-      position: absolute; top: 6px; right: 6px; background: #8a2be2; color: #fff;
-      font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 10px;
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      background: #8a2be2;
+      color: #ffffff;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 10px;
     }
 
     /* ТОП */
+    .top-header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .top-rewards-btn {
+      padding: 7px 11px;
+      border: 1px solid rgba(245, 166, 35, 0.45);
+      border-radius: 9px;
+      background: rgba(245, 166, 35, 0.14);
+      color: #ffd700;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
     .leaderboard-item {
-      display: flex; align-items: center; gap: 10px;
-      padding: 10px; background: rgba(255,255,255,0.05); border-radius: 12px;
-      margin-bottom: 8px; cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      margin-bottom: 8px;
+      cursor: pointer;
     }
-    .leaderboard-item:active { background: rgba(255,255,255,0.1); }
-    
+
     .lb-avatar {
-      width: 42px; height: 42px; border-radius: 50%; background: #333;
-      display: flex; align-items: center; justify-content: center; font-size: 20px;
-      flex-shrink: 0; background-size: cover; background-position: center;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: #333;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+      background-size: cover;
+      background-position: center;
     }
-    .lb-info { flex: 1; min-width: 0; }
-    .lb-name { font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .lb-title { 
-      display: inline-block; font-size: 9px; padding: 2px 6px; border-radius: 4px;
-      color: #fff; margin-top: 2px;
+
+    .lb-info {
+      flex: 1;
+      min-width: 0;
     }
-    .lb-stats { text-align: right; flex-shrink: 0; }
-    .lb-xp { font-size: 13px; font-weight: 700; color: #2ecc71; }
-    .lb-prestige { font-size: 11px; font-weight: 700; color: #da70d6; }
+
+    .lb-name {
+      font-size: 14px;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .lb-title {
+      display: inline-block;
+      font-size: 9px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #ffffff;
+      margin-top: 2px;
+    }
+
+    .lb-stats {
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .lb-xp {
+      font-size: 13px;
+      font-weight: 700;
+      color: #2ecc71;
+    }
+
+    .lb-prestige {
+      font-size: 11px;
+      font-weight: 700;
+      color: #da70d6;
+    }
 
     /* НАЛАШТУВАННЯ */
     .settings-group {
-      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 14px; padding: 14px; margin-bottom: 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 12px;
     }
-    .settings-label { font-size: 14px; font-weight: 700; margin-bottom: 8px; display: block; color: #fff; }
-    .settings-select, .settings-btn {
-      width: 100%; padding: 12px; background: #1a1a1a; border: 1px solid #333;
-      border-radius: 10px; color: #fff; font-size: 14px; outline: none; cursor: pointer;
+
+    .settings-label {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      display: block;
+      color: var(--text-main);
     }
-    .settings-toggle-row { display: flex; justify-content: space-between; align-items: center; }
+
+    .settings-select,
+    .settings-btn {
+      width: 100%;
+      padding: 12px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-strong);
+      border-radius: 10px;
+      color: var(--text-main);
+      font-size: 14px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .settings-toggle-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
     .toggle-switch {
-      position: relative; display: inline-block; width: 50px; height: 26px;
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 26px;
+      flex-shrink: 0;
     }
-    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
     .toggle-slider {
-      position: absolute; cursor: pointer; inset: 0; background-color: #333;
-      transition: .3s; border-radius: 26px;
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background-color: #333333;
+      transition: 0.3s;
+      border-radius: 26px;
     }
+
     .toggle-slider:before {
-      position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px;
-      background-color: white; transition: .3s; border-radius: 50%;
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 3px;
+      bottom: 3px;
+      background-color: #ffffff;
+      transition: 0.3s;
+      border-radius: 50%;
     }
-    input:checked + .toggle-slider { background-color: #2ecc71; }
-    input:checked + .toggle-slider:before { transform: translateX(24px); }
+
+    input:checked + .toggle-slider {
+      background-color: var(--accent);
+    }
+
+    input:checked + .toggle-slider:before {
+      transform: translateX(24px);
+    }
 
     /* МОДАЛКИ */
     .modal-overlay {
-      position: fixed; inset: 0; z-index: 1500; background: rgba(0,0,0,0.8);
-      display: flex; align-items: center; justify-content: center; padding: 20px;
-      opacity: 0; pointer-events: none; transition: opacity 0.3s;
+      position: fixed;
+      inset: 0;
+      z-index: 1500;
+      background: rgba(0, 0, 0, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
     }
-    .modal-overlay.show { opacity: 1; pointer-events: all; }
-    .modal-content {
-      background: #1a1a1a; border: 1px solid #333; border-radius: 16px;
-      padding: 20px; width: 100%; max-width: 340px; text-align: center;
-    }
-    .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 12px; }
-    .preview-box {
-      width: 100px; height: 100px; border-radius: 20px; background: rgba(255,255,255,0.1);
-      display: flex; align-items: center; justify-content: center; font-size: 60px;
-      margin: 0 auto 16px; background-size: cover; background-position: center;
-    }
-    .modal-actions { display: flex; gap: 10px; margin-top: 16px; }
-    .modal-btn {
-      flex: 1; padding: 12px; border: none; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer;
-    }
-    .modal-btn.cancel { background: #333; color: #fff; }
-    .modal-btn.confirm { background: #2ecc71; color: #000; }
 
-    /* Кейс відкриття */
-    .case-open-overlay {
-      position: fixed; inset: 0; z-index: 2500; background: rgba(0,0,0,0.95);
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      opacity: 0; pointer-events: none; transition: opacity 0.3s;
+    .modal-overlay.show {
+      opacity: 1;
+      pointer-events: all;
     }
-    .case-open-overlay.show { opacity: 1; pointer-events: all; }
-    .case-opening-box { font-size: 100px; animation: shake 0.5s infinite; }
+
+    .modal-content {
+      position: relative;
+      overflow: hidden;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-strong);
+      border-radius: 16px;
+      padding: 20px;
+      width: 100%;
+      max-width: 340px;
+      text-align: center;
+    }
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .preview-box {
+      width: 100px;
+      height: 100px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 60px;
+      margin: 0 auto 16px;
+      background-size: cover;
+      background-position: center;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .modal-btn {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .modal-btn.cancel { background: #333333; color: #ffffff; }
+    .modal-btn.confirm { background: var(--accent); color: #000000; }
+
+    .case-open-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 2500;
+      background: rgba(0, 0, 0, 0.95);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+
+    .case-open-overlay.show {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .case-opening-box {
+      font-size: 100px;
+      animation: shake 0.5s infinite;
+    }
+
     @keyframes shake {
       0% { transform: rotate(0deg) scale(1); }
       25% { transform: rotate(15deg) scale(1.1); }
@@ -423,78 +1275,213 @@
       75% { transform: rotate(15deg) scale(1.1); }
       100% { transform: rotate(0deg) scale(1); }
     }
+
     .case-reward-text {
-      font-size: 20px; font-weight: 800; color: #fff; margin-top: 20px; text-align: center; max-height: 200px; overflow-y: auto;
-      animation: popIn 0.5s ease-out forwards; padding: 0 10px;
+      font-size: 20px;
+      font-weight: 800;
+      color: #ffffff;
+      margin-top: 20px;
+      text-align: center;
+      max-height: 200px;
+      overflow-y: auto;
+      animation: popIn 0.5s ease-out forwards;
+      padding: 0 10px;
+      white-space: pre-line;
     }
+
     @keyframes popIn {
       0% { transform: scale(0.5); opacity: 0; }
       100% { transform: scale(1); opacity: 1; }
     }
 
-    /* Рулетка */
     .roulette-container {
-      width: 100%; overflow: hidden; background: #222; border-radius: 10px;
-      margin-top: 15px; position: relative; height: 60px;
+      width: 100%;
+      overflow: hidden;
+      background: #222222;
+      border-radius: 10px;
+      margin-top: 15px;
+      position: relative;
+      height: 60px;
     }
-    .roulette-strip { display: flex; align-items: center; height: 100%; transition: transform 3s cubic-bezier(0.2, 0.8, 0.3, 1); }
-    .roulette-item { min-width: 60px; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 24px; border-right: 1px solid #333; }
+
+    .roulette-strip {
+      display: flex;
+      align-items: center;
+      height: 100%;
+      transition: transform 3s cubic-bezier(0.2, 0.8, 0.3, 1);
+    }
+
+    .roulette-item {
+      min-width: 60px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      border-right: 1px solid #333;
+    }
+
     .roulette-pointer {
-      position: absolute; top: 0; left: 50%; transform: translateX(-50%);
-      width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent;
-      border-top: 15px solid #2ecc71; z-index: 10;
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 10px solid transparent;
+      border-right: 10px solid transparent;
+      border-top: 15px solid var(--accent);
+      z-index: 10;
     }
 
     .admin-input {
-      width: 100%; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid #333;
-      border-radius: 8px; color: #fff; font-size: 14px; outline: none; margin-bottom: 8px;
+      width: 100%;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid #333;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 14px;
+      outline: none;
+      margin-bottom: 8px;
     }
 
     /* НИЖНЯ ПАНЕЛЬ */
     .bottom-panel {
-      background: #0a0a0a; border-top: 1px solid #222;
+      background: var(--bg-surface);
+      border-top: 1px solid #222;
       padding: 8px 14px calc(10px + env(safe-area-inset-bottom, 0px));
       flex-shrink: 0;
     }
-    .bottom-stats { display: flex; justify-content: space-between; align-items: center; font-size: clamp(11px, 3vw, 12px); color: #aaa; margin-bottom: 5px; }
-    .energy-bar-wrap { width: 100%; height: 10px; background: #222; border-radius: 5px; overflow: hidden; position: relative; }
-    .energy-bar { height: 100%; background: linear-gradient(90deg, #f5a623, #ffd700); width: 100%; transition: width 0.3s; }
-    .energy-labels { display: flex; justify-content: space-between; font-size: 10px; color: #666; margin-top: 3px; }
-    .xp-row { display: flex; justify-content: space-between; font-size: 11px; color: #666; margin-bottom: 4px; margin-top: 5px; }
-    .xp-bar-wrap { width: 100%; height: 8px; background: #222; border-radius: 4px; overflow: hidden; margin-bottom: 2px; }
-    .xp-bar { height: 100%; background: linear-gradient(90deg, #00bcd4, #2196f3); width: 0%; transition: width 0.3s; }
+
+    .bottom-stats {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: clamp(11px, 3vw, 12px);
+      color: #aaa;
+      margin-bottom: 5px;
+    }
+
+    .energy-bar-wrap {
+      width: 100%;
+      height: 10px;
+      background: #222;
+      border-radius: 5px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .energy-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #f5a623, #ffd700);
+      width: 100%;
+      transition: width 0.3s;
+    }
+
+    .energy-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: #666;
+      margin-top: 3px;
+    }
+
+    .xp-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: #666;
+      margin-bottom: 4px;
+      margin-top: 5px;
+    }
+
+    .xp-bar-wrap {
+      width: 100%;
+      height: 8px;
+      background: #222;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 2px;
+    }
+
+    .xp-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #00bcd4, #2196f3);
+      width: 0%;
+      transition: width 0.3s;
+    }
 
     #status {
-      position: fixed; bottom: calc(115px + env(safe-area-inset-bottom, 0px)); left: 50%; transform: translateX(-50%);
-      background: rgba(0, 0, 0, 0.92); padding: 10px 20px; border-radius: 10px;
-      font-size: 13px; opacity: 0; transition: opacity 0.3s; pointer-events: none;
-      white-space: nowrap; z-index: 100; border: 1px solid rgba(255, 255, 255, 0.12);
+      position: fixed;
+      bottom: calc(115px + env(safe-area-inset-bottom, 0px));
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.92);
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-size: 13px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+      white-space: nowrap;
+      z-index: 100;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      max-width: 92vw;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
-    #status.show { opacity: 1; }
+
+    #status.show {
+      opacity: 1;
+    }
 
     .prestige-overlay {
-      position: fixed; inset: 0; z-index: 2000; background: rgba(0,0,0,0.9);
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      opacity: 0; pointer-events: none; transition: opacity 0.5s;
+      position: fixed;
+      inset: 0;
+      z-index: 2000;
+      background: rgba(0, 0, 0, 0.9);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s;
     }
-    .prestige-overlay.show { opacity: 1; pointer-events: all; }
-    .prestige-glow { font-size: 80px; animation: prestigePop 1s ease-out infinite alternate; }
+
+    .prestige-overlay.show {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .prestige-glow {
+      font-size: 80px;
+      animation: prestigePop 1s ease-out infinite alternate;
+    }
+
     @keyframes prestigePop {
       0% { transform: scale(1); filter: drop-shadow(0 0 10px #8a2be2); }
       100% { transform: scale(1.2); filter: drop-shadow(0 0 30px #da70d6); }
     }
-    .prestige-text { font-size: 32px; font-weight: 900; margin-top: 20px; background: linear-gradient(90deg, #8a2be2, #da70d6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+    .prestige-text {
+      font-size: 32px;
+      font-weight: 900;
+      margin-top: 20px;
+      background: linear-gradient(90deg, #8a2be2, #da70d6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
   </style>
 </head>
 <body>
 
-  <!-- Екран завантаження -->
   <div id="loading-screen">
     <div class="loader"></div>
     <div class="loading-text" data-i18n="loading">Loading...</div>
   </div>
 
-  <!-- АВТОРИЗАЦІЯ -->
   <div id="auth-screen" class="hidden">
     <div class="auth-logo-img">🐭</div>
     <div class="auth-title">Hamka</div>
@@ -510,28 +1497,27 @@
     <div class="auth-form">
       <div class="input-wrap">
         <span class="input-icon">👤</span>
-        <input type="text" id="auth-nickname" class="auth-input" placeholder="Nickname (latin)" autocomplete="username">
+        <input type="text" id="auth-nickname" class="auth-input" placeholder="Nickname (3-16 chars)" maxlength="16" autocomplete="username" />
       </div>
       <div class="input-wrap">
         <span class="input-icon">🔑</span>
-        <input type="password" id="auth-password" class="auth-input" placeholder="Password (min. 6)" autocomplete="current-password">
+        <input type="password" id="auth-password" class="auth-input" placeholder="Password (min. 6)" autocomplete="current-password" />
       </div>
-      
+
       <div class="auth-error" id="auth-error"></div>
 
-      <button class="auth-btn btn-green" id="auth-submit" data-i18n="btn_login">👉 Login</button>
-      
+      <button type="button" class="auth-btn btn-green" id="auth-submit" data-i18n="btn_login">👉 Login</button>
       <div class="auth-divider" data-i18n="or">or</div>
-      <button class="auth-btn btn-blue" id="tg-login-btn" data-i18n="btn_tg">📱 Login via Telegram</button>
+      <button type="button" class="auth-btn btn-blue" id="tg-login-btn" data-i18n="btn_tg">📱 Login via Telegram</button>
     </div>
   </div>
 
-  <!-- ГРА -->
   <div id="game-screen">
     <div class="top-stats">
       <div class="top-stats-group">
         <div class="stat-pill"><span class="icon">🪙</span> <span id="top-coins">0</span></div>
         <div class="stat-pill"><span class="icon">🐹</span> <span id="top-homs">0</span></div>
+        <div id="active-boost-badge" class="boost-badge">⚡ <span id="active-boost-text"></span></div>
       </div>
       <div style="display:flex; gap:8px; align-items:center;">
         <div class="admin-btn-badge" id="admin-btn-badge" onclick="document.getElementById('modal-admin').classList.add('show')">🛠 Admin</div>
@@ -549,7 +1535,6 @@
       <div class="menu-item" data-page="settings"><div class="menu-icon-wrap">⚙️</div><span data-i18n="menu_settings">Settings</span></div>
     </div>
 
-    <!-- ТАП -->
     <div class="page active" id="page-tap">
       <div class="tap-area" id="tap-area">
         <div class="coin-counter">
@@ -562,7 +1547,6 @@
       </div>
     </div>
 
-    <!-- МАГАЗИН -->
     <div class="page" id="page-shop">
       <div class="shop-container">
         <div class="shop-tabs">
@@ -575,80 +1559,100 @@
       </div>
     </div>
 
-    <!-- МІНІ-ІГРИ -->
     <div class="page crypto-page" id="page-minigames">
-      <div class="inventory-title" style="text-align:center; font-size: 20px; margin-bottom: 16px;" data-i18n="menu_games">🎲 Mini-games</div>
-      
-      <div class="shop-tabs" style="margin-bottom: 16px;">
+      <div class="inventory-title" style="text-align:center; font-size: 20px; margin-bottom: 14px;" data-i18n="menu_games">🎲 Mini-games</div>
+
+      <div class="shop-tabs" style="margin-bottom: 14px; padding: 0;">
         <div class="shop-tab active" id="minitab-crypto">₿ Crypto</div>
         <div class="shop-tab" id="minitab-roulette" data-i18n="roulette">🎰 Roulette</div>
       </div>
 
-      <!-- Крипта -->
       <div id="mini-content-crypto">
         <div id="crypto-list"></div>
       </div>
 
-      <!-- Рулетка -->
       <div id="mini-content-roulette" style="display:none; text-align: center;">
         <div class="crypto-card">
           <div style="font-size: 18px; font-weight: 700; color: #f5a623; margin-bottom: 8px;" data-i18n="roulette_title">Roulette for Ad</div>
-          <div style="font-size: 12px; color: #aaa; margin-bottom: 16px;" data-i18n="roulette_desc">Spin and get coins, XP, Homs or exclusive items!</div>
-          
-          <div class="roulette-container" style="margin-bottom: 16px;">
+          <div style="font-size: 12px; color: #aaa; margin-bottom: 14px;" data-i18n="roulette_desc">Spin and get coins, XP, Homs or exclusive items!</div>
+
+          <div class="roulette-container" style="margin-bottom: 14px;">
             <div class="roulette-pointer"></div>
             <div class="roulette-strip" id="roulette-strip"></div>
           </div>
 
-          <button class="auth-btn btn-green" id="btn-spin-roulette" style="width:100%;" data-i18n="spin_btn">🎬 Spin for Ad</button>
+          <button type="button" class="auth-btn btn-green" id="btn-spin-roulette" style="width:100%; max-width:none;" data-i18n="spin_btn">🎬 Spin for Ad</button>
         </div>
       </div>
     </div>
 
-    <!-- ПРОФІЛЬ -->
     <div class="page scroll-page" id="page-profile">
       <div class="profile-card">
-        <div class="profile-avatar-wrap">
-          <div class="profile-avatar" id="prof-avatar">🐭</div>
-        </div>
-        
-        <div class="profile-name-wrap">
-          <div class="profile-name" id="prof-nickname">Player</div>
-          <button class="edit-name-btn" id="btn-change-nickname">✏️</button>
-        </div>
-        <div class="profile-id" id="prof-public-id">ID: 000000</div>
+        <div id="prof-banner" class="profile-banner-bg"></div>
+        <div class="profile-card-inner">
+          <div class="profile-avatar-wrap">
+            <div class="profile-avatar" id="prof-avatar">🐭</div>
+          </div>
 
-        <div class="profile-title-badge" id="prof-title-badge">
-          <span id="prof-title">Beginner</span>
-        </div>
-        
-        <div class="profile-stats">
-          <div class="profile-stat-item">
-            <div class="profile-stat-val" id="prof-coins">0</div>
-            <div class="profile-stat-lbl" data-i18n="coins">Coins</div>
+          <div class="profile-name-wrap">
+            <div class="profile-name" id="prof-nickname">Player</div>
+            <button type="button" class="edit-name-btn" id="btn-change-nickname">✏️</button>
           </div>
-          <div class="profile-stat-item">
-            <div class="profile-stat-val" id="prof-homs">0</div>
-            <div class="profile-stat-lbl" data-i18n="homs">Homs</div>
+          <div class="profile-id" id="prof-public-id">ID: 000000</div>
+
+          <div class="profile-title-badge" id="prof-title-badge">
+            <span id="prof-title">Beginner</span>
           </div>
-          <div class="profile-stat-item">
-            <div class="profile-stat-val" id="prof-xp">0</div>
-            <div class="profile-stat-lbl">XP</div>
-          </div>
-          <div class="profile-stat-item">
-            <div class="profile-stat-val" id="prof-prestige">0</div>
-            <div class="profile-stat-lbl" data-i18n="prestige">Prestige</div>
+
+          <div class="profile-stats">
+            <div class="profile-stat-item">
+              <div class="profile-stat-val" id="prof-coins">0</div>
+              <div class="profile-stat-lbl" data-i18n="coins">Coins</div>
+            </div>
+            <div class="profile-stat-item">
+              <div class="profile-stat-val" id="prof-homs">0</div>
+              <div class="profile-stat-lbl" data-i18n="homs">Homs</div>
+            </div>
+            <div class="profile-stat-item">
+              <div class="profile-stat-val" id="prof-xp">0</div>
+              <div class="profile-stat-lbl">XP</div>
+            </div>
+            <div class="profile-stat-item">
+              <div class="profile-stat-val" id="prof-prestige">0</div>
+              <div class="profile-stat-lbl" data-i18n="prestige">Prestige</div>
+            </div>
           </div>
         </div>
       </div>
 
-      <div class="prestige-section">
-        <div style="font-size: 18px; font-weight: 800; color: #da70d6;" data-i18n="prestige_title">🌟 Prestige</div>
-        <div style="font-size: 12px; color: #aaa; margin-top: 4px;" id="prestige-info">Required 1,000,000 XP</div>
+      <!-- Серія та престижі внизу профілю в 1 ряд -->
+      <div class="streak-prestige-row">
+        <div class="streak-prestige-col">
+          <div>
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:4px; margin-bottom:4px;">
+              <div class="shop-card-title" style="font-size:13px; margin-bottom:0;" data-i18n="streak_title">🔥 Серія</div>
+              <span class="season-badge" id="streak-days-badge" style="padding:2px 7px; font-size:10px;">0 дн.</span>
+            </div>
+            <div class="shop-card-desc" id="streak-desc"></div>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <button type="button" class="shop-card-btn" id="btn-claim-streak" style="display:none; width:100%;">🎁 Забрати</button>
+            <button type="button" class="shop-card-btn" id="btn-restore-streak" style="display:none; width:100%;"></button>
+          </div>
+        </div>
+
+        <div class="streak-prestige-col" style="background: rgba(138, 43, 226, 0.12); border-color: rgba(138, 43, 226, 0.35);">
+          <div>
+            <div class="shop-card-title" style="font-size:13px; color:#da70d6;" data-i18n="prestige_title">🌟 Престиж</div>
+            <div class="shop-card-desc" id="prestige-info">Required 1,000,000 XP</div>
+          </div>
+          <div class="shop-card-desc" style="color:#d0b8ff;">
+            Банери за престиж: 1, 3, 5 🌟
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- ІНВЕНТАР -->
     <div class="page scroll-page" id="page-inventory">
       <div class="inventory-section" id="cases-section" style="display:none;">
         <div class="inventory-title" data-i18n="cases_title">📦 Cases</div>
@@ -656,31 +1660,39 @@
       </div>
 
       <div class="inventory-section">
+        <div class="inventory-title" data-i18n="banners_title">🖼️ Banners</div>
+        <div class="inventory-grid" id="inv-banners"></div>
+      </div>
+
+      <div class="inventory-section">
         <div class="inventory-title" data-i18n="titles_title">Titles</div>
         <div class="inventory-grid" id="inv-titles"></div>
       </div>
+
       <div class="inventory-section">
         <div class="inventory-title" data-i18n="avatars_title">Avatars</div>
         <div class="inventory-grid" id="inv-avatars"></div>
       </div>
+
       <div class="inventory-section">
         <div class="inventory-title" data-i18n="skins_title">Skins</div>
         <div class="inventory-grid" id="inv-skins"></div>
       </div>
     </div>
 
-    <!-- ТОП -->
     <div class="page scroll-page" id="page-top">
-      <div class="inventory-title" style="text-align:center; font-size: 20px; margin-bottom: 12px;" data-i18n="top_title">🏆 Leaderboard</div>
+      <div class="top-header-bar">
+        <div class="inventory-title" style="font-size: 19px; margin-bottom: 0;" data-i18n="top_title">🏆 Leaderboard</div>
+        <button type="button" class="top-rewards-btn" id="btn-month-rewards" data-i18n="month_rewards_btn">🏅 Нагороди в кінці місяця</button>
+      </div>
       <div id="leaderboard-list"></div>
     </div>
 
-    <!-- НАЛАШТУВАННЯ -->
     <div class="page scroll-page" id="page-settings">
       <div class="inventory-title" style="text-align:center; font-size: 20px; margin-bottom: 16px;" data-i18n="settings_title">⚙️ Settings</div>
-      
+
       <div class="settings-group">
-        <span class="settings-label" data-i18n="lang_label">Language / Мова / Язык</span>
+        <label for="language-select" class="settings-label" data-i18n="lang_label">Language / Мова / Язык</label>
         <select class="settings-select" id="language-select">
           <option value="en">English</option>
           <option value="uk">Українська</option>
@@ -692,22 +1704,21 @@
         <div class="settings-toggle-row">
           <span class="settings-label" style="margin-bottom:0;" data-i18n="hide_top_label">Hide me from Leaderboard</span>
           <label class="toggle-switch">
-            <input type="checkbox" id="hide-top-toggle">
+            <input type="checkbox" id="hide-top-toggle" />
             <span class="toggle-slider"></span>
           </label>
         </div>
       </div>
 
       <div class="settings-group">
-        <button class="settings-btn" id="btn-logout" style="background: #ff5252; color: #fff; font-weight: 700;" data-i18n="logout_btn">🚪 Log out</button>
+        <button type="button" class="settings-btn" id="btn-logout" style="background: #ff5252; color: #fff; font-weight: 700;" data-i18n="logout_btn">🚪 Log out</button>
       </div>
     </div>
 
-    <!-- НИЖНЯ ПАНЕЛЬ -->
     <div class="bottom-panel">
       <div class="bottom-stats">
         <span>⚡ <span id="energy-label-text">200/200</span></span>
-        <span>+1 ⚡/s</span>
+        <span>+<span id="auto-energy-label">1</span> ⚡/s</span>
         <span>+<span id="auto-tap-label">0</span> 🪙/s</span>
         <span>🪙 <span id="bottom-coins">0</span></span>
       </div>
@@ -726,47 +1737,64 @@
 
   <div id="status"></div>
 
-  <!-- Модалки -->
+  <div class="modal-overlay" id="modal-month-rewards" onclick="if(event.target===this)this.classList.remove('show')">
+    <div class="modal-content" style="text-align:left;">
+      <div class="modal-title" style="text-align:center;" data-i18n="month_rewards_title">🏅 Нагороди в кінці місяця</div>
+      <div style="font-size:12px; color:#ccc; line-height:1.5; display:flex; flex-direction:column; gap:8px;">
+        <div>🥇 <b>1 місце:</b> Буст монет <b>x3</b> на <b>5 год</b> + титул «🥇 Top 1».</div>
+        <div>🥈 <b>2 місце:</b> Буст монет <b>x3</b> на <b>2 год</b> + титул «🥈 Top 2».</div>
+        <div>🥉 <b>3 місце:</b> Буст монет <b>x2</b> на <b>1 год</b> + титул «🥉 Top 3».</div>
+        <div style="color:#9aa2b1; font-size:11px;">Нагороди нараховуються автоматично при першому вході в наступному місяці.</div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="modal-btn cancel" onclick="document.getElementById('modal-month-rewards').classList.remove('show')" data-i18n="close">Close</button>
+      </div>
+    </div>
+  </div>
+
   <div class="modal-overlay" id="modal-case-qty">
     <div class="modal-content">
       <div class="modal-title" id="case-modal-title" data-i18n="open_case">Open Case</div>
       <div style="font-size: 14px; color: #aaa; margin-bottom: 16px;" id="case-modal-count">Available: 0</div>
       <div style="display:flex; gap:8px; margin-bottom:12px;">
-        <button class="modal-btn confirm" onclick="openCasesBatch(1)">1</button>
-        <button class="modal-btn confirm" onclick="openCasesBatch(5)">5</button>
-        <button class="modal-btn confirm" onclick="openCasesBatch(10)">10</button>
-        <button class="modal-btn confirm" onclick="openCasesBatch('all')" data-i18n="all">All</button>
+        <button type="button" class="modal-btn confirm" onclick="openCasesBatch(1)">1</button>
+        <button type="button" class="modal-btn confirm" onclick="openCasesBatch(5)">5</button>
+        <button type="button" class="modal-btn confirm" onclick="openCasesBatch(10)">10</button>
+        <button type="button" class="modal-btn confirm" onclick="openCasesBatch('all')" data-i18n="all">All</button>
       </div>
       <div class="modal-actions">
-        <button class="modal-btn cancel" onclick="document.getElementById('modal-case-qty').classList.remove('show')" data-i18n="cancel">Cancel</button>
+        <button type="button" class="modal-btn cancel" onclick="document.getElementById('modal-case-qty').classList.remove('show')" data-i18n="cancel">Cancel</button>
       </div>
     </div>
   </div>
 
-  <div class="modal-overlay" id="modal-view-profile">
+  <div class="modal-overlay" id="modal-view-profile" onclick="if(event.target===this)this.classList.remove('show')">
     <div class="modal-content">
-      <div class="modal-title" data-i18n="player_profile">Player Profile</div>
-      <div class="preview-box" id="view-prof-avatar" style="font-size: 50px;">🐭</div>
-      <div style="text-align:center; font-size: 20px; font-weight: 800; margin-bottom: 4px;" id="view-prof-nick">Player</div>
-      <div style="text-align:center; font-size: 12px; color: #666; margin-bottom: 8px;" id="view-prof-id">ID: 000000</div>
-      
-      <div style="text-align:center; margin-bottom:12px;">
-        <span class="profile-title-badge" id="view-prof-title" style="margin-top:0;">Beginner</span>
-      </div>
+      <div id="view-prof-banner" class="profile-banner-bg"></div>
+      <div style="position:relative; z-index:1;">
+        <div class="modal-title" data-i18n="player_profile">Player Profile</div>
+        <div class="preview-box" id="view-prof-avatar" style="font-size: 50px;">🐭</div>
+        <div style="text-align:center; font-size: 20px; font-weight: 800; margin-bottom: 4px;" id="view-prof-nick">Player</div>
+        <div style="text-align:center; font-size: 12px; color: #aaa; margin-bottom: 8px;" id="view-prof-id">ID: 000000</div>
 
-      <div style="display:flex; justify-content:space-around; background:rgba(255,255,255,0.05); padding:10px; border-radius:10px; margin-bottom:12px;">
-        <div style="text-align:center;">
-          <div style="font-weight:700; color:#f5a623;" id="view-prof-xp">0</div>
-          <div style="font-size:10px; color:#888;">XP</div>
+        <div style="text-align:center; margin-bottom:12px;">
+          <span class="profile-title-badge" id="view-prof-title" style="margin-top:0;">Beginner</span>
         </div>
-        <div style="text-align:center;">
-          <div style="font-weight:700; color:#da70d6;" id="view-prof-prestige">0</div>
-          <div style="font-size:10px; color:#888;" data-i18n="prestige">Prestige</div>
-        </div>
-      </div>
 
-      <div class="modal-actions">
-        <button class="modal-btn cancel" onclick="document.getElementById('modal-view-profile').classList.remove('show')" data-i18n="close">Close</button>
+        <div style="display:flex; justify-content:space-around; background:rgba(0,0,0,0.45); padding:10px; border-radius:10px; margin-bottom:12px;">
+          <div style="text-align:center;">
+            <div style="font-weight:700; color:#f5a623;" id="view-prof-xp">0</div>
+            <div style="font-size:10px; color:#aaa;">XP</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-weight:700; color:#da70d6;" id="view-prof-prestige">0</div>
+            <div style="font-size:10px; color:#aaa;" data-i18n="prestige">Prestige</div>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="modal-btn cancel" onclick="document.getElementById('modal-view-profile').classList.remove('show')" data-i18n="close">Close</button>
+        </div>
       </div>
     </div>
   </div>
@@ -774,10 +1802,10 @@
   <div class="modal-overlay" id="modal-nickname">
     <div class="modal-content">
       <div class="modal-title" data-i18n="change_nickname">Change Nickname</div>
-      <input type="text" class="admin-input" id="new-nickname-input" placeholder="New nickname">
+      <input type="text" class="admin-input" id="new-nickname-input" maxlength="16" placeholder="New nickname" />
       <div class="modal-actions">
-        <button class="modal-btn cancel" onclick="document.getElementById('modal-nickname').classList.remove('show')" data-i18n="cancel">Cancel</button>
-        <button class="modal-btn confirm" id="btn-save-nickname" data-i18n="save">Save</button>
+        <button type="button" class="modal-btn cancel" onclick="document.getElementById('modal-nickname').classList.remove('show')" data-i18n="cancel">Cancel</button>
+        <button type="button" class="modal-btn confirm" id="btn-save-nickname" data-i18n="save">Save</button>
       </div>
     </div>
   </div>
@@ -785,19 +1813,19 @@
   <div class="modal-overlay" id="modal-admin">
     <div class="modal-content">
       <div class="modal-title">🛠 Admin Panel</div>
-      <input type="number" class="admin-input" id="admin-coins-input" placeholder="Coins amount">
-      <button class="modal-btn confirm" style="width:100%; margin-bottom:10px;" onclick="adminAddCoins()">Add Coins</button>
+      <input type="number" class="admin-input" id="admin-coins-input" placeholder="Coins amount" />
+      <button type="button" class="modal-btn confirm" style="width:100%; margin-bottom:10px;" onclick="adminAddCoins()">Add Coins</button>
 
-      <input type="number" class="admin-input" id="admin-homs-input" placeholder="Homs amount">
-      <button class="modal-btn confirm" style="width:100%; margin-bottom:10px;" onclick="adminAddHoms()">Add Homs</button>
+      <input type="number" class="admin-input" id="admin-homs-input" placeholder="Homs amount" />
+      <button type="button" class="modal-btn confirm" style="width:100%; margin-bottom:10px;" onclick="adminAddHoms()">Add Homs</button>
 
-      <input type="number" class="admin-input" id="admin-xp-input" placeholder="XP amount">
-      <button class="modal-btn confirm" style="width:100%; margin-bottom:10px;" onclick="adminAddXp()">Add XP</button>
+      <input type="number" class="admin-input" id="admin-xp-input" placeholder="XP amount" />
+      <button type="button" class="modal-btn confirm" style="width:100%; margin-bottom:10px;" onclick="adminAddXp()">Add XP</button>
 
-      <button class="modal-btn confirm" style="width:100%; margin-bottom:10px;" onclick="adminAddCase()">Add Case</button>
+      <button type="button" class="modal-btn confirm" style="width:100%; margin-bottom:10px;" onclick="adminAddCase()">Add Case</button>
 
       <div class="modal-actions">
-        <button class="modal-btn cancel" onclick="document.getElementById('modal-admin').classList.remove('show')">Close</button>
+        <button type="button" class="modal-btn cancel" onclick="document.getElementById('modal-admin').classList.remove('show')">Close</button>
       </div>
     </div>
   </div>
@@ -806,7 +1834,7 @@
     <div class="case-opening-box" id="case-opening-box">📦</div>
     <div class="case-reward-text" id="case-reward-text"></div>
     <div class="modal-actions" style="width: 100%; max-width: 300px; margin-top: 30px;">
-      <button class="modal-btn confirm" id="btn-close-case" data-i18n="take">Take</button>
+      <button type="button" class="modal-btn confirm" id="btn-close-case" data-i18n="take">Take</button>
     </div>
   </div>
 
@@ -815,1702 +1843,6 @@
     <div class="prestige-text" id="prestige-text">PRESTIGE 1</div>
   </div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getDatabase, ref, get, set, update, runTransaction, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyD1-UDrqRzfUw_32nOzqT2mAozzab5DJZk",
-      authDomain: "hamka-game.firebaseapp.com",
-      databaseURL: "https://hamka-game-default-rtdb.europe-west1.firebasedatabase.app",
-      projectId: "hamka-game",
-      storageBucket: "hamka-game.firebasestorage.app",
-      messagingSenderId: "975050013138",
-      appId: "1:975050013138:web:19f42c1c5f2b2d35d6300b",
-      measurementId: "G-W4G3ZZ5R68"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-    const auth = getAuth(app);
-
-    const tg = window.Telegram?.WebApp;
-    try { tg?.expand(); tg?.ready(); } catch(e) {}
-
-    let AdController = null;
-    const BOT_LINK = "https://t.me/hamka_game_bot";
-
-    const translations = {
-      en: {
-        loading: "Loading...",
-        auth_subtitle: "Crypto clicker with upgrades",
-        login: "Login",
-        register: "Register",
-        auth_hint: "🔒 Choose login method",
-        btn_login: "👉 Login",
-        or: "or",
-        btn_tg: "📱 Login via Telegram",
-        season: "🏆 Season 1",
-        menu_tap: "Tap",
-        menu_shop: "Shop",
-        menu_games: "Games",
-        menu_profile: "Profile",
-        menu_inventory: "Inventory",
-        menu_top: "Top",
-        menu_settings: "Settings",
-        shop_auto: "Auto",
-        shop_upgrade: "Upgrades",
-        shop_cases: "Cases",
-        shop_cosmetics: "Cosmetics",
-        roulette: "🎰 Roulette",
-        roulette_title: "Roulette for Ad",
-        roulette_desc: "Spin and get coins, XP, Homs or exclusive items!",
-        spin_btn: "🎬 Spin for Ad",
-        coins: "Coins",
-        homs: "Homs",
-        prestige: "Prestige",
-        prestige_title: "🌟 Prestige",
-        cases_title: "📦 Cases",
-        titles_title: "Titles",
-        avatars_title: "Avatars",
-        skins_title: "Skins",
-        top_title: "🏆 Leaderboard",
-        settings_title: "⚙️ Settings",
-        lang_label: "Language / Мова / Язык",
-        hide_top_label: "Hide me from Leaderboard",
-        logout_btn: "🚪 Log out",
-        all: "All",
-        cancel: "Cancel",
-        close: "Close",
-        player_profile: "Player Profile",
-        change_nickname: "Change Nickname",
-        save: "Save",
-        take: "Take",
-        energy: "Energy",
-        buy: "Buy",
-        sell: "Sell",
-        owned: "Owned",
-        max: "MAX",
-        open_case: "Open Case",
-        promo_title: "🎟 Referral Promo Code",
-        promo_desc: "Share your code! Friend gets 1 Basic Case, you get 1 Legendary Case (x10 loot)!",
-        promo_enter_placeholder: "Enter friend's promo code",
-        promo_activate: "Activate",
-        promo_share: "Share",
-        promo_already_used: "✅ You have already activated a referral promo code"
-      },
-      uk: {
-        loading: "Завантаження...",
-        auth_subtitle: "Крипто-клікер з апгрейдами",
-        login: "Вхід",
-        register: "Реєстрація",
-        auth_hint: "🔒 Виберіть спосіб входу",
-        btn_login: "👉 Увійти",
-        or: "або",
-        btn_tg: "📱 Увійти через Telegram",
-        season: "🏆 Сезон 1",
-        menu_tap: "Гра",
-        menu_shop: "Магазин",
-        menu_games: "Ігри",
-        menu_profile: "Профіль",
-        menu_inventory: "Інвентар",
-        menu_top: "Топ",
-        menu_settings: "Налаштування",
-        shop_auto: "Авто",
-        shop_upgrade: "Прокачка",
-        shop_cases: "Кейси",
-        shop_cosmetics: "Косметика",
-        roulette: "🎰 Рулетка",
-        roulette_title: "Рулетка за рекламу",
-        roulette_desc: "Крути та отримуй монети, XP, Хоми або ексклюзиви!",
-        spin_btn: "🎬 Крутити за рекламу",
-        coins: "Монети",
-        homs: "Хоми",
-        prestige: "Престиж",
-        prestige_title: "🌟 Престиж",
-        cases_title: "📦 Кейси",
-        titles_title: "Титули",
-        avatars_title: "Аватарки",
-        skins_title: "Скіни",
-        top_title: "🏆 Топ гравців",
-        settings_title: "⚙️ Налаштування",
-        lang_label: "Мова / Language / Язык",
-        hide_top_label: "Не показувати мене в топі",
-        logout_btn: "🚪 Вийти з акаунта",
-        all: "Всі",
-        cancel: "Скасувати",
-        close: "Закрити",
-        player_profile: "Профіль гравця",
-        change_nickname: "Змінити нікнейм",
-        save: "Зберегти",
-        take: "Забрати",
-        energy: "Енергія",
-        buy: "Купити",
-        sell: "Продати",
-        owned: "Куплено",
-        max: "МАКС",
-        open_case: "Відкрити кейс",
-        promo_title: "🎟 Реферальний промокод",
-        promo_desc: "Ділися кодом! Друг отримає 1 Базовий кейс, а ти — 1 Легендарний кейс (лут x10)!",
-        promo_enter_placeholder: "Введіть промокод друга",
-        promo_activate: "Активувати",
-        promo_share: "Поділитися",
-        promo_already_used: "✅ Ви вже активували реферальний промокод"
-      },
-      ru: {
-        loading: "Загрузка...",
-        auth_subtitle: "Крипто-кликер с апгрейдами",
-        login: "Вход",
-        register: "Регистрация",
-        auth_hint: "🔒 Выберите способ входа",
-        btn_login: "👉 Войти",
-        or: "или",
-        btn_tg: "📱 Войти через Telegram",
-        season: "🏆 Сезон 1",
-        menu_tap: "Игра",
-        menu_shop: "Магазин",
-        menu_games: "Игры",
-        menu_profile: "Профиль",
-        menu_inventory: "Инвентарь",
-        menu_top: "Топ",
-        menu_settings: "Настройки",
-        shop_auto: "Авто",
-        shop_upgrade: "Прокачка",
-        shop_cases: "Кейсы",
-        shop_cosmetics: "Косметика",
-        roulette: "🎰 Рулетка",
-        roulette_title: "Рулетка за рекламу",
-        roulette_desc: "Крути и получай монеты, XP, Хомы или эксклюзивы!",
-        spin_btn: "🎬 Крутить за рекламу",
-        coins: "Монеты",
-        homs: "Хомы",
-        prestige: "Престиж",
-        prestige_title: "🌟 Престиж",
-        cases_title: "📦 Кейсы",
-        titles_title: "Титулы",
-        avatars_title: "Аватарки",
-        skins_title: "Скины",
-        top_title: "🏆 Топ игроков",
-        settings_title: "⚙️ Настройки",
-        lang_label: "Язык / Language / Мова",
-        hide_top_label: "Не показывать меня в топе",
-        logout_btn: "🚪 Выйти из аккаунта",
-        all: "Все",
-        cancel: "Отмена",
-        close: "Закрыть",
-        player_profile: "Профиль игрока",
-        change_nickname: "Изменить никнейм",
-        save: "Сохранить",
-        take: "Забрать",
-        energy: "Энергия",
-        buy: "Купить",
-        sell: "Продать",
-        owned: "Куплено",
-        max: "МАКС",
-        open_case: "Открыть кейс",
-        promo_title: "🎟 Реферальный промокод",
-        promo_desc: "Делись кодом! Друг получит 1 Базовый кейс, а ты — 1 Легендарный кейс (лут x10)!",
-        promo_enter_placeholder: "Введите промокод друга",
-        promo_activate: "Активировать",
-        promo_share: "Поделиться",
-        promo_already_used: "✅ Вы уже активировали реферальный промокод"
-      }
-    };
-
-    let currentLang = localStorage.getItem('hamka_lang') || 'en';
-
-    function setLanguage(lang) {
-      if (!translations[lang]) lang = 'en';
-      currentLang = lang;
-      localStorage.setItem('hamka_lang', lang);
-      
-      document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.getAttribute('data-i18n');
-        if (translations[lang][key]) {
-          el.innerText = translations[lang][key];
-        }
-      });
-
-      const langSelect = document.getElementById('language-select');
-      if (langSelect) langSelect.value = lang;
-    }
-
-    const loadingScreen = document.getElementById('loading-screen');
-    const authScreen = document.getElementById('auth-screen');
-    const gameScreen = document.getElementById('game-screen');
-    const tabLogin = document.getElementById('tab-login');
-    const tabRegister = document.getElementById('tab-register');
-    const authNickname = document.getElementById('auth-nickname');
-    const authPassword = document.getElementById('auth-password');
-    const authError = document.getElementById('auth-error');
-    const authSubmit = document.getElementById('auth-submit');
-    const tgLoginBtn = document.getElementById('tg-login-btn');
-    const adminBtnBadge = document.getElementById('admin-btn-badge');
-
-    const tapCoinDisplay = document.getElementById('tap-coin-display');
-    const topCoins = document.getElementById('top-coins');
-    const topHoms = document.getElementById('top-homs');
-    const bottomCoins = document.getElementById('bottom-coins');
-    const energyDisplay = document.getElementById('energy-label-text');
-    const energyDisplayBottom = document.getElementById('energy-label-bottom');
-    const energyBar = document.getElementById('energy-bar');
-    const hamster = document.getElementById('hamster');
-    const tapArea = document.getElementById('tap-area');
-    const statusEl = document.getElementById('status');
-    const cryptoListEl = document.getElementById('crypto-list');
-    const shopListEl = document.getElementById('shop-list');
-    const leaderboardList = document.getElementById('leaderboard-list');
-    
-    const xpDisplay = document.getElementById('xp-display');
-    const xpNext = document.getElementById('xp-next');
-    const xpBar = document.getElementById('xp-bar');
-    const levelName = document.getElementById('level-name');
-    const autoTapLabel = document.getElementById('auto-tap-label');
-
-    const profAvatar = document.getElementById('prof-avatar');
-    const profNickname = document.getElementById('prof-nickname');
-    const profPublicId = document.getElementById('prof-public-id');
-    const profTitle = document.getElementById('prof-title');
-    const profTitleBadge = document.getElementById('prof-title-badge');
-    const profCoins = document.getElementById('prof-coins');
-    const profHoms = document.getElementById('prof-homs');
-    const profXp = document.getElementById('prof-xp');
-    const profPrestige = document.getElementById('prof-prestige');
-    const prestigeInfo = document.getElementById('prestige-info');
-
-    const invTitles = document.getElementById('inv-titles');
-    const invAvatars = document.getElementById('inv-avatars');
-    const invSkins = document.getElementById('inv-skins');
-    const invCases = document.getElementById('inv-cases');
-    const casesSection = document.getElementById('cases-section');
-
-    const modalViewProfile = document.getElementById('modal-view-profile');
-    const viewProfAvatar = document.getElementById('view-prof-avatar');
-    const viewProfNick = document.getElementById('view-prof-nick');
-    const viewProfId = document.getElementById('view-prof-id');
-    const viewProfTitle = document.getElementById('view-prof-title');
-    const viewProfXp = document.getElementById('view-prof-xp');
-    const viewProfPrestige = document.getElementById('view-prof-prestige');
-
-    const modalNickname = document.getElementById('modal-nickname');
-    const newNicknameInput = document.getElementById('new-nickname-input');
-    const btnSaveNickname = document.getElementById('btn-save-nickname');
-    const btnChangeNickname = document.getElementById('btn-change-nickname');
-
-    const prestigeOverlay = document.getElementById('prestige-overlay');
-    const prestigeText = document.getElementById('prestige-text');
-
-    const caseOpenOverlay = document.getElementById('case-open-overlay');
-    const caseOpeningBox = document.getElementById('case-opening-box');
-    const caseRewardText = document.getElementById('case-reward-text');
-    const btnCloseCase = document.getElementById('btn-close-case');
-
-    const btnSpinRoulette = document.getElementById('btn-spin-roulette');
-    const rouletteStrip = document.getElementById('roulette-strip');
-
-    const languageSelect = document.getElementById('language-select');
-    const hideTopToggle = document.getElementById('hide-top-toggle');
-    const btnLogout = document.getElementById('btn-logout');
-
-    const minitabCrypto = document.getElementById('minitab-crypto');
-    const minitabRoulette = document.getElementById('minitab-roulette');
-    const miniContentCrypto = document.getElementById('mini-content-crypto');
-    const miniContentRoulette = document.getElementById('mini-content-roulette');
-
-    let isLoginMode = true;
-    let state = { 
-      coins: 0, homs: 0, energy: 200, maxEnergy: 200, xp: 0, prestige: 0,
-      title: 'Beginner', avatar: '🐭', nickname: '', publicId: '',
-      activeSkin: 'default', holdings: {},
-      purchasedTitles: [], purchasedAvatars: [], purchasedSkins: [],
-      cases: {}, legendaryCases: 0,
-      adWatches: 0,
-      usedReferralCode: false,
-      hideFromTop: false,
-      upgrades: { 
-        tapLevel: 0, tapPower: 1, xpPerTap: 1, 
-        autoTapRate: 0, autoXpRate: 0, energyRate: 1, caseChance: 0
-      }
-    };
-    let pendingTap = false;
-    let lastTapTime = 0;
-    let unsubscribeUserData = null;
-    let gameLoop = null;
-    let cryptoInterval = null;
-    let currentUid = null;
-    let currentShopTab = 'auto';
-    let isAdmin = false;
-    let selectedCaseTypeToOpen = null;
-
-    const GITHUB_RAW = "https://raw.githubusercontent.com/lolord1k228-create/hamka-game/main/skins/";
-    const SKINS = [
-      { id: 'skin_ai', name: 'AIHamster', file: 'ai_hamster.png', price: 50000 },
-      { id: 'skin_neon', name: 'Neon Hamster', file: 'hamster.png', price: 5000000 },
-      { id: 'skin_hom', name: 'HomHamster', file: 'homhamster.png', price: 1500, currency: 'homs' }
-    ];
-
-    let TITLES = [];
-    let AVATARS = [];
-
-    const CASE_TITLES = [
-      { name: 'Case Legend', color: 'linear-gradient(90deg, #ff0000, #ff8c00)' },
-      { name: 'Lootbox King', color: 'linear-gradient(90deg, #00ff00, #00bfff)' },
-      { name: 'Chosen', color: 'linear-gradient(90deg, #ffffff, #ffd700)' },
-      { name: 'Shadow', color: 'linear-gradient(90deg, #2f4f4f, #000000)' }
-    ];
-
-    const TOP_TITLES = [
-      { name: '🥇 Top 1', color: 'linear-gradient(90deg, #ffd700, #ff8c00)' },
-      { name: '🥈 Top 2', color: 'linear-gradient(90deg, #c0c0c0, #808080)' },
-      { name: '🥉 Top 3', color: 'linear-gradient(90deg, #cd7f32, #8b4513)' }
-    ];
-
-    const LEVELS = [
-      { name: '0 beginner', xp: 0 },
-      { name: '1 beginner', xp: 50 },
-      { name: '2 beginner', xp: 200 },
-      { name: '3 beginner', xp: 500 },
-      { name: '4 beginner', xp: 1500 },
-      { name: 'bronze 1', xp: 5000 },
-      { name: 'bronze 2', xp: 10000 },
-      { name: 'bronze 3', xp: 15000 },
-      { name: 'silver 1', xp: 50000 },
-      { name: 'silver 2', xp: 1000000 },
-      { name: 'silver 3', xp: 150000 },
-      { name: 'gold 1', xp: 300000 },
-      { name: 'gold 2', xp: 600000 },
-      { name: 'gold 3', xp: 900000 }
-    ];
-
-    const COINS = ['OLDHAM', 'NEWHAM', 'HAM', 'BHAM', 'PLAYERHOM'];
-    const INITIAL_PRICES = { OLDHAM: 100, NEWHAM: 250, HAM: 500, BHAM: 1000, PLAYERHOM: 50 };
-
-    const SHOP_ITEMS = {
-      auto: [
-        { id: 'autoTap', title: 'Auto Tap', desc: '+1 coin/sec', basePrice: 200, multiplier: 2, maxLevel: 999 },
-        { id: 'autoXp', title: 'Auto XP', desc: '+1 XP/sec', basePrice: 1500, multiplier: 2, maxLevel: 999 },
-        { id: 'energyRate', title: '+Energy Regen', desc: '+1 energy/sec', basePrice: 1000, multiplier: 10, maxLevel: 999 },
-      ],
-      upgrade: [
-        { id: 'tap', title: 'Tap Power', desc: '+1 coin per tap', basePrice: 50, multiplier: 10, maxLevel: 9, prices: [50, 200, 2000, 5000, 20000, 50000, 150000, 500000, 2000000] },
-        { id: 'xpTap', title: 'XP Tap', desc: '+1 XP per tap', basePrice: 50000, multiplier: 10, maxLevel: 999, prices: [50000, 500000, 5000000, 50000000, 500000000] },
-        { id: 'maxEnergy', title: 'Max Energy', desc: '+50 max energy', basePrice: 50000, multiplier: 10, maxLevel: 999, prices: [50000, 500000, 5000000, 50000000, 500000000] },
-      ]
-    };
-
-    function getShopPrice(itemId, level) {
-      const allItems = [...SHOP_ITEMS.auto, ...SHOP_ITEMS.upgrade];
-      const item = allItems.find(i => i.id === itemId);
-      if (!item) return 0;
-      if (item.prices && level < item.prices.length) return item.prices[level];
-      if (item.prices && level >= item.prices.length) return Infinity;
-      return Math.floor(item.basePrice * Math.pow(item.multiplier, level));
-    }
-
-    function getQty(symbol) {
-      const v = localStorage.getItem('qty_' + symbol);
-      return v ? Math.max(1, parseInt(v) || 1) : 1;
-    }
-    function setQty(symbol, val) { localStorage.setItem('qty_' + symbol, val); }
-
-    function showStatus(text) {
-      statusEl.innerText = text;
-      statusEl.classList.add('show');
-      clearTimeout(showStatus._t);
-      showStatus._t = setTimeout(() => statusEl.classList.remove('show'), 2500);
-    }
-
-    function formatNumber(num) {
-      if (num >= 1e9) return (num / 1e9).toFixed(1) + 'B';
-      if (num >= 1e6) return (num / 1e6).toFixed(1) + 'M';
-      if (num >= 1e3) return (num / 1e3).toFixed(1) + 'K';
-      return Math.floor(num).toString();
-    }
-
-    function formatPrice(p) {
-      if (p >= 1e6) return (p / 1e6).toFixed(2) + 'M';
-      if (p >= 1e3) return (p / 1e3).toFixed(2) + 'K';
-      return p.toFixed(2);
-    }
-
-    languageSelect.addEventListener('change', (e) => {
-      setLanguage(e.target.value);
-      if (currentUid) {
-        update(ref(db, 'users/' + currentUid), { language: e.target.value });
-      }
-    });
-
-    hideTopToggle.addEventListener('change', async (e) => {
-      const val = e.target.checked;
-      state.hideFromTop = val;
-      if (currentUid) {
-        await update(ref(db, 'users/' + currentUid), { hideFromTop: val });
-        showStatus('✅ Updated settings');
-      }
-    });
-
-    btnLogout.addEventListener('click', async () => {
-      try {
-        await signOut(auth);
-        showStatus('Logged out');
-      } catch(e) {}
-    });
-
-    setAuthMode(true);
-    function setAuthMode(loginMode) {
-      isLoginMode = loginMode;
-      if (loginMode) {
-        tabLogin.classList.add('active');
-        tabRegister.classList.remove('active');
-        authSubmit.innerHTML = '👉 Login';
-      } else {
-        tabRegister.classList.add('active');
-        tabLogin.classList.remove('active');
-        authSubmit.innerHTML = '📝 Register';
-      }
-      authError.innerText = '';
-    }
-    tabLogin.addEventListener('click', () => setAuthMode(true));
-    tabRegister.addEventListener('click', () => setAuthMode(false));
-
-    function nickToEmail(nick) {
-      if (nick.includes('@')) return nick.trim();
-      const cleanNick = nick.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
-      if (cleanNick.length < 3) return null;
-      return cleanNick + '@hamka.game';
-    }
-
-    async function autoLoginTelegram() {
-      const tgUser = tg?.initDataUnsafe?.user;
-      if (!tgUser) {
-        loadingScreen.style.display = 'none';
-        authScreen.classList.remove('hidden');
-        return;
-      }
-      const email = `tg_${tgUser.id}@hamka.test`;
-      const password = `Tg_${tgUser.id}_SecurePass_2026!`;
-      try {
-        await signInWithEmailAndPassword(auth, email, password);
-      } catch (e) {
-        try {
-          await createUserWithEmailAndPassword(auth, email, password);
-        } catch (createErr) {
-          loadingScreen.style.display = 'none';
-          authScreen.classList.remove('hidden');
-        }
-      }
-    }
-
-    autoLoginTelegram();
-
-    authSubmit.addEventListener('click', async () => {
-      const nick = authNickname.value.trim();
-      const password = authPassword.value;
-      if (!nick) { authError.innerText = 'Enter nickname'; return; }
-      if (password.length < 6) { authError.innerText = 'Password min 6 chars'; return; }
-      const email = nickToEmail(nick);
-      if (!email) { authError.innerText = 'Invalid nickname'; return; }
-
-      authSubmit.disabled = true;
-      try {
-        if (isLoginMode) {
-          await signInWithEmailAndPassword(auth, email, password);
-        } else {
-          await createUserWithEmailAndPassword(auth, email, password);
-        }
-      } catch (err) {
-        authError.innerText = err.message;
-      } finally {
-        authSubmit.disabled = false;
-      }
-    });
-
-    tgLoginBtn.addEventListener('click', async () => {
-      const tgUser = tg?.initDataUnsafe?.user;
-      if (!tgUser) { authError.innerText = 'Open via Telegram bot'; return; }
-      try {
-        await signInWithEmailAndPassword(auth, `tg_${tgUser.id}@hamka.test`, `Tg_${tgUser.id}_SecurePass_2026!`);
-      } catch (e) {
-        try {
-          await createUserWithEmailAndPassword(auth, `tg_${tgUser.id}@hamka.test`, `Tg_${tgUser.id}_SecurePass_2026!`);
-        } catch (err) {}
-      }
-    });
-
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        currentUid = user.uid;
-        loadingScreen.style.display = 'none';
-        authScreen.classList.add('hidden');
-        gameScreen.classList.add('visible');
-        
-        if (typeof window.Adsgram !== 'undefined') {
-          try { AdController = window.Adsgram.init({ blockId: "59759" }); } catch (e) {}
-        }
-
-        loadGameData().then(() => {
-          initGame(user.uid);
-          initCryptoSystem();
-          checkAdminStatus(user.uid);
-          initRoulette();
-        });
-      } else {
-        currentUid = null;
-        loadingScreen.style.display = 'none';
-        authScreen.classList.remove('hidden');
-        gameScreen.classList.remove('visible');
-        if (unsubscribeUserData) { unsubscribeUserData(); unsubscribeUserData = null; }
-        if (gameLoop) { clearInterval(gameLoop); gameLoop = null; }
-        if (cryptoInterval) { clearInterval(cryptoInterval); cryptoInterval = null; }
-      }
-    });
-
-    document.querySelectorAll('.menu-item[data-page]').forEach(item => {
-      item.addEventListener('click', () => {
-        document.querySelectorAll('.menu-item').forEach(n => n.classList.remove('active'));
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        item.classList.add('active');
-        document.getElementById('page-' + item.dataset.page).classList.add('active');
-        if (item.dataset.page === 'shop') renderShop();
-        if (item.dataset.page === 'profile') renderProfile();
-        if (item.dataset.page === 'inventory') renderInventory();
-        if (item.dataset.page === 'top') loadLeaderboard();
-        if (item.dataset.page === 'minigames') {
-          minitabCrypto.classList.add('active');
-          minitabRoulette.classList.remove('active');
-          miniContentCrypto.style.display = 'block';
-          miniContentRoulette.style.display = 'none';
-        }
-      });
-    });
-
-    minitabCrypto.addEventListener('click', () => {
-      minitabCrypto.classList.add('active');
-      minitabRoulette.classList.remove('active');
-      miniContentCrypto.style.display = 'block';
-      miniContentRoulette.style.display = 'none';
-    });
-
-    minitabRoulette.addEventListener('click', () => {
-      minitabCrypto.classList.remove('active');
-      minitabRoulette.classList.add('active');
-      miniContentCrypto.style.display = 'none';
-      miniContentRoulette.style.display = 'block';
-    });
-
-    document.querySelectorAll('.shop-tab').forEach(tab => {
-      tab.addEventListener('click', () => {
-        document.querySelectorAll('.shop-tab').forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-        currentShopTab = tab.dataset.shopTab;
-        renderShop();
-      });
-    });
-
-    async function loadGameData() {
-      try {
-        const titlesSnap = await get(ref(db, 'game_data/titles'));
-        if (titlesSnap.exists()) {
-          TITLES = Object.keys(titlesSnap.val()).map(id => ({ id, ...titlesSnap.val()[id] }));
-        } else {
-          TITLES = [
-            { id: 'beg', name: 'Beginner', price: 0, color: 'linear-gradient(90deg, #555, #777)', reqPrestige: 0 },
-            { id: 'brnz', name: 'Bronze Hamster', price: 0, color: 'linear-gradient(90deg, #cd7f32, #8b4513)', reqPrestige: 1 },
-            { id: 'slvr', name: 'Silver Hamster', price: 0, color: 'linear-gradient(90deg, #c0c0c0, #808080)', reqPrestige: 2 },
-            { id: 'gld', name: 'Gold Hamster', price: 0, color: 'linear-gradient(90deg, #ffd700, #b8860b)', reqPrestige: 3 },
-            { id: 'crypto_baron', name: 'Crypto Baron', price: 10000, color: 'linear-gradient(90deg, #ff9800, #ff5722)', reqPrestige: 0 },
-            { id: 'tap_god', name: 'Tap God', price: 50000, color: 'linear-gradient(90deg, #00bcd4, #2196f3)', reqPrestige: 0 },
-            { id: 'h_mag', name: 'Хом\'яковий Магнат', price: 100, currency: 'homs', color: 'linear-gradient(90deg, #2ecc71, #27ae60)', reqPrestige: 0 },
-            { id: 'h_lord', name: 'Володар Хомів', price: 500, currency: 'homs', color: 'linear-gradient(90deg, #9b59b6, #8e44ad)', reqPrestige: 0 },
-            { id: 'h_leg', name: 'Легендарний Хом\'як', price: 2000, currency: 'homs', color: 'linear-gradient(90deg, #f1c40f, #e67e22)', reqPrestige: 0 }
-          ];
-        }
-
-        const avatarsSnap = await get(ref(db, 'game_data/avatars'));
-        if (avatarsSnap.exists()) {
-          AVATARS = Object.keys(avatarsSnap.val()).map(id => ({ id, ...avatarsSnap.val()[id] }));
-        } else {
-          AVATARS = [
-            { id: 'dog', name: '🐶', price: 5000 },
-            { id: 'cat', name: '🐱', price: 5000 },
-            { id: 'lion', name: '🦁', price: 15000 },
-            { id: 'panda', name: '🐼', price: 20000 },
-            { id: 'unicorn', name: '🦄', price: 30000 }
-          ];
-        }
-      } catch (err) {}
-    }
-
-    async function loadLeaderboard() {
-      leaderboardList.innerHTML = '<div style="text-align:center; padding:20px; color:#888;">Loading...</div>';
-      try {
-        const snap = await get(ref(db, 'users'));
-        const users = snap.val() || {};
-        const arr = [];
-        for (const uid in users) {
-          const u = users[uid];
-          if (u.hideFromTop) continue;
-          arr.push({ 
-            uid, nickname: u.nickname || 'Player', avatar: u.avatar || '🐭',
-            title: u.title || 'Beginner', activeSkin: u.activeSkin || 'default',
-            publicId: u.publicId || '000000', xp: u.xp || 0, prestige: u.prestige || 0
-          });
-        }
-        arr.sort((a, b) => b.prestige - a.prestige || b.xp - a.xp);
-        const top10 = arr.slice(0, 10);
-
-        leaderboardList.innerHTML = '';
-        top10.forEach((u, i) => {
-          const el = document.createElement('div');
-          el.className = 'leaderboard-item';
-          
-          if (i < 3 && u.uid === currentUid) {
-            const topTitle = TOP_TITLES[i].name;
-            if (!state.purchasedTitles.includes(topTitle)) {
-              update(ref(db, 'users/' + currentUid), { purchasedTitles: [...state.purchasedTitles, topTitle] });
-            }
-          }
-
-          const titleObj = TITLES.find(t => t.name === u.title) || CASE_TITLES.find(t => t.name === u.title) || TOP_TITLES.find(t => t.name === u.title);
-          const titleColor = titleObj ? titleObj.color : 'linear-gradient(90deg, #8a2be2, #da70d6)';
-
-          let avatarHtml = `<div class="lb-avatar">${u.avatar}</div>`;
-          if (u.activeSkin !== 'default') {
-            const skinObj = SKINS.find(s => s.id === u.activeSkin);
-            if (skinObj && skinObj.file) avatarHtml = `<div class="lb-avatar" style="background-image: url('${GITHUB_RAW}${skinObj.file}');"></div>`;
-          }
-
-          el.innerHTML = `
-            <div style="font-size:16px; font-weight:800; color:#f5a623; width:25px;">#${i + 1}</div>
-            ${avatarHtml}
-            <div class="lb-info">
-              <div class="lb-name">${u.nickname}</div>
-              <div class="lb-title" style="background:${titleColor};">${u.title}</div>
-            </div>
-            <div class="lb-stats">
-              <div class="lb-xp">${formatNumber(u.xp)} XP</div>
-              <div class="lb-prestige">🌟 ${u.prestige}</div>
-            </div>
-          `;
-          el.addEventListener('click', () => {
-            viewProfNick.innerText = u.nickname;
-            viewProfId.innerText = 'ID: ' + u.publicId;
-            viewProfTitle.innerText = u.title;
-            viewProfTitle.style.background = titleColor;
-            viewProfXp.innerText = formatNumber(u.xp);
-            viewProfPrestige.innerText = u.prestige;
-            modalViewProfile.classList.add('show');
-          });
-          leaderboardList.appendChild(el);
-        });
-      } catch (err) {}
-    }
-
-    btnChangeNickname.addEventListener('click', () => {
-      newNicknameInput.value = state.nickname;
-      modalNickname.classList.add('show');
-    });
-
-    btnSaveNickname.addEventListener('click', async () => {
-      const newNick = newNicknameInput.value.trim();
-      if (newNick.length < 3) { showStatus('❌ Too short'); return; }
-      await update(ref(db, 'users/' + currentUid), { nickname: newNick });
-      modalNickname.classList.remove('show');
-      showStatus('✅ Saved!');
-    });
-
-    async function checkAdminStatus(uid) {
-      try {
-        const snap = await get(ref(db, 'admins/' + uid));
-        if (snap.exists() && snap.val() === true) {
-          isAdmin = true;
-          adminBtnBadge.style.display = 'flex';
-        }
-      } catch (e) {}
-    }
-
-    window.adminAddCoins = async () => {
-      if (!isAdmin || !currentUid) return;
-      const amount = parseInt(document.getElementById('admin-coins-input').value) || 0;
-      await runTransaction(ref(db, 'users/' + currentUid), d => { if (d) d.coins = (d.coins || 0) + amount; return d; });
-      showStatus('✅ Added coins');
-    };
-    window.adminAddHoms = async () => {
-      if (!isAdmin || !currentUid) return;
-      const amount = parseInt(document.getElementById('admin-homs-input').value) || 0;
-      await runTransaction(ref(db, 'users/' + currentUid), d => { if (d) d.homs = (d.homs || 0) + amount; return d; });
-      showStatus('✅ Added Homs');
-    };
-    window.adminAddXp = async () => {
-      if (!isAdmin || !currentUid) return;
-      const amount = parseInt(document.getElementById('admin-xp-input').value) || 0;
-      await runTransaction(ref(db, 'users/' + currentUid), d => { if (d) d.xp = (d.xp || 0) + amount; return d; });
-      showStatus('✅ Added XP');
-    };
-    window.adminAddCase = async () => {
-      if (!isAdmin || !currentUid) return;
-      await runTransaction(ref(db, 'users/' + currentUid), d => {
-        if (!d) return d;
-        if (!d.cases) d.cases = {};
-        d.cases.basic = (d.cases.basic || 0) + 1;
-        return d;
-      });
-      showStatus('✅ Case added');
-    };
-
-    function initGame(uid) {
-      const userRef = ref(db, 'users/' + uid);
-      
-      get(userRef).then((snap) => {
-        if (!snap.exists()) {
-          const tgUser = tg?.initDataUnsafe?.user;
-          const generatedId = tgUser ? 'tg_' + tgUser.id : Math.floor(100000 + Math.random() * 900000).toString();
-          const defaultNick = tgUser ? (tgUser.username || tgUser.first_name) : 'Player_' + generatedId;
-
-          set(userRef, { 
-            coins: 0, homs: 0, energy: 200, maxEnergy: 200, xp: 0, prestige: 0, 
-            title: 'Beginner', avatar: '🐭', holdings: {},
-            nickname: defaultNick, publicId: generatedId, activeSkin: 'default',
-            tapLevel: 0, tapPower: 1, xpPerTap: 1, autoTapRate: 0, autoXpRate: 0, energyRate: 1,
-            purchasedTitles: [], purchasedAvatars: [], purchasedSkins: [],
-            cases: { basic: 1 }, legendaryCases: 0, adWatches: 0,
-            usedReferralCode: false, hideFromTop: false, language: 'en',
-            createdAt: Date.now()
-          });
-        }
-      }).catch(err => {});
-
-      unsubscribeUserData = onValue(userRef, (snapshot) => {
-        const data = snapshot.val();
-        if (!data) return;
-        if (pendingTap) return;
-
-        state.coins = data.coins || 0;
-        state.homs = data.homs || 0;
-        state.energy = data.energy ?? 200;
-        state.maxEnergy = data.maxEnergy ?? 200;
-        state.xp = data.xp || 0;
-        state.prestige = data.prestige || 0;
-        state.title = data.title || 'Beginner';
-        state.avatar = data.avatar || '🐭';
-        state.nickname = data.nickname || 'Player';
-        state.publicId = data.publicId || '000000';
-        state.holdings = data.holdings || {};
-        state.purchasedTitles = data.purchasedTitles || [];
-        state.purchasedAvatars = data.purchasedAvatars || [];
-        state.purchasedSkins = data.purchasedSkins || [];
-        state.cases = data.cases || {};
-        state.legendaryCases = data.legendaryCases || 0;
-        state.activeSkin = data.activeSkin || 'default';
-        state.adWatches = data.adWatches || 0;
-        state.usedReferralCode = data.usedReferralCode || false;
-        state.hideFromTop = data.hideFromTop || false;
-        
-        if (data.language && data.language !== currentLang) {
-          setLanguage(data.language);
-        } else {
-          setLanguage(currentLang);
-        }
-
-        state.upgrades.tapLevel = data.tapLevel || 0;
-        state.upgrades.tapPower = data.tapPower || 1;
-        state.upgrades.xpPerTap = data.xpPerTap || 1;
-        state.upgrades.autoTapRate = data.autoTapRate || 0;
-        state.upgrades.autoXpRate = data.autoXpRate || 0;
-        state.upgrades.energyRate = data.energyRate || 1;
-
-        hideTopToggle.checked = state.hideFromTop;
-
-        renderUI();
-        checkAutoPrestige();
-        updateHamsterSkin();
-
-        if (document.getElementById('page-shop').classList.contains('active')) renderShop();
-        if (document.getElementById('page-profile').classList.contains('active')) renderProfile();
-        if (document.getElementById('page-inventory').classList.contains('active')) renderInventory();
-        renderCryptoList();
-      });
-
-      if (gameLoop) clearInterval(gameLoop);
-      gameLoop = setInterval(async () => {
-        const earn = state.upgrades.autoTapRate;
-        const earnXp = state.upgrades.autoXpRate;
-        const earnEnergy = state.upgrades.energyRate;
-        
-        if (earn > 0 || earnXp > 0 || (state.energy < state.maxEnergy && earnEnergy > 0)) {
-          await runTransaction(userRef, (data) => {
-            if (!data) return data;
-            let changed = false;
-            if (earn > 0) { data.coins = (data.coins || 0) + earn; changed = true; }
-            if (earnXp > 0) { data.xp = (data.xp || 0) + earnXp; changed = true; }
-            if (earnEnergy > 0 && (data.energy ?? 0) < (data.maxEnergy ?? 200)) {
-              data.energy = Math.min(data.maxEnergy ?? 200, (data.energy || 0) + earnEnergy);
-              changed = true;
-            }
-            return changed ? data : undefined;
-          });
-        }
-      }, 1000);
-
-      hamster.onclick = async (e) => {
-        const now = Date.now();
-        if (now - lastTapTime < 60) return; 
-        lastTapTime = now;
-
-        if (state.energy < 1) { showStatus("❌ No energy!"); return; }
-        const tapPower = state.upgrades.tapPower;
-        const xpPerTap = state.upgrades.xpPerTap;
-
-        state.energy = Math.max(0, state.energy - 1);
-        state.coins += tapPower;
-        state.xp += xpPerTap;
-        renderUI();
-
-        const rect = tapArea.getBoundingClientRect();
-        const effect = document.createElement('div');
-        effect.className = 'tap-effect';
-        effect.innerText = `+${tapPower}`;
-        effect.style.left = (e.clientX - rect.left - 10) + 'px';
-        effect.style.top = (e.clientY - rect.top - 10) + 'px';
-        tapArea.appendChild(effect);
-        setTimeout(() => effect.remove(), 800);
-
-        try { tg?.HapticFeedback?.impactOccurred('light'); } catch(e) {}
-
-        pendingTap = true;
-        try {
-          await runTransaction(userRef, (data) => {
-            if (!data) data = {};
-            const curEnergy = data.energy ?? 200;
-            if (curEnergy < 1) return;
-            data.energy = curEnergy - 1;
-            data.coins = (data.coins || 0) + tapPower;
-            data.xp = (data.xp || 0) + xpPerTap;
-            return data;
-          });
-        } catch (err) {} finally { pendingTap = false; }
-      };
-    }
-
-    function updateHamsterSkin() {
-      if (state.activeSkin === 'default') {
-        hamster.style.backgroundImage = 'none';
-        hamster.innerText = '🐭';
-      } else {
-        const skinObj = SKINS.find(s => s.id === state.activeSkin);
-        if (skinObj && skinObj.file) {
-          hamster.innerText = '';
-          hamster.style.backgroundImage = `url('${GITHUB_RAW}${skinObj.file}')`;
-        } else {
-          hamster.style.backgroundImage = 'none';
-          hamster.innerText = '🐭';
-        }
-      }
-    }
-
-    function getPrestigeReq(prestigeLvl) {
-      return prestigeLvl === 0 ? 1000000 : 1000000 * Math.pow(2, prestigeLvl);
-    }
-
-    async function checkAutoPrestige() {
-      const req = getPrestigeReq(state.prestige);
-      if (state.xp >= req && currentUid) {
-        const userRef = ref(db, 'users/' + currentUid);
-        let newPrestige = state.prestige + 1;
-        
-        prestigeText.innerText = `PRESTIGE ${newPrestige}`;
-        prestigeOverlay.classList.add('show');
-        setTimeout(() => prestigeOverlay.classList.remove('show'), 2500);
-
-        await runTransaction(userRef, (data) => {
-          if (!data) return data;
-          if ((data.xp || 0) >= req) {
-            data.xp = (data.xp || 0) - req;
-            data.prestige = (data.prestige || 0) + 1;
-          }
-          return data;
-        });
-        try { tg?.HapticFeedback?.notificationOccurred('success'); } catch(e) {}
-      }
-    }
-
-    function getLevelInfo(xp) {
-      let currentLvl = LEVELS[0];
-      let nextLvl = LEVELS[1];
-      for (let i = 0; i < LEVELS.length; i++) {
-        if (xp >= LEVELS[i].xp) {
-          currentLvl = LEVELS[i];
-          nextLvl = LEVELS[i + 1] || LEVELS[i];
-        }
-      }
-      return { currentLvl, nextLvl };
-    }
-
-    function renderUI() {
-      const coinsStr = formatNumber(state.coins);
-      const homsStr = formatNumber(state.homs);
-      
-      tapCoinDisplay.innerText = coinsStr;
-      topCoins.innerText = coinsStr;
-      topHoms.innerText = homsStr;
-      bottomCoins.innerText = coinsStr;
-      autoTapLabel.innerText = formatNumber(state.upgrades.autoTapRate);
-
-      const energyPct = (state.energy / state.maxEnergy) * 100;
-      energyBar.style.width = energyPct + '%';
-      energyDisplay.innerText = Math.floor(state.energy) + '/' + state.maxEnergy;
-      energyDisplayBottom.innerText = Math.floor(state.energy) + '/' + state.maxEnergy;
-
-      const { currentLvl, nextLvl } = getLevelInfo(state.xp);
-      levelName.innerText = currentLvl.name;
-      xpDisplay.innerText = formatNumber(state.xp);
-      xpNext.innerText = nextLvl.xp === currentLvl.xp ? 'MAX' : formatNumber(nextLvl.xp);
-      
-      const lvlProgress = nextLvl.xp === currentLvl.xp ? 100 : ((state.xp - currentLvl.xp) / (nextLvl.xp - currentLvl.xp)) * 100;
-      xpBar.style.width = Math.min(100, Math.max(0, lvlProgress)) + '%';
-    }
-
-    function renderShop() {
-      if (!shopListEl) return;
-      shopListEl.innerHTML = '';
-
-      if (currentShopTab === 'cosmetics') {
-        const grid = document.createElement('div');
-        grid.className = 'shop-grid';
-
-        TITLES.forEach(item => {
-          if (item.price <= 0) return;
-          const isOwned = state.purchasedTitles.includes(item.name);
-          const isHoms = item.currency === 'homs';
-          const canAfford = isHoms ? state.homs >= item.price : state.coins >= item.price;
-          
-          const card = document.createElement('div');
-          card.className = 'shop-card';
-          card.innerHTML = `
-            <div class="grid-preview" style="font-size:24px; background:${item.color};">🏆</div>
-            <div class="shop-card-info">
-              <div class="shop-card-title" style="background:${item.color}; -webkit-background-clip:text; -webkit-text-fill-color:transparent;">${item.name}</div>
-              <div class="shop-card-price">${formatNumber(item.price)} ${isHoms ? '🐹' : '🪙'}</div>
-            </div>
-            <button class="shop-card-btn" data-title-name="${item.name}" ${isOwned || !canAfford ? 'disabled' : ''}>${isOwned ? (translations[currentLang].owned || 'Owned') : (translations[currentLang].buy || 'Buy')}</button>
-          `;
-          grid.appendChild(card);
-        });
-
-        AVATARS.forEach(item => {
-          const isOwned = state.purchasedAvatars.includes(item.name);
-          const canAfford = state.coins >= item.price;
-          const card = document.createElement('div');
-          card.className = 'shop-card';
-          card.innerHTML = `
-            <div class="grid-preview">${item.name}</div>
-            <div class="shop-card-info">
-              <div class="shop-card-title">Avatar</div>
-              <div class="shop-card-price">${formatNumber(item.price)} 🪙</div>
-            </div>
-            <button class="shop-card-btn" data-avatar-name="${item.name}" ${isOwned || !canAfford ? 'disabled' : ''}>${isOwned ? (translations[currentLang].owned || 'Owned') : (translations[currentLang].buy || 'Buy')}</button>
-          `;
-          grid.appendChild(card);
-        });
-
-        SKINS.forEach(item => {
-          if (!item.file) return;
-          const isOwned = state.purchasedSkins.includes(item.id);
-          const isHoms = item.currency === 'homs';
-          const canAfford = isHoms ? state.homs >= item.price : state.coins >= item.price;
-
-          const card = document.createElement('div');
-          card.className = 'shop-card';
-          card.innerHTML = `
-            <div class="grid-preview" style="background-image: url('${GITHUB_RAW}${item.file}');"></div>
-            <div class="shop-card-info">
-              <div class="shop-card-title">Skin: ${item.name}</div>
-              <div class="shop-card-price">${formatNumber(item.price)} ${isHoms ? '🐹' : '🪙'}</div>
-            </div>
-            <button class="shop-card-btn" data-skin-id="${item.id}" ${isOwned || !canAfford ? 'disabled' : ''}>${isOwned ? (translations[currentLang].owned || 'Owned') : (translations[currentLang].buy || 'Buy')}</button>
-          `;
-          grid.appendChild(card);
-        });
-
-        shopListEl.appendChild(grid);
-
-        shopListEl.querySelectorAll('.shop-card-btn').forEach(btn => {
-          if (btn.dataset.titleName) {
-            const item = TITLES.find(t => t.name === btn.dataset.titleName);
-            btn.addEventListener('click', () => buyCosmetic({ name: item.name, price: item.price, type: 'title', currency: item.currency || 'coins' }));
-          } else if (btn.dataset.avatarName) {
-            const item = AVATARS.find(a => a.name === btn.dataset.avatarName);
-            btn.addEventListener('click', () => buyCosmetic({ name: item.name, price: item.price, type: 'avatar', currency: 'coins' }));
-          } else if (btn.dataset.skinId) {
-            btn.addEventListener('click', () => buySkin(SKINS.find(s => s.id === btn.dataset.skinId)));
-          }
-        });
-        return;
-      }
-
-      if (currentShopTab === 'cases') {
-        const t = translations[currentLang];
-        const promoBox = document.createElement('div');
-        promoBox.className = 'promo-box';
-        
-        const enterHtml = state.usedReferralCode 
-          ? `<div style="font-size:12px; color:#2ecc71; margin-top:10px; font-weight:600;">${t.promo_already_used}</div>`
-          : `<div class="promo-input-row">
-               <input type="text" class="promo-input" id="ref-promo-input" placeholder="${t.promo_enter_placeholder}">
-               <button class="shop-card-btn" id="btn-activate-promo">${t.promo_activate}</button>
-             </div>`;
-
-        promoBox.innerHTML = `
-          <div class="shop-card-title" style="color:#2ecc71;">${t.promo_title}</div>
-          <div class="shop-card-desc">${t.promo_desc}</div>
-          <div class="promo-code-display">
-            <span class="promo-code-text" id="my-promo-code">${state.publicId}</span>
-            <div style="display:flex; gap:6px;">
-              <button class="shop-card-btn" id="btn-copy-promo" style="padding:6px 10px;">📋</button>
-              <button class="shop-card-btn" id="btn-share-promo" style="padding:6px 10px; background:#2aabee; color:#fff;">${t.promo_share}</button>
-            </div>
-          </div>
-          ${enterHtml}
-        `;
-        shopListEl.appendChild(promoBox);
-
-        document.getElementById('btn-copy-promo').addEventListener('click', () => {
-          const shareText = `🐭 Грай у Hamka Game та забирай бонусний кейс!\n🤖 Бот: ${BOT_LINK}\n🎟 Мій промокод: ${state.publicId}`;
-          navigator.clipboard.writeText(shareText);
-          showStatus('✅ Copied with bot link!');
-        });
-
-        document.getElementById('btn-share-promo').addEventListener('click', () => {
-          const shareText = `🐭 Грай у Hamka Game та забирай бонусний кейс!\n🎟 Мій промокод: ${state.publicId}`;
-          const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(BOT_LINK)}&text=${encodeURIComponent(shareText)}`;
-          if (tg && tg.openTelegramLink) {
-            tg.openTelegramLink(shareUrl);
-          } else {
-            window.open(shareUrl, '_blank');
-          }
-        });
-
-        const btnActivate = document.getElementById('btn-activate-promo');
-        if (btnActivate) {
-          btnActivate.addEventListener('click', async () => {
-            const code = document.getElementById('ref-promo-input').value.trim();
-            if (!code) { showStatus('❌ [ERR_1] Enter code'); return; }
-            if (code === state.publicId || code === currentUid) { showStatus('❌ [ERR_3] Own code'); return; }
-            if (state.usedReferralCode) { showStatus('❌ [ERR_4] Already activated'); return; }
-
-            btnActivate.disabled = true;
-            showStatus('⏳ Searching...');
-            try {
-              const usersSnap = await get(ref(db, 'users'));
-              if (!usersSnap.exists()) {
-                showStatus('❌ [ERR_5] Database empty');
-                btnActivate.disabled = false;
-                return;
-              }
-
-              const users = usersSnap.val();
-              let referrerUid = null;
-              for (const uId in users) {
-                const uData = users[uId];
-                if (String(uData.publicId) === code || uId === code) {
-                  referrerUid = uId;
-                  break;
-                }
-              }
-
-              if (!referrerUid) {
-                showStatus('❌ [ERR_6] Code not found');
-                btnActivate.disabled = false;
-                return;
-              }
-
-              const res1 = await runTransaction(ref(db, 'users/' + currentUid), (data) => {
-                if (!data) return data;
-                if (data.usedReferralCode) return;
-                data.usedReferralCode = true;
-                if (!data.cases) data.cases = {};
-                data.cases.basic = (data.cases.basic || 0) + 1;
-                return data;
-              });
-
-              if (!res1.committed) {
-                showStatus('❌ [ERR_7] User tx failed (Rules)');
-                btnActivate.disabled = false;
-                return;
-              }
-
-              const res2 = await runTransaction(ref(db, 'users/' + referrerUid), (data) => {
-                if (!data) return data;
-                data.legendaryCases = (data.legendaryCases || 0) + 1;
-                return data;
-              });
-
-              if (!res2.committed) {
-                showStatus('❌ [ERR_8] Referrer tx failed (Rules)');
-                btnActivate.disabled = false;
-                return;
-              }
-
-              showStatus('🎁 Promo activated! +1 Basic Case!');
-              try { tg?.HapticFeedback?.notificationOccurred('success'); } catch(e) {}
-            } catch (err) {
-              alert(`Firebase Error:\n${err.code || ''}\n${err.message}`);
-              showStatus('❌ [ERR_SYS] ' + (err.code || err.message));
-              btnActivate.disabled = false;
-            }
-          });
-        }
-
-        const adCaseCard = document.createElement('div');
-        adCaseCard.className = 'shop-card';
-        adCaseCard.innerHTML = `
-          <div class="grid-preview" style="font-size:40px;">🎬</div>
-          <div class="shop-card-info">
-            <div class="shop-card-title">Case for Ad</div>
-            <div class="shop-card-price">Progress: ${state.adWatches} / 5</div>
-          </div>
-          <button class="shop-card-btn" id="btn-buy-case-ad">${state.adWatches >= 5 ? 'Claim' : 'Watch'}</button>
-        `;
-        shopListEl.appendChild(adCaseCard);
-
-        document.getElementById('btn-buy-case-ad').addEventListener('click', async () => {
-          if (state.adWatches >= 5) {
-            await update(ref(db, 'users/' + currentUid), {
-              adWatches: 0,
-              cases: { ...state.cases, basic: (state.cases.basic || 0) + 1 }
-            });
-            showStatus('✅ Case received!');
-          } else {
-            if (!AdController) { showStatus('❌ Ad not available'); return; }
-            try {
-              const result = await AdController.show();
-              if (result && result.done) {
-                await runTransaction(ref(db, 'users/' + currentUid), (data) => {
-                  if (!data) return data;
-                  data.adWatches = (data.adWatches || 0) + 1;
-                  return data;
-                });
-                showStatus(`✅ Ad credited! (${state.adWatches + 1}/5)`);
-              }
-            } catch(e) { showStatus('❌ Ad not completed'); }
-          }
-        });
-        return;
-      }
-
-      const items = SHOP_ITEMS[currentShopTab] || [];
-      items.forEach(item => {
-        let currentLevel = 0;
-        if (item.id === 'autoTap') currentLevel = state.upgrades.autoTapRate;
-        else if (item.id === 'autoXp') currentLevel = state.upgrades.autoXpRate;
-        else if (item.id === 'energyRate') currentLevel = state.upgrades.energyRate - 1;
-        else if (item.id === 'tap') currentLevel = state.upgrades.tapLevel;
-        else if (item.id === 'xpTap') currentLevel = state.upgrades.xpPerTap - 1;
-        else if (item.id === 'maxEnergy') currentLevel = (state.maxEnergy - 200) / 50;
-
-        const price = getShopPrice(item.id, currentLevel);
-        const isMaxed = currentLevel >= item.maxLevel || price === Infinity;
-        const canAfford = state.coins >= price;
-
-        const card = document.createElement('div');
-        card.className = 'shop-card';
-        card.innerHTML = `
-          <div class="shop-card-info">
-            <div class="shop-card-title">${item.title} <span style="font-size:10px; color:#888;">(Lvl ${currentLevel})</span></div>
-            <div class="shop-card-desc">${item.desc}</div>
-            ${!isMaxed ? `<div class="shop-card-price">${formatNumber(price)} 🪙</div>` : `<div class="shop-card-price" style="color:#2ecc71;">${translations[currentLang].max || 'MAX'}</div>`}
-          </div>
-          <button class="shop-card-btn" data-id="${item.id}" ${isMaxed || !canAfford ? 'disabled' : ''}>${isMaxed ? (translations[currentLang].max || 'Max') : (translations[currentLang].buy || 'Buy')}</button>
-        `;
-        shopListEl.appendChild(card);
-      });
-
-      shopListEl.querySelectorAll('.shop-card-btn').forEach(btn => {
-        btn.addEventListener('click', () => buyUpgrade(btn.dataset.id));
-      });
-    }
-
-    async function buyUpgrade(itemId) {
-      if (!currentUid) return;
-      const allItems = [...SHOP_ITEMS.auto, ...SHOP_ITEMS.upgrade];
-      const item = allItems.find(i => i.id === itemId);
-      if (!item) return;
-
-      let currentLevel = 0;
-      if (itemId === 'autoTap') currentLevel = state.upgrades.autoTapRate;
-      else if (itemId === 'autoXp') currentLevel = state.upgrades.autoXpRate;
-      else if (itemId === 'energyRate') currentLevel = state.upgrades.energyRate - 1;
-      else if (itemId === 'tap') currentLevel = state.upgrades.tapLevel;
-      else if (itemId === 'xpTap') currentLevel = state.upgrades.xpPerTap - 1;
-      else if (itemId === 'maxEnergy') currentLevel = (state.maxEnergy - 200) / 50;
-
-      const price = getShopPrice(itemId, currentLevel);
-      await runTransaction(ref(db, 'users/' + currentUid), (data) => {
-        if (!data || (data.coins || 0) < price) return;
-        data.coins -= price;
-        if (itemId === 'autoTap') data.autoTapRate = (data.autoTapRate || 0) + 1;
-        else if (itemId === 'autoXp') data.autoXpRate = (data.autoXpRate || 0) + 1;
-        else if (itemId === 'energyRate') data.energyRate = (data.energyRate || 1) + 1;
-        else if (itemId === 'tap') { data.tapLevel = (data.tapLevel || 0) + 1; data.tapPower = (data.tapPower || 1) + 1; }
-        else if (itemId === 'xpTap') data.xpPerTap = (data.xpPerTap || 1) + 1;
-        else if (itemId === 'maxEnergy') data.maxEnergy = (data.maxEnergy || 200) + 50;
-        return data;
-      });
-      showStatus('✅ Upgrade purchased!');
-    }
-
-    async function buySkin(item) {
-      const isHoms = item.currency === 'homs';
-      await runTransaction(ref(db, 'users/' + currentUid), (data) => {
-        if (!data) return data;
-        const bal = isHoms ? (data.homs || 0) : (data.coins || 0);
-        if (bal < item.price) return;
-        if (isHoms) data.homs -= item.price; else data.coins -= item.price;
-        if (!data.purchasedSkins) data.purchasedSkins = [];
-        if (!data.purchasedSkins.includes(item.id)) data.purchasedSkins.push(item.id);
-        return data;
-      });
-      showStatus('✅ Skin bought!');
-      renderShop();
-    }
-
-    async function buyCosmetic(item) {
-      const isHoms = item.currency === 'homs';
-      await runTransaction(ref(db, 'users/' + currentUid), (data) => {
-        if (!data) return data;
-        const bal = isHoms ? (data.homs || 0) : (data.coins || 0);
-        if (bal < item.price) return;
-        if (isHoms) data.homs -= item.price; else data.coins -= item.price;
-        if (item.type === 'title') {
-          if (!data.purchasedTitles) data.purchasedTitles = [];
-          if (!data.purchasedTitles.includes(item.name)) data.purchasedTitles.push(item.name);
-        } else if (item.type === 'avatar') {
-          if (!data.purchasedAvatars) data.purchasedAvatars = [];
-          if (!data.purchasedAvatars.includes(item.name)) data.purchasedAvatars.push(item.name);
-        }
-        return data;
-      });
-      showStatus('✅ Purchased!');
-      renderShop();
-    }
-
-    function renderProfile() {
-      profCoins.innerText = formatNumber(state.coins);
-      profHoms.innerText = formatNumber(state.homs);
-      profXp.innerText = formatNumber(state.xp);
-      profPrestige.innerText = state.prestige;
-      profNickname.innerText = state.nickname;
-      profPublicId.innerText = 'ID: ' + state.publicId;
-      
-      if (state.activeSkin !== 'default') {
-        const skinObj = SKINS.find(s => s.id === state.activeSkin);
-        if (skinObj && skinObj.file) {
-          profAvatar.style.backgroundImage = `url('${GITHUB_RAW}${skinObj.file}')`;
-          profAvatar.innerText = '';
-        }
-      } else {
-        profAvatar.style.backgroundImage = 'none';
-        profAvatar.innerText = state.avatar;
-      }
-
-      const titleObj = TITLES.find(t => t.name === state.title) || CASE_TITLES.find(t => t.name === state.title) || TOP_TITLES.find(t => t.name === state.title);
-      if (titleObj) {
-        profTitle.innerText = titleObj.name;
-        profTitleBadge.style.background = titleObj.color;
-      } else {
-        profTitle.innerText = state.title;
-        profTitleBadge.style.background = 'linear-gradient(90deg, #8a2be2, #da70d6)';
-      }
-
-      const req = getPrestigeReq(state.prestige);
-      prestigeInfo.innerText = state.xp >= req ? 'Ready!' : `Required ${formatNumber(req)} XP`;
-    }
-
-    function renderInventory() {
-      const cases = state.cases || {};
-      const legendaryCount = state.legendaryCases || 0;
-      const hasCases = Object.keys(cases).some(k => cases[k] > 0) || legendaryCount > 0;
-      
-      if (hasCases) {
-        casesSection.style.display = 'block';
-        invCases.innerHTML = '';
-        for (const type in cases) {
-          const count = cases[type];
-          if (count <= 0) continue;
-          const el = document.createElement('div');
-          el.className = 'case-item';
-          el.innerHTML = `
-            <div class="case-count-badge">${count}</div>
-            <div class="case-icon">📦</div>
-            <div class="case-name">Basic Case</div>
-          `;
-          el.addEventListener('click', () => openCaseModal(type, count));
-          invCases.appendChild(el);
-        }
-
-        if (legendaryCount > 0) {
-          const el = document.createElement('div');
-          el.className = 'case-item legendary';
-          el.innerHTML = `
-            <div class="case-count-badge">${legendaryCount}</div>
-            <div class="case-icon">🌟</div>
-            <div class="case-name">Legendary Case</div>
-          `;
-          el.addEventListener('click', () => openCaseModal('legendary', legendaryCount));
-          invCases.appendChild(el);
-        }
-      } else {
-        casesSection.style.display = 'none';
-      }
-
-      const availableTitles = [
-        ...TITLES.filter(t => (t.price === 0 && (t.reqPrestige === 0 || state.prestige >= t.reqPrestige)) || state.purchasedTitles.includes(t.name)),
-        ...CASE_TITLES.filter(t => state.purchasedTitles.includes(t.name)),
-        ...TOP_TITLES.filter(t => state.purchasedTitles.includes(t.name))
-      ];
-      invTitles.innerHTML = '';
-      availableTitles.forEach(tItem => {
-        const el = document.createElement('div');
-        el.className = `inventory-item ${state.title === tItem.name ? 'active' : ''}`;
-        el.innerHTML = `<div class="inventory-item-icon">🏆</div><div class="inventory-item-name" style="background:${tItem.color}; -webkit-background-clip:text; -webkit-text-fill-color:transparent;">${tItem.name}</div>`;
-        el.addEventListener('click', async () => {
-          await update(ref(db, 'users/' + currentUid), { title: tItem.name });
-          showStatus('✅ Title equipped!');
-        });
-        invTitles.appendChild(el);
-      });
-
-      const availableAvatars = ['🐭', ...state.purchasedAvatars];
-      invAvatars.innerHTML = '';
-      availableAvatars.forEach(avName => {
-        const el = document.createElement('div');
-        el.className = `inventory-item ${state.avatar === avName ? 'active' : ''}`;
-        el.innerHTML = `<div class="inventory-item-icon">${avName}</div>`;
-        el.addEventListener('click', async () => {
-          await update(ref(db, 'users/' + currentUid), { avatar: avName });
-          showStatus('✅ Avatar changed!');
-        });
-        invAvatars.appendChild(el);
-      });
-
-      invSkins.innerHTML = '';
-      const defaultEl = document.createElement('div');
-      defaultEl.className = `inventory-item ${state.activeSkin === 'default' ? 'active' : ''}`;
-      defaultEl.innerHTML = `<div class="inventory-item-icon">🐭</div><div class="inventory-item-name">Default</div>`;
-      defaultEl.addEventListener('click', async () => {
-        await update(ref(db, 'users/' + currentUid), { activeSkin: 'default' });
-        showStatus('✅ Skin changed!');
-      });
-      invSkins.appendChild(defaultEl);
-
-      state.purchasedSkins.forEach(skinId => {
-        const skinObj = SKINS.find(s => s.id === skinId);
-        if (!skinObj || !skinObj.file) return;
-        const el = document.createElement('div');
-        el.className = `inventory-item ${state.activeSkin === skinId ? 'active' : ''}`;
-        el.innerHTML = `<div class="inventory-item-icon" style="background-image: url('${GITHUB_RAW}${skinObj.file}'); background-size: cover; border-radius:4px;"></div><div class="inventory-item-name">${skinObj.name}</div>`;
-        el.addEventListener('click', async () => {
-          await update(ref(db, 'users/' + currentUid), { activeSkin: skinId });
-          showStatus('✅ Skin changed!');
-        });
-        invSkins.appendChild(el);
-      });
-    }
-
-    function openCaseModal(type, count) {
-      selectedCaseTypeToOpen = type;
-      const titleText = type === 'legendary' ? 'Open Legendary Case' : 'Open Case';
-      document.getElementById('case-modal-title').innerText = titleText;
-      document.getElementById('case-modal-count').innerText = `Available: ${count}`;
-      document.getElementById('modal-case-qty').classList.add('show');
-    }
-
-    window.openCasesBatch = async function(qty) {
-      document.getElementById('modal-case-qty').classList.remove('show');
-      if (!currentUid || !selectedCaseTypeToOpen) return;
-
-      const isLegendary = selectedCaseTypeToOpen === 'legendary';
-      const currentCount = isLegendary ? (state.legendaryCases || 0) : (state.cases[selectedCaseTypeToOpen] || 0);
-      let openNum = qty === 'all' ? currentCount : parseInt(qty);
-      if (openNum > currentCount) openNum = currentCount;
-      if (openNum <= 0) return;
-
-      caseOpenOverlay.classList.add('show');
-      caseOpeningBox.style.display = 'block';
-      caseOpeningBox.innerText = isLegendary ? '🌟' : '📦';
-      caseRewardText.innerText = '';
-      btnCloseCase.style.display = 'none';
-
-      setTimeout(async () => {
-        caseOpeningBox.style.display = 'none';
-        let summaryRewards = [];
-        const multiplier = isLegendary ? 10 : 1;
-
-        await runTransaction(ref(db, 'users/' + currentUid), (data) => {
-          if (!data) return data;
-          if (isLegendary) {
-            if ((data.legendaryCases || 0) < openNum) return;
-            data.legendaryCases -= openNum;
-          } else {
-            if (!data.cases || (data.cases[selectedCaseTypeToOpen] || 0) < openNum) return;
-            data.cases[selectedCaseTypeToOpen] -= openNum;
-            if (data.cases[selectedCaseTypeToOpen] <= 0) delete data.cases[selectedCaseTypeToOpen];
-          }
-
-          if (!data.purchasedTitles) data.purchasedTitles = [];
-          if (!data.purchasedAvatars) data.purchasedAvatars = [];
-          if (!data.purchasedSkins) data.purchasedSkins = [];
-
-          for (let i = 0; i < openNum; i++) {
-            const rand = Math.random() * 100;
-            if (rand < 20) {
-              const randomSkin = SKINS[Math.floor(Math.random() * SKINS.length)];
-              if (data.purchasedSkins.includes(randomSkin.id)) {
-                const homsBonus = 10 * multiplier;
-                data.homs = (data.homs || 0) + homsBonus;
-                summaryRewards.push(`+${homsBonus} Homs (Skin Duplicate)`);
-              } else {
-                data.purchasedSkins.push(randomSkin.id);
-                summaryRewards.push(`Skin: ${randomSkin.name}`);
-              }
-            } else if (rand < 45) {
-              const randomAvatar = AVATARS[Math.floor(Math.random() * AVATARS.length)];
-              if (data.purchasedAvatars.includes(randomAvatar.name)) {
-                const homsBonus = 10 * multiplier;
-                data.homs = (data.homs || 0) + homsBonus;
-                summaryRewards.push(`+${homsBonus} Homs (Avatar Duplicate)`);
-              } else {
-                data.purchasedAvatars.push(randomAvatar.name);
-                summaryRewards.push(`Avatar: ${randomAvatar.name}`);
-              }
-            } else if (rand < 70) {
-              const randomTitle = CASE_TITLES[Math.floor(Math.random() * CASE_TITLES.length)];
-              if (data.purchasedTitles.includes(randomTitle.name)) {
-                const homsBonus = 10 * multiplier;
-                data.homs = (data.homs || 0) + homsBonus;
-                summaryRewards.push(`+${homsBonus} Homs (Title Duplicate)`);
-              } else {
-                data.purchasedTitles.push(randomTitle.name);
-                summaryRewards.push(`Title: ${randomTitle.name}`);
-              }
-            } else {
-              const xpReward = (Math.floor(Math.random() * 49000) + 1000) * multiplier;
-              data.xp = (data.xp || 0) + xpReward;
-              summaryRewards.push(`+${formatNumber(xpReward)} XP`);
-            }
-          }
-          return data;
-        });
-
-        caseRewardText.innerText = summaryRewards.join('\n');
-        btnCloseCase.style.display = 'block';
-        try { tg?.HapticFeedback?.notificationOccurred('success'); } catch(e) {}
-      }, 1500);
-    };
-
-    btnCloseCase.addEventListener('click', () => {
-      caseOpenOverlay.classList.remove('show');
-    });
-
-    let cryptoState = {};
-    async function initCryptoSystem() {
-      for (const symbol of COINS) {
-        const cRef = ref(db, 'crypto/' + symbol);
-        const snap = await get(cRef);
-        if (!snap.exists()) {
-          const price = INITIAL_PRICES[symbol];
-          await set(cRef, { price: price, history: [{ t: Date.now(), p: price }] });
-        }
-      }
-
-      onValue(ref(db, 'crypto'), (snap) => {
-        const data = snap.val();
-        if (!data) return;
-        cryptoState = data;
-        renderCryptoList();
-      });
-
-      if (cryptoInterval) clearInterval(cryptoInterval);
-      cryptoInterval = setInterval(async () => {
-        for (const symbol of COINS) {
-          updateCryptoPrice(symbol);
-        }
-      }, 10000);
-    }
-
-    async function updateCryptoPrice(symbol) {
-      const cRef = ref(db, 'crypto/' + symbol);
-      try {
-        await runTransaction(cRef, (data) => {
-          if (!data) return data;
-          const currentPrice = data.price || INITIAL_PRICES[symbol];
-          const isGrowth = Math.random() < 0.4;
-          const percent = (Math.random() * 0.03) + 0.005;
-          let newPrice = isGrowth ? currentPrice * (1 + percent) : currentPrice * (1 - percent);
-          newPrice = Math.max(1, newPrice);
-
-          const history = data.history || [];
-          history.push({ t: Date.now(), p: newPrice });
-          if (history.length > 30) history.shift();
-          return { price: newPrice, history: history };
-        });
-      } catch (err) {}
-    }
-
-    function renderCryptoList() {
-      if (!cryptoListEl) return;
-      cryptoListEl.innerHTML = '';
-      for (const symbol of COINS) {
-        const info = cryptoState[symbol];
-        if (!info) continue;
-
-        const price = info.price || INITIAL_PRICES[symbol];
-        const history = info.history || [];
-        const firstPrice = history[0]?.p || price;
-        const isUp = price >= firstPrice;
-        const holding = state.holdings?.[symbol] || 0;
-        const qty = getQty(symbol);
-
-        const card = document.createElement('div');
-        card.className = 'crypto-card';
-        card.innerHTML = `
-          <div class="crypto-header">
-            <div class="crypto-symbol">${symbol}</div>
-            <div class="crypto-price ${isUp ? 'up' : 'down'}">${formatPrice(price)} 🪙</div>
-          </div>
-          <canvas class="crypto-chart" id="chart-${symbol}" width="300" height="60"></canvas>
-          <div class="crypto-actions">
-            <input type="number" min="1" value="${qty}" class="crypto-input" id="qty-${symbol}" data-symbol="${symbol}">
-            <button class="crypto-btn buy" data-symbol="${symbol}" data-action="buy">${translations[currentLang].buy || 'Buy'}</button>
-            <button class="crypto-btn sell" data-symbol="${symbol}" data-action="sell">${translations[currentLang].sell || 'Sell'}</button>
-          </div>
-          <div class="crypto-holdings">You have: <span>${holding}</span> ${symbol}</div>
-        `;
-        cryptoListEl.appendChild(card);
-        drawChart(document.getElementById('chart-' + symbol), history, isUp);
-      }
-
-      cryptoListEl.querySelectorAll('.crypto-input').forEach(inp => {
-        inp.addEventListener('input', () => setQty(inp.dataset.symbol, inp.value));
-      });
-
-      cryptoListEl.querySelectorAll('.crypto-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const symbol = btn.dataset.symbol;
-          const action = btn.dataset.action;
-          const qty = parseInt(document.getElementById('qty-' + symbol).value) || 1;
-          tradeCrypto(symbol, action, qty);
-        });
-      });
-    }
-
-    function drawChart(canvas, history, isUp) {
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      const w = canvas.width, h = canvas.height;
-      ctx.clearRect(0, 0, w, h);
-      if (history.length < 2) return;
-
-      const prices = history.map(x => x.p);
-      const min = Math.min(...prices);
-      const max = Math.max(...prices);
-      const range = max - min || 1;
-
-      ctx.beginPath();
-      ctx.strokeStyle = isUp ? '#2ecc71' : '#ff5252';
-      ctx.lineWidth = 2;
-
-      history.forEach((point, i) => {
-        const x = (i / (history.length - 1)) * (w - 4) + 2;
-        const y = h - ((point.p - min) / range) * (h - 8) - 4;
-        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-      });
-      ctx.stroke();
-    }
-
-    async function tradeCrypto(symbol, action, qty) {
-      if (!currentUid) return;
-      const info = cryptoState[symbol];
-      if (!info) return;
-
-      const price = info.price;
-      const total = price * qty;
-
-      await runTransaction(ref(db, 'users/' + currentUid), (data) => {
-        if (!data) return data;
-        if (!data.holdings) data.holdings = {};
-
-        if (action === 'buy') {
-          if ((data.coins || 0) < total) return;
-          data.coins -= total;
-          data.holdings[symbol] = (data.holdings[symbol] || 0) + qty;
-        } else {
-          const owned = data.holdings[symbol] || 0;
-          if (owned < qty) return;
-          data.coins = (data.coins || 0) + total;
-          data.holdings[symbol] = owned - qty;
-        }
-        return data;
-      });
-      showStatus('✅ Trade successful!');
-    }
-
-    function initRoulette() {
-      if (!rouletteStrip) return;
-      rouletteStrip.innerHTML = '';
-      const items = ['🪙', '⭐', '📦', '🐹', '🪙', '⭐', '🪙', '🐹'];
-      for (let i = 0; i < 40; i++) {
-        const div = document.createElement('div');
-        div.className = 'roulette-item';
-        div.innerText = items[i % items.length];
-        rouletteStrip.appendChild(div);
-      }
-    }
-
-    btnSpinRoulette.addEventListener('click', async () => {
-      if (!AdController) { showStatus('❌ Ad not available'); return; }
-      try {
-        const result = await AdController.show();
-        if (result && result.done) {
-          const randomOffset = Math.floor(Math.random() * 15) * 60 + 900;
-          rouletteStrip.style.transition = 'transform 3s cubic-bezier(0.1, 0.8, 0.2, 1)';
-          rouletteStrip.style.transform = `translateX(-${randomOffset}px)`;
-
-          setTimeout(async () => {
-            rouletteStrip.style.transition = 'none';
-            rouletteStrip.style.transform = 'translateX(0)';
-
-            const rewards = [
-              { type: 'coins', val: 1000, text: '+1,000 Coins' },
-              { type: 'xp', val: 500, text: '+500 XP' },
-              { type: 'homs', val: 10, text: '+10 Homs' },
-              { type: 'case', val: 1, text: '+1 Basic Case' },
-              { type: 'leg_case', val: 1, text: '+1 Legendary Case' }
-            ];
-            const reward = rewards[Math.floor(Math.random() * rewards.length)];
-
-            await runTransaction(ref(db, 'users/' + currentUid), (data) => {
-              if (!data) return data;
-              if (reward.type === 'coins') data.coins = (data.coins || 0) + reward.val;
-              if (reward.type === 'xp') data.xp = (data.xp || 0) + reward.val;
-              if (reward.type === 'homs') data.homs = (data.homs || 0) + reward.val;
-              if (reward.type === 'case') {
-                if (!data.cases) data.cases = {};
-                data.cases.basic = (data.cases.basic || 0) + 1;
-              }
-              if (reward.type === 'leg_case') {
-                data.legendaryCases = (data.legendaryCases || 0) + 1;
-              }
-              return data;
-            });
-
-            showStatus(`🎁 Reward: ${reward.text}`);
-            try { tg?.HapticFeedback?.notificationOccurred('success'); } catch(e) {}
-          }, 3100);
-        }
-      } catch(e) { showStatus('❌ Ad not completed'); }
-    });
-  </script>
+  <script type="module" src="app.js"></script>
 </body>
 </html>
