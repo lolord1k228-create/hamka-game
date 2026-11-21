@@ -18,7 +18,7 @@ const db = getDatabase(app);
 const auth = getAuth(app);
 
 const tg = window.Telegram?.WebApp;
-try { tg?.expand(); tg?.ready(); } catch(e) {}
+try { tg?.expand(); tg?.ready(); } catch (e) {}
 
 let AdController = null;
 const BOT_LINK = "https://t.me/hamka_game_bot";
@@ -264,18 +264,36 @@ const translations = {
 };
 
 let currentLang = localStorage.getItem('hamka_lang') || 'uk';
-
-function setLanguage(lang) {
-  if (!translations[lang]) lang = 'uk';
-  currentLang = lang;
-  localStorage.setItem('hamka_lang', lang);
-  document.querySelectorAll('[data-i18n]').forEach(el => {
-    const key = el.getAttribute('data-i18n');
-    if (translations[lang][key]) el.innerText = translations[lang][key];
-  });
-  const langSelect = document.getElementById('language-select');
-  if (langSelect) langSelect.value = lang;
-}
+let isLoginMode = true;
+let state = {
+  coins: 0, homs: 0, energy: 200, maxEnergy: 200, xp: 0, prestige: 0,
+  title: 'Beginner', avatar: '🐭', nickname: '', publicId: '',
+  activeSkin: 'default', activeBanner: 'default', holdings: {},
+  purchasedTitles: [], purchasedAvatars: [], purchasedSkins: [], purchasedBanners: [],
+  cases: {}, legendaryCases: 0, adWatches: 0,
+  usedReferralCode: false, referredBy: '', invited: 0, hideFromTop: false,
+  streakCount: 0, lastStreakDay: '', claimedStreakDay: '', lostStreakCount: 0,
+  tap3BoostGranted: false, coinBoostMult: 1, coinBoostExpiresAt: 0,
+  lastRewardMonth: '', lastSeenAt: 0,
+  upgrades: {
+    tapLevel: 0, tapPower: 1, xpPerTap: 1,
+    autoTapRate: 0, autoXpRate: 0, energyRate: 1
+  }
+};
+let pendingTap = false;
+let lastTapTime = 0;
+let unsubscribeUserData = null;
+let gameLoop = null;
+let cryptoInterval = null;
+let currentUid = null;
+let currentShopTab = 'auto';
+let isAdmin = false;
+let selectedCaseTypeToOpen = null;
+let userDataReady = false;
+let pendingStartParam = null;
+let referralProcessing = false;
+let dailyCheckDone = false;
+let cryptoState = {};
 
 const loadingScreen = document.getElementById('loading-screen');
 const authScreen = document.getElementById('auth-screen');
@@ -371,36 +389,30 @@ const minitabRoulette = document.getElementById('minitab-roulette');
 const miniContentCrypto = document.getElementById('mini-content-crypto');
 const miniContentRoulette = document.getElementById('mini-content-roulette');
 
-if (btnMonthRewards) {
-  btnMonthRewards.addEventListener('click', () => {
-    document.getElementById('modal-month-rewards')?.classList.add('show');
-  });
+function showAuthFallback() {
+  if (loadingScreen) loadingScreen.style.display = 'none';
+  if (authScreen && !currentUid) authScreen.classList.remove('hidden');
 }
 
-languageSelect.addEventListener('change', (e) => {
-  setLanguage(e.target.value);
-  if (currentUid) {
-    update(ref(db, 'users/' + currentUid), { language: e.target.value });
+// Страховка від безкінечного завантаження при повільному з'єднанні або блокуванні
+setTimeout(() => {
+  if (loadingScreen && loadingScreen.style.display !== 'none' && !currentUid) {
+    showAuthFallback();
   }
-});
+}, 4000);
 
-hideTopToggle.addEventListener('change', async (e) => {
-  const val = e.target.checked;
-  state.hideFromTop = val;
-  if (currentUid) {
-    await update(ref(db, 'users/' + currentUid), { hideFromTop: val });
-    showStatus('✅ Updated settings');
-  }
-});
+function setLanguage(lang) {
+  if (!translations[lang]) lang = 'uk';
+  currentLang = lang;
+  localStorage.setItem('hamka_lang', lang);
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (translations[lang][key]) el.innerText = translations[lang][key];
+  });
+  const langSelect = document.getElementById('language-select');
+  if (langSelect) langSelect.value = lang;
+}
 
-btnLogout.addEventListener('click', async () => {
-  try {
-    await signOut(auth);
-    showStatus('Logged out');
-  } catch(e) {}
-});
-
-setAuthMode(true);
 function setAuthMode(loginMode) {
   isLoginMode = loginMode;
   if (loginMode) {
@@ -414,192 +426,6 @@ function setAuthMode(loginMode) {
   }
   authError.innerText = '';
 }
-tabLogin.addEventListener('click', () => setAuthMode(true));
-tabRegister.addEventListener('click', () => setAuthMode(false));
-
-async function autoLoginTelegram() {
-  const tgUser = tg?.initDataUnsafe?.user;
-  if (!tgUser) {
-    loadingScreen.style.display = 'none';
-    authScreen.classList.remove('hidden');
-    return;
-  }
-  const email = `tg_${tgUser.id}@hamka.test`;
-  const password = `Tg_${tgUser.id}_SecurePass_2026!`;
-  try {
-    await signInWithEmailAndPassword(auth, email, password);
-  } catch (e) {
-    try {
-      await createUserWithEmailAndPassword(auth, email, password);
-    } catch (createErr) {
-      loadingScreen.style.display = 'none';
-      authScreen.classList.remove('hidden');
-    }
-  }
-}
-
-autoLoginTelegram();
-
-authSubmit.addEventListener('click', async () => {
-  const nick = authNickname.value.trim();
-  const password = authPassword.value;
-  if (!isValidNickname(nick)) {
-    authError.innerText = 'Nickname: 3-16 chars (letters, numbers, _, ., -)';
-    return;
-  }
-  if (password.length < 6) {
-    authError.innerText = 'Password min 6 chars';
-    return;
-  }
-
-  authSubmit.disabled = true;
-  authError.innerText = '';
-  try {
-    if (isLoginMode) {
-      const legacyCandidates = getLegacyEmailCandidates(nick);
-      let loggedIn = false;
-      let lastErr = null;
-      for (const legacyEmail of legacyCandidates) {
-        try {
-          await signInWithEmailAndPassword(auth, legacyEmail, password);
-          loggedIn = true;
-          break;
-        } catch (err) {
-          lastErr = err;
-        }
-      }
-      if (!loggedIn) {
-        try {
-          await signInWithEmailAndPassword(auth, getRegisterEmail(nick), password);
-        } catch (err) {
-          throw lastErr || err;
-        }
-      }
-    } else {
-      await createUserWithEmailAndPassword(auth, getRegisterEmail(nick), password);
-    }
-  } catch (err) {
-    authError.innerText = err.message;
-  } finally {
-    authSubmit.disabled = false;
-  }
-});
-
-tgLoginBtn.addEventListener('click', async () => {
-  const tgUser = tg?.initDataUnsafe?.user;
-  if (!tgUser) { authError.innerText = 'Open via Telegram bot'; return; }
-  try {
-    await signInWithEmailAndPassword(auth, `tg_${tgUser.id}@hamka.test`, `Tg_${tgUser.id}_SecurePass_2026!`);
-  } catch (e) {
-    try {
-      await createUserWithEmailAndPassword(auth, `tg_${tgUser.id}@hamka.test`, `Tg_${tgUser.id}_SecurePass_2026!`);
-    } catch (err) {}
-  }
-});
-
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    currentUid = user.uid;
-    userDataReady = false;
-    dailyCheckDone = false;
-    loadingScreen.style.display = 'none';
-    authScreen.classList.add('hidden');
-    gameScreen.classList.add('visible');
-
-    if (typeof window.Adsgram !== 'undefined') {
-      try { AdController = window.Adsgram.init({ blockId: "59759" }); } catch (e) {}
-    }
-
-    loadGameData().then(() => {
-      initGame(user.uid);
-      initCryptoSystem();
-      checkAdminStatus(user.uid);
-      initRoulette();
-    });
-  } else {
-    currentUid = null;
-    userDataReady = false;
-    dailyCheckDone = false;
-    loadingScreen.style.display = 'none';
-    authScreen.classList.remove('hidden');
-    gameScreen.classList.remove('visible');
-    if (unsubscribeUserData) { unsubscribeUserData(); unsubscribeUserData = null; }
-    if (gameLoop) { clearInterval(gameLoop); gameLoop = null; }
-    if (cryptoInterval) { clearInterval(cryptoInterval); cryptoInterval = null; }
-  }
-});
-
-document.querySelectorAll('.menu-item[data-page]').forEach(item => {
-  item.addEventListener('click', () => {
-    document.querySelectorAll('.menu-item').forEach(n => n.classList.remove('active'));
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    item.classList.add('active');
-    document.getElementById('page-' + item.dataset.page).classList.add('active');
-    if (item.dataset.page === 'shop') renderShop();
-    if (item.dataset.page === 'profile') renderProfile();
-    if (item.dataset.page === 'inventory') renderInventory();
-    if (item.dataset.page === 'top') loadLeaderboard();
-    if (item.dataset.page === 'minigames') {
-      minitabCrypto.classList.add('active');
-      minitabRoulette.classList.remove('active');
-      miniContentCrypto.style.display = 'block';
-      miniContentRoulette.style.display = 'none';
-    }
-  });
-});
-
-minitabCrypto.addEventListener('click', () => {
-  minitabCrypto.classList.add('active');
-  minitabRoulette.classList.remove('active');
-  miniContentCrypto.style.display = 'block';
-  miniContentRoulette.style.display = 'none';
-});
-
-minitabRoulette.addEventListener('click', () => {
-  minitabCrypto.classList.remove('active');
-  minitabRoulette.classList.add('active');
-  miniContentCrypto.style.display = 'none';
-  miniContentRoulette.style.display = 'block';
-});
-
-document.querySelectorAll('.shop-tab[data-shop-tab]').forEach(tab => {
-  tab.addEventListener('click', () => {
-    document.querySelectorAll('.shop-tab[data-shop-tab]').forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-    currentShopTab = tab.dataset.shopTab;
-    renderShop();
-  });
-});
-
-let isLoginMode = true;
-let state = {
-  coins: 0, homs: 0, energy: 200, maxEnergy: 200, xp: 0, prestige: 0,
-  title: 'Beginner', avatar: '🐭', nickname: '', publicId: '',
-  activeSkin: 'default', activeBanner: 'default', holdings: {},
-  purchasedTitles: [], purchasedAvatars: [], purchasedSkins: [], purchasedBanners: [],
-  cases: {}, legendaryCases: 0, adWatches: 0,
-  usedReferralCode: false, referredBy: '', invited: 0, hideFromTop: false,
-  streakCount: 0, lastStreakDay: '', claimedStreakDay: '', lostStreakCount: 0,
-  tap3BoostGranted: false, coinBoostMult: 1, coinBoostExpiresAt: 0,
-  lastRewardMonth: '', lastSeenAt: 0,
-  upgrades: {
-    tapLevel: 0, tapPower: 1, xpPerTap: 1,
-    autoTapRate: 0, autoXpRate: 0, energyRate: 1
-  }
-};
-let pendingTap = false;
-let lastTapTime = 0;
-let unsubscribeUserData = null;
-let gameLoop = null;
-let cryptoInterval = null;
-let currentUid = null;
-let currentShopTab = 'auto';
-let isAdmin = false;
-let selectedCaseTypeToOpen = null;
-let userDataReady = false;
-let pendingStartParam = null;
-let referralProcessing = false;
-let dailyCheckDone = false;
 
 function extractReferralCode(rawValue) {
   if (typeof rawValue !== 'string') return '';
@@ -616,7 +442,7 @@ try {
   const sp = tg?.initDataUnsafe?.start_param;
   const parsed = extractReferralCode(sp);
   if (parsed.length > 0) pendingStartParam = parsed;
-} catch(e) {}
+} catch (e) {}
 
 const GITHUB_BASE = "https://raw.githubusercontent.com/lolord1k228-create/hamka-game/main/";
 const GITHUB_RAW = GITHUB_BASE + "skins/";
@@ -769,6 +595,195 @@ function formatPrice(p) {
   return p.toFixed(2);
 }
 
+if (btnMonthRewards) {
+  btnMonthRewards.addEventListener('click', () => {
+    document.getElementById('modal-month-rewards')?.classList.add('show');
+  });
+}
+
+languageSelect.addEventListener('change', (e) => {
+  setLanguage(e.target.value);
+  if (currentUid) {
+    update(ref(db, 'users/' + currentUid), { language: e.target.value }).catch(() => {});
+  }
+});
+
+hideTopToggle.addEventListener('change', async (e) => {
+  const val = e.target.checked;
+  state.hideFromTop = val;
+  if (currentUid) {
+    try {
+      await update(ref(db, 'users/' + currentUid), { hideFromTop: val });
+      showStatus('✅ Updated settings');
+    } catch (err) {}
+  }
+});
+
+btnLogout.addEventListener('click', async () => {
+  try {
+    await signOut(auth);
+    showStatus('Logged out');
+  } catch (e) {}
+});
+
+setAuthMode(true);
+tabLogin.addEventListener('click', () => setAuthMode(true));
+tabRegister.addEventListener('click', () => setAuthMode(false));
+
+async function autoLoginTelegram() {
+  const tgUser = tg?.initDataUnsafe?.user;
+  if (!tgUser) {
+    showAuthFallback();
+    return;
+  }
+  const email = `tg_${tgUser.id}@hamka.test`;
+  const password = `Tg_${tgUser.id}_SecurePass_2026!`;
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+  } catch (e) {
+    try {
+      await createUserWithEmailAndPassword(auth, email, password);
+    } catch (createErr) {
+      showAuthFallback();
+    }
+  }
+}
+
+authSubmit.addEventListener('click', async () => {
+  const nick = authNickname.value.trim();
+  const password = authPassword.value;
+  if (!isValidNickname(nick)) {
+    authError.innerText = 'Nickname: 3-16 chars (letters, numbers, _, ., -)';
+    return;
+  }
+  if (password.length < 6) {
+    authError.innerText = 'Password min 6 chars';
+    return;
+  }
+
+  authSubmit.disabled = true;
+  authError.innerText = '';
+  try {
+    if (isLoginMode) {
+      const legacyCandidates = getLegacyEmailCandidates(nick);
+      let loggedIn = false;
+      let lastErr = null;
+      for (const legacyEmail of legacyCandidates) {
+        try {
+          await signInWithEmailAndPassword(auth, legacyEmail, password);
+          loggedIn = true;
+          break;
+        } catch (err) {
+          lastErr = err;
+        }
+      }
+      if (!loggedIn) {
+        try {
+          await signInWithEmailAndPassword(auth, getRegisterEmail(nick), password);
+        } catch (err) {
+          throw lastErr || err;
+        }
+      }
+    } else {
+      await createUserWithEmailAndPassword(auth, getRegisterEmail(nick), password);
+    }
+  } catch (err) {
+    authError.innerText = err.message;
+  } finally {
+    authSubmit.disabled = false;
+  }
+});
+
+tgLoginBtn.addEventListener('click', async () => {
+  const tgUser = tg?.initDataUnsafe?.user;
+  if (!tgUser) { authError.innerText = 'Open via Telegram bot'; return; }
+  try {
+    await signInWithEmailAndPassword(auth, `tg_${tgUser.id}@hamka.test`, `Tg_${tgUser.id}_SecurePass_2026!`);
+  } catch (e) {
+    try {
+      await createUserWithEmailAndPassword(auth, `tg_${tgUser.id}@hamka.test`, `Tg_${tgUser.id}_SecurePass_2026!`);
+    } catch (err) {
+      authError.innerText = err.message;
+    }
+  }
+});
+
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    currentUid = user.uid;
+    userDataReady = false;
+    dailyCheckDone = false;
+    if (loadingScreen) loadingScreen.style.display = 'none';
+    if (authScreen) authScreen.classList.add('hidden');
+    if (gameScreen) gameScreen.classList.add('visible');
+
+    if (typeof window.Adsgram !== 'undefined') {
+      try { AdController = window.Adsgram.init({ blockId: "59759" }); } catch (e) {}
+    }
+
+    try { await loadGameData(); } catch (e) {}
+    try { initGame(user.uid); } catch (e) {}
+    try { initCryptoSystem(); } catch (e) {}
+    try { checkAdminStatus(user.uid); } catch (e) {}
+    try { initRoulette(); } catch (e) {}
+  } else {
+    currentUid = null;
+    userDataReady = false;
+    dailyCheckDone = false;
+    if (loadingScreen) loadingScreen.style.display = 'none';
+    if (authScreen) authScreen.classList.remove('hidden');
+    if (gameScreen) gameScreen.classList.remove('visible');
+    if (unsubscribeUserData) { unsubscribeUserData(); unsubscribeUserData = null; }
+    if (gameLoop) { clearInterval(gameLoop); gameLoop = null; }
+    if (cryptoInterval) { clearInterval(cryptoInterval); cryptoInterval = null; }
+  }
+});
+
+// Запускаємо автовхід після того, як усе ініціалізовано
+autoLoginTelegram();
+
+document.querySelectorAll('.menu-item[data-page]').forEach(item => {
+  item.addEventListener('click', () => {
+    document.querySelectorAll('.menu-item').forEach(n => n.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    item.classList.add('active');
+    document.getElementById('page-' + item.dataset.page).classList.add('active');
+    if (item.dataset.page === 'shop') renderShop();
+    if (item.dataset.page === 'profile') renderProfile();
+    if (item.dataset.page === 'inventory') renderInventory();
+    if (item.dataset.page === 'top') loadLeaderboard();
+    if (item.dataset.page === 'minigames') {
+      minitabCrypto.classList.add('active');
+      minitabRoulette.classList.remove('active');
+      miniContentCrypto.style.display = 'block';
+      miniContentRoulette.style.display = 'none';
+    }
+  });
+});
+
+minitabCrypto.addEventListener('click', () => {
+  minitabCrypto.classList.add('active');
+  minitabRoulette.classList.remove('active');
+  miniContentCrypto.style.display = 'block';
+  miniContentRoulette.style.display = 'none';
+});
+
+minitabRoulette.addEventListener('click', () => {
+  minitabCrypto.classList.remove('active');
+  minitabRoulette.classList.add('active');
+  miniContentCrypto.style.display = 'none';
+  miniContentRoulette.style.display = 'block';
+});
+
+document.querySelectorAll('.shop-tab[data-shop-tab]').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.shop-tab[data-shop-tab]').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    currentShopTab = tab.dataset.shopTab;
+    renderShop();
+  });
+});
+
 async function loadGameData() {
   try {
     const titlesSnap = await get(ref(db, 'game_data/titles'));
@@ -867,7 +882,7 @@ async function loadLeaderboard() {
       if (i < 3 && u.uid === currentUid) {
         const topTitle = TOP_TITLES[i].name;
         if (!state.purchasedTitles.includes(topTitle)) {
-          update(ref(db, 'users/' + currentUid), { purchasedTitles: [...state.purchasedTitles, topTitle] });
+          update(ref(db, 'users/' + currentUid), { purchasedTitles: [...state.purchasedTitles, topTitle] }).catch(() => {});
         }
       }
 
@@ -1061,7 +1076,7 @@ async function processMonthlyTopAndStreak(uid, data) {
 
     if (rewardStatusMsg) showStatus(rewardStatusMsg);
   } else {
-    await update(ref(db, 'users/' + uid), { lastSeenAt: nowMs });
+    await update(ref(db, 'users/' + uid), { lastSeenAt: nowMs }).catch(() => {});
   }
 }
 
@@ -1116,7 +1131,7 @@ btnClaimStreak.addEventListener('click', async () => {
 
   if (res.committed && rewardSummary) {
     showStatus(rewardSummary);
-    try { tg?.HapticFeedback?.notificationOccurred('success'); } catch(e) {}
+    try { tg?.HapticFeedback?.notificationOccurred('success'); } catch (e) {}
   }
 });
 
@@ -1145,7 +1160,7 @@ btnRestoreStreak.addEventListener('click', async () => {
 
   if (res.committed) {
     showStatus(`✅ Серію ${restoredNum} дн. відновлено! Тепер натисни «Забрати»`);
-    try { tg?.HapticFeedback?.notificationOccurred('success'); } catch(e) {}
+    try { tg?.HapticFeedback?.notificationOccurred('success'); } catch (e) {}
   }
 });
 
@@ -1265,7 +1280,7 @@ async function applyReferralCode(rawCode) {
 
     pendingStartParam = null;
     showStatus(`Тебя пригласил ${referrerNick} (+1 Легендарный кейс другу)`);
-    try { tg?.HapticFeedback?.notificationOccurred('success'); } catch(e) {}
+    try { tg?.HapticFeedback?.notificationOccurred('success'); } catch (e) {}
     referralProcessing = false;
     return true;
   } catch (err) {
@@ -1303,7 +1318,7 @@ function getReferralInviteLink() {
   return `${BOT_LINK}?startapp=${encodeURIComponent(refCode)}`;
 }
 
-window.shareReferralLink = function() {
+window.shareReferralLink = function () {
   const inviteLink = getReferralInviteLink();
   const shareText = `🐭 Грай у Hamka Game та забирай бонусний кейс!`;
   const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(inviteLink)}&text=${encodeURIComponent(shareText)}`;
@@ -1315,6 +1330,7 @@ window.shareReferralLink = function() {
 };
 
 function initGame(uid) {
+  if (unsubscribeUserData) { unsubscribeUserData(); unsubscribeUserData = null; }
   const userRef = ref(db, 'users/' + uid);
 
   get(userRef).then((snap) => {
@@ -1337,9 +1353,9 @@ function initGame(uid) {
         tap3BoostGranted: false, coinBoostMult: 1, coinBoostExpiresAt: 0,
         lastRewardMonth: getMonthKey(), lastSeenAt: Date.now(),
         createdAt: Date.now()
-      });
+      }).catch(() => {});
     }
-  }).catch(err => {});
+  }).catch(() => {});
 
   unsubscribeUserData = onValue(userRef, async (snapshot) => {
     const data = snapshot.val();
@@ -1427,19 +1443,21 @@ function initGame(uid) {
     const earnEnergy = state.upgrades.energyRate;
 
     if (earn > 0 || earnXp > 0 || (state.energy < state.maxEnergy && earnEnergy > 0)) {
-      await runTransaction(userRef, (data) => {
-        if (!data) return data;
-        let changed = false;
-        const curMult = (data.coinBoostExpiresAt && now < data.coinBoostExpiresAt) ? (data.coinBoostMult || 1) : 1;
-        const tickCoins = (data.autoTapRate || 0) * curMult;
-        if (tickCoins > 0) { data.coins = (data.coins || 0) + tickCoins; changed = true; }
-        if (earnXp > 0) { data.xp = (data.xp || 0) + earnXp; changed = true; }
-        if (earnEnergy > 0 && (data.energy ?? 0) < (data.maxEnergy ?? 200)) {
-          data.energy = Math.min(data.maxEnergy ?? 200, (data.energy || 0) + earnEnergy);
-          changed = true;
-        }
-        return changed ? data : undefined;
-      });
+      try {
+        await runTransaction(userRef, (data) => {
+          if (!data) return data;
+          let changed = false;
+          const curMult = (data.coinBoostExpiresAt && now < data.coinBoostExpiresAt) ? (data.coinBoostMult || 1) : 1;
+          const tickCoins = (data.autoTapRate || 0) * curMult;
+          if (tickCoins > 0) { data.coins = (data.coins || 0) + tickCoins; changed = true; }
+          if (earnXp > 0) { data.xp = (data.xp || 0) + earnXp; changed = true; }
+          if (earnEnergy > 0 && (data.energy ?? 0) < (data.maxEnergy ?? 200)) {
+            data.energy = Math.min(data.maxEnergy ?? 200, (data.energy || 0) + earnEnergy);
+            changed = true;
+          }
+          return changed ? data : undefined;
+        });
+      } catch (e) {}
     }
 
     renderBoostBadge();
@@ -1472,7 +1490,7 @@ function initGame(uid) {
     tapArea.appendChild(effect);
     setTimeout(() => effect.remove(), 800);
 
-    try { tg?.HapticFeedback?.impactOccurred('light'); } catch(e) {}
+    try { tg?.HapticFeedback?.impactOccurred('light'); } catch (err) {}
 
     pendingTap = true;
     try {
@@ -1538,7 +1556,7 @@ async function checkAutoPrestige() {
       }
       return data;
     });
-    try { tg?.HapticFeedback?.notificationOccurred('success'); } catch(e) {}
+    try { tg?.HapticFeedback?.notificationOccurred('success'); } catch (e) {}
   }
 }
 
@@ -1752,7 +1770,7 @@ function renderShop() {
             });
             showStatus(`✅ Ad credited! (${updatedWatches}/5)`);
           }
-        } catch(e) { showStatus('❌ Ad not completed'); }
+        } catch (e) { showStatus('❌ Ad not completed'); }
       }
     });
     return;
@@ -2065,7 +2083,7 @@ function openCaseModal(type, count) {
   document.getElementById('modal-case-qty').classList.add('show');
 }
 
-window.openCasesBatch = async function(qty) {
+window.openCasesBatch = async function (qty) {
   document.getElementById('modal-case-qty').classList.remove('show');
   if (!currentUid || !selectedCaseTypeToOpen) return;
 
@@ -2169,7 +2187,7 @@ window.openCasesBatch = async function(qty) {
 
     caseRewardText.innerText = summaryRewards.join('\n');
     btnCloseCase.style.display = 'block';
-    try { tg?.HapticFeedback?.notificationOccurred('success'); } catch(e) {}
+    try { tg?.HapticFeedback?.notificationOccurred('success'); } catch (e) {}
   }, 1500);
 };
 
@@ -2177,15 +2195,16 @@ btnCloseCase.addEventListener('click', () => {
   caseOpenOverlay.classList.remove('show');
 });
 
-let cryptoState = {};
 async function initCryptoSystem() {
   for (const symbol of COINS) {
-    const cRef = ref(db, 'crypto/' + symbol);
-    const snap = await get(cRef);
-    if (!snap.exists()) {
-      const price = INITIAL_PRICES[symbol];
-      await set(cRef, { price: price, history: [{ t: Date.now(), p: price }] });
-    }
+    try {
+      const cRef = ref(db, 'crypto/' + symbol);
+      const snap = await get(cRef);
+      if (!snap.exists()) {
+        const price = INITIAL_PRICES[symbol];
+        await set(cRef, { price: price, history: [{ t: Date.now(), p: price }] });
+      }
+    } catch (e) {}
   }
 
   onValue(ref(db, 'crypto'), (snap) => {
@@ -2414,10 +2433,10 @@ btnSpinRoulette.addEventListener('click', async () => {
 
         btnSpinRoulette.disabled = false;
         showStatus(`🎁 Reward: ${reward.text}`);
-        try { tg?.HapticFeedback?.notificationOccurred('success'); } catch(e) {}
+        try { tg?.HapticFeedback?.notificationOccurred('success'); } catch (e) {}
       }, 3100);
     }
-  } catch(e) {
+  } catch (e) {
     btnSpinRoulette.disabled = false;
     showStatus('❌ Ad not completed');
   }
